@@ -76,7 +76,7 @@ export default function AuthLayout() {
         </div>
 
         {/* Dynamic Outlet Container */}
-        <div className="w-full max-w-[420px] mx-auto my-auto py-8">
+        <div className="w-full max-w-420px mx-auto my-auto py-8">
           <Outlet />
         </div>
 
