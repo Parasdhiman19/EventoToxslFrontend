@@ -1,10 +1,18 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import API from '../services/api'
+import { setCredentials } from '../redux/slice/authSlice'
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
+  const [serverError, setServerError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const dispatch = useDispatch()
 
   const formik = useFormik({
     initialValues: {
@@ -19,8 +27,36 @@ function Login() {
         .min(8, 'Password must be at least 8 characters')
         .required('Password is required'),
     }),
-    onSubmit: (values) => {
-      console.log(values)
+    onSubmit: async (values) => {
+      setIsLoading(true)
+      setServerError(null)
+
+      try {
+        const response = await API.post('auth/login/', {
+          email: values.email,
+          password: values.password,
+        })
+
+        const { user, access } = response.data
+
+        // Store user and access token in in-memory Redux state
+        dispatch(setCredentials({ user, accessToken: access }))
+
+        // Seamless navigation: if manager/organizer, go to manager overview, else intended path
+        const isOrganizerUser = user?.isOrganizer || user?.is_organizer || user?.role === 'manager'
+        const defaultPath = isOrganizerUser ? '/manager/overview' : '/user/home'
+        const targetPath = location.state?.from?.pathname || defaultPath
+        navigate(targetPath, { replace: true })
+      } catch (err) {
+        const message =
+          err.response?.data?.non_field_errors?.[0] ||
+          err.response?.data?.detail ||
+          err.response?.data?.message ||
+          'Invalid email or password. Please try again.'
+        setServerError(message)
+      } finally {
+        setIsLoading(false)
+      }
     },
   })
 
@@ -36,6 +72,13 @@ function Login() {
         </p>
       </div>
 
+      {/* Server Error Alert */}
+      {serverError && (
+        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          {serverError}
+        </div>
+      )}
+
       {/* Form */}
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {/* Email Field */}
@@ -44,7 +87,7 @@ function Login() {
             htmlFor="email" 
             className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
           >
-            Email Address
+            Email Address <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
           </label>
           <input
             id="email"
@@ -52,7 +95,10 @@ function Login() {
             type="email"
             autoComplete="email"
             placeholder="organizer@evento.com"
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              setServerError(null)
+              formik.handleChange(e)
+            }}
             onBlur={formik.handleBlur}
             value={formik.values.email}
             className={`w-full rounded-md border bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -73,10 +119,10 @@ function Login() {
               htmlFor="password" 
               className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
             >
-              Password
+              Password <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
             </label>
             <Link 
-              to="/Account/forgot-password" 
+              to="/account/forgot-password" 
               className="text-xs text-stone-500 hover:text-stone-900 transition-colors"
             >
               Forgot password?
@@ -90,7 +136,10 @@ function Login() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               placeholder="••••••••"
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                setServerError(null)
+                formik.handleChange(e)
+              }}
               onBlur={formik.handleBlur}
               value={formik.values.password}
               className={`w-full rounded-md border bg-white pl-3.5 pr-11 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -104,7 +153,7 @@ function Login() {
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none"
+              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none cursor-pointer"
             >
               {showPassword ? (
                 /* Eye Off Icon */
@@ -119,7 +168,7 @@ function Login() {
                     d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.375l1.091 1.091a4 4 0 0 0-5.557-5.557Z"
                     clipRule="evenodd"
                   />
-                  <path d="m10.748 13.93 2.523 2.523a9.987 9.987 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z" />
+                  <path d="m10.748 13.93 2.523 2.523a9.987 9.987 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z" />
                 </svg>
               ) : (
                 /* Eye Icon */
@@ -148,9 +197,10 @@ function Login() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full cursor-pointer rounded-md bg-stone-900 py-2.5 px-4 text-sm font-medium text-stone-50 hover:bg-stone-800 active:bg-stone-950 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2"
+          disabled={isLoading}
+          className="w-full cursor-pointer rounded-md bg-stone-900 py-2.5 px-4 text-sm font-medium text-stone-50 hover:bg-stone-800 active:bg-stone-950 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign In
+          {isLoading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
 
@@ -158,7 +208,7 @@ function Login() {
       <div className="pt-2 text-center text-xs text-stone-500">
         Don&apos;t have an account?{' '}
         <Link 
-          to="/Account/signup" 
+          to="/account/signup" 
           className="font-medium text-stone-900 underline underline-offset-4 hover:text-stone-700 transition-colors"
         >
           Create one now

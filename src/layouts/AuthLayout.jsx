@@ -61,27 +61,27 @@ export default function AuthLayout() {
       </section>
 
       {/* Right Content Panel (Auth Form Injection) */}
-      <section className="col-span-1 lg:col-span-7 xl:col-span-8 flex flex-col justify-between min-h-screen px-6 py-10 sm:px-12 md:px-20">
+      <section className="col-span-1 lg:col-span-7 xl:col-span-8 flex flex-col justify-between min-h-screen px-4 sm:px-8 md:px-16 lg:px-12 xl:px-20 py-6 sm:py-10">
         {/* Mobile Header */}
-        <div className="flex items-center justify-between lg:hidden pb-8">
+        <div className="flex items-center justify-between lg:hidden pb-6 border-b border-stone-200/60 mb-2">
           <Link to="/" className="inline-flex items-center gap-2 text-base font-serif font-bold">
             <span className="h-6 w-6 rounded bg-stone-900 text-stone-50 flex items-center justify-center text-xs">
               E
             </span>
             Evento
           </Link>
-          <Link to="/explore" className="text-xs font-medium text-stone-600 hover:text-stone-900 transition-colors">
+          <Link to="/user/discover" className="text-xs font-medium text-stone-600 hover:text-stone-900 transition-colors">
             Browse Events &rarr;
           </Link>
         </div>
 
         {/* Dynamic Outlet Container */}
-        <div className="w-full max-w-420px mx-auto my-auto py-8">
+        <div className="w-full max-w-[420px] mx-auto my-auto py-4 sm:py-8">
           <Outlet />
         </div>
 
         {/* Sub-footer */}
-        <footer className="text-center lg:text-left text-xs text-stone-400 pt-8 border-t border-stone-200/80 lg:border-none">
+        <footer className="text-center lg:text-left text-xs text-stone-400 pt-6 border-t border-stone-200/80 lg:border-none">
           <p>Secure ticketing and verified checkout powered by Evento.</p>
         </footer>
       </section>

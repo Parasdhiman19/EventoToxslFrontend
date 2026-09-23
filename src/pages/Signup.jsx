@@ -1,11 +1,18 @@
-import React, { useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import API from '../services/api'
+import { setCredentials } from '../redux/slice/authSlice'
 
 function Signup() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [serverError, setServerError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const formik = useFormik({
     initialValues: {
@@ -37,8 +44,40 @@ function Signup() {
         .oneOf([Yup.ref('password')], 'Passwords must match')
         .required('Please confirm your password'),
     }),
-    onSubmit: (values) => {
-      console.log('Signup Values:', values)
+    onSubmit: async (values) => {
+      setIsLoading(true)
+      setServerError(null)
+
+      try {
+        const response = await API.post('auth/signup/', {
+          fullName: values.fullName,
+          email: values.email,
+          password: values.password,
+          role: values.role,
+        })
+
+        const { user, access } = response.data
+
+        // Store user and access token in in-memory Redux state
+        dispatch(setCredentials({ user, accessToken: access }))
+
+        // Redirection: if initial choice was host, enter manager studio, else explore
+        if (user?.isOrganizer || user?.role === 'manager') {
+          navigate('/manager/overview')
+        } else {
+          navigate('/user/home')
+        }
+      } catch (err) {
+        const message =
+          err.response?.data?.email?.[0] ||
+          err.response?.data?.password?.[0] ||
+          err.response?.data?.non_field_errors?.[0] ||
+          err.response?.data?.detail ||
+          'Failed to create account. Please check your information.'
+        setServerError(message)
+      } finally {
+        setIsLoading(false)
+      }
     },
   })
 
@@ -78,6 +117,13 @@ function Signup() {
           Join Evento to discover events or host your own stage.
         </p>
       </div>
+
+      {/* Server Error Alert */}
+      {serverError && (
+        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          {serverError}
+        </div>
+      )}
 
       {/* Form */}
       <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -119,7 +165,7 @@ function Signup() {
             htmlFor="fullName"
             className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
           >
-            Full Name
+            Full Name <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
           </label>
           <input
             id="fullName"
@@ -127,7 +173,10 @@ function Signup() {
             type="text"
             autoComplete="name"
             placeholder="Jane Doe"
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              setServerError(null)
+              formik.handleChange(e)
+            }}
             onBlur={formik.handleBlur}
             value={formik.values.fullName}
             className={`w-full rounded-md border bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -147,7 +196,7 @@ function Signup() {
             htmlFor="email"
             className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
           >
-            Email Address
+            Email Address <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
           </label>
           <input
             id="email"
@@ -155,7 +204,10 @@ function Signup() {
             type="email"
             autoComplete="email"
             placeholder="organizer@evento.com"
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              setServerError(null)
+              formik.handleChange(e)
+            }}
             onBlur={formik.handleBlur}
             value={formik.values.email}
             className={`w-full rounded-md border bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -176,7 +228,7 @@ function Signup() {
               htmlFor="password"
               className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
             >
-              Password
+              Password <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
             </label>
             {formik.values.password && (
               <span className={`text-[11px] font-mono font-medium ${strength.text}`}>
@@ -192,7 +244,10 @@ function Signup() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               placeholder="••••••••"
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                setServerError(null)
+                formik.handleChange(e)
+              }}
               onBlur={formik.handleBlur}
               value={formik.values.password}
               className={`w-full rounded-md border bg-white pl-3.5 pr-11 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -246,7 +301,7 @@ function Signup() {
             htmlFor="confirmPassword"
             className="block text-xs font-medium uppercase tracking-wider text-stone-700 font-mono"
           >
-            Confirm Password
+            Confirm Password <span style={{ color: 'red', position: 'relative', top: '-3px' }}>*</span>
           </label>
           <div className="relative">
             <input
@@ -255,7 +310,10 @@ function Signup() {
               type={showConfirmPassword ? 'text' : 'password'}
               autoComplete="new-password"
               placeholder="••••••••"
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                setServerError(null)
+                formik.handleChange(e)
+              }}
               onBlur={formik.handleBlur}
               value={formik.values.confirmPassword}
               className={`w-full rounded-md border bg-white pl-3.5 pr-11 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all ${
@@ -291,9 +349,10 @@ function Signup() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full cursor-pointer rounded-md bg-stone-900 py-2.5 px-4 text-sm font-medium text-stone-50 hover:bg-stone-800 active:bg-stone-950 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2 pt-2.5"
+          disabled={isLoading}
+          className="w-full cursor-pointer rounded-md bg-stone-900 py-2.5 px-4 text-sm font-medium text-stone-50 hover:bg-stone-800 active:bg-stone-950 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2 pt-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Account
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
 
@@ -301,7 +360,7 @@ function Signup() {
       <div className="pt-2 text-center text-xs text-stone-500">
         Already have an account?{' '}
         <Link
-          to="/Account/login"
+          to="/account/login"
           className="font-medium text-stone-900 underline underline-offset-4 hover:text-stone-700 transition-colors"
         >
           Sign in
