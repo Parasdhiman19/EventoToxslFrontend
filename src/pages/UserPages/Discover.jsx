@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Sparkles,
   ShieldCheck,
@@ -20,8 +21,11 @@ import FeedRightSidebar from '../../components/feed/FeedRightSidebar'
 import FeedEventCard from '../../components/feed/FeedEventCard'
 import FeedSkeleton from '../../components/feed/FeedSkeleton'
 import CommentDrawer from '../../components/feed/CommentDrawer'
+import { useAuthPrompt } from '../../context/AuthPromptContext'
 
 export default function Discover() {
+  const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { openAuthPrompt } = useAuthPrompt()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialQuery = searchParams.get('q') || ''
   const initialCategory = searchParams.get('category') || 'All'
@@ -236,6 +240,16 @@ export default function Discover() {
       e.preventDefault()
       e.stopPropagation()
     }
+
+    if (!isAuthenticated) {
+      openAuthPrompt({
+        actionType: 'bookmark',
+        title: 'Save to Your Wishlist',
+        subtitle: 'Sign in or register to bookmark stages and receive notifications before passes sell out.',
+      })
+      return
+    }
+
     const strId = String(id)
     const isCurrentlyBookmarked = bookmarkedIds.includes(strId)
 

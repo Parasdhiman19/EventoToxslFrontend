@@ -21,6 +21,8 @@ import {
 } from 'lucide-react'
 import API from '../services/api'
 import { logout, updateUser } from '../redux/slice/authSlice'
+import Footer from '../components/layout/Footer'
+import { useAuthPrompt } from '../context/AuthPromptContext'
 
 export default function UserLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -80,6 +82,7 @@ export default function UserLayout() {
   const location = useLocation()
   const dispatch = useDispatch()
   const { user, isOrganizer, isAuthenticated } = useSelector((state) => state.auth)
+  const { openAuthPrompt } = useAuthPrompt()
 
   // Load events for instant search dropdown
   const loadSearchEvents = async () => {
@@ -171,9 +174,9 @@ export default function UserLayout() {
     setIsSearchOpen(false)
     const q = headerSearch.trim()
     if (q) {
-      navigate(`/user/discover?q=${encodeURIComponent(q)}`)
+      navigate(`/discover?q=${encodeURIComponent(q)}`)
     } else {
-      navigate('/user/discover')
+      navigate('/discover')
     }
   }
 
@@ -198,7 +201,11 @@ export default function UserLayout() {
   const handleOpenBecomeOrganizer = () => {
     setIsMobileMenuOpen(false)
     if (!isAuthenticated) {
-      navigate('/account/login')
+      openAuthPrompt({
+        actionType: 'host',
+        title: 'Host Experiences on Evento',
+        subtitle: 'Sign in or create an organizer account to host events, design seating plans, and sell passes.',
+      })
       return
     }
     setOrgForm({
@@ -236,13 +243,41 @@ export default function UserLayout() {
     }
   }
 
-  const navLinks = [
-    { name: 'Home', path: '/user/home', icon: HomeIcon },
-    { name: 'Discover', path: '/user/discover', icon: Compass },
-    { name: 'My Tickets', path: '/user/tickets', icon: Ticket },
-    { name: 'Saved', path: '/user/saved', icon: Bookmark },
-    { name: 'Orders', path: '/user/orders', icon: Receipt },
-  ]
+  const navLinks = useMemo(() => {
+    if (isAuthenticated) {
+      return [
+        { name: 'Home', path: '/', icon: HomeIcon },
+        { name: 'Discover', path: '/discover', icon: Compass },
+        { name: 'My Tickets', path: '/user/tickets', icon: Ticket },
+        { name: 'Saved', path: '/user/saved', icon: Bookmark },
+        { name: 'Orders', path: '/user/orders', icon: Receipt },
+      ]
+    }
+    return [
+      { name: 'Home', path: '/', icon: HomeIcon },
+      { name: 'Discover', path: '/discover', icon: Compass },
+      { name: 'About', path: '/about', icon: Sparkles },
+    ]
+  }, [isAuthenticated])
+
+  const mobileBottomLinks = useMemo(() => {
+    if (isAuthenticated) {
+      return [
+        { name: 'Home', path: '/', icon: HomeIcon },
+        { name: 'Discover', path: '/discover', icon: Compass },
+        { name: 'Tickets', path: '/user/tickets', icon: Ticket },
+        { name: 'Saved', path: '/user/saved', icon: Bookmark },
+        { name: 'Orders', path: '/user/orders', icon: Receipt },
+      ]
+    }
+    return [
+      { name: 'Home', path: '/', icon: HomeIcon },
+      { name: 'Discover', path: '/discover', icon: Compass },
+      { name: 'Saved', path: '/user/saved', icon: Bookmark, isAuthGated: true, authAction: 'bookmark' },
+      { name: 'About', path: '/about', icon: Sparkles },
+      { name: 'Sign In', path: '/account/login', icon: UserIcon },
+    ]
+  }, [isAuthenticated])
 
   const userHasOrganizerAccess = isOrganizer || user?.isOrganizer || user?.role === 'manager'
   const isDiscoverPage = location.pathname.includes('/discover')
@@ -261,7 +296,7 @@ export default function UserLayout() {
           }`}>
             
             {/* Left: Brand Logo & Desktop Nav */}
-            <div className="flex items-center gap-6 shrink-0">
+            <div className="flex items-center gap-2 lg:gap-6 shrink-0">
               <Link to="/" className="inline-flex items-center gap-2.5 group">
                 <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-stone-50 font-serif font-bold shadow-xs ring-1 ring-stone-900/10 group-hover:scale-105 group-hover:shadow-md transition-all duration-300 ${
                   isScrolled ? 'w-7 h-7 text-sm sm:w-8 sm:h-8 sm:text-base' : 'w-8 h-8 text-base'
@@ -283,8 +318,8 @@ export default function UserLayout() {
                 </div>
               </Link>
 
-              {/* Desktop Nav Links */}
-              <nav className="hidden lg:flex items-center gap-1 p-1 bg-stone-100/70 rounded-full border border-stone-200/70 backdrop-blur-xs">
+              {/* Desktop & Tablet Nav Links (Always visible from md breakpoint onwards) */}
+              <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 p-1 bg-stone-100/70 rounded-full border border-stone-200/70 backdrop-blur-xs">
                 {navLinks.map((link) => {
                   const Icon = link.icon
                   return (
@@ -292,7 +327,7 @@ export default function UserLayout() {
                       key={link.path}
                       to={link.path}
                       className={({ isActive }) =>
-                        `flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none ${
+                        `flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none ${
                           isActive
                             ? 'bg-stone-900 text-stone-50 shadow-xs font-semibold'
                             : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/60'
@@ -307,8 +342,8 @@ export default function UserLayout() {
               </nav>
             </div>
 
-            {/* Middle: Working Interactive Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-sm xl:max-w-md relative" ref={searchRef}>
+            {/* Middle: Working Interactive Search Bar (Responsive sizing on tablet/desktop) */}
+            <div className="hidden md:flex flex-1 min-w-0 max-w-[160px] lg:max-w-xs xl:max-w-md relative" ref={searchRef}>
               <form onSubmit={handleHeaderSearchSubmit} className="w-full relative group">
                 <input
                   ref={searchInputRef}
@@ -378,7 +413,7 @@ export default function UserLayout() {
                           className="w-full p-3 text-left hover:bg-stone-50 transition-colors flex items-center gap-3.5 cursor-pointer group"
                         >
                           <img
-                            src={ev.image || ev.banner || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=200&q=80'}
+                            src={ev.image || ev.banner || '/emptybanner.jpg'}
                             alt={ev.title}
                             className="w-12 h-12 rounded-xl object-cover bg-stone-100 shrink-0 border border-stone-200/80 shadow-2xs group-hover:scale-102 transition-transform"
                           />
@@ -454,30 +489,61 @@ export default function UserLayout() {
                     onClick={() => setIsProfileOpen((prev) => !prev)}
                     className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full border border-stone-200/80 bg-white hover:border-stone-300 hover:bg-stone-50 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-stone-900/5"
                   >
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-stone-50 text-[11px] font-bold flex items-center justify-center font-mono shadow-2xs">
-                      {user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'ME'}
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-stone-50 text-[11px] font-bold flex items-center justify-center font-mono shadow-2xs overflow-hidden">
+                      {user?.avatarUrl || user?.avatar_url ? (
+                        <img
+                          src={user.avatarUrl || user.avatar_url}
+                          alt={user?.fullName || 'User'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'ME'}</span>
+                      )}
                     </div>
                     <span className="text-xs font-medium text-stone-800 max-w-[110px] truncate hidden xl:inline-block">
-                      {user?.fullName || 'Attendee'}
+                      {user?.fullName || (user?.username ? `@${user.username}` : 'Attendee')}
                     </span>
                     <ChevronDown size={13} className={`text-stone-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180 text-stone-900' : ''}`} />
                   </button>
 
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-stone-200 shadow-2xl py-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150 divide-y divide-stone-100">
-                      <div className="px-4 py-3 bg-stone-50/60">
-                        <div className="flex items-center justify-between">
-                          <p className="font-semibold text-stone-900 truncate">{user?.fullName || 'Attendee'}</p>
-                          {userHasOrganizerAccess && (
-                            <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded-full bg-stone-900 text-stone-50 font-medium">
-                              Host
-                            </span>
+                      <div className="px-4 py-3 bg-stone-50/60 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-stone-900 text-stone-50 font-bold flex items-center justify-center text-xs font-mono shadow-2xs overflow-hidden shrink-0 border border-stone-200">
+                          {user?.avatarUrl || user?.avatar_url ? (
+                            <img
+                              src={user.avatarUrl || user.avatar_url}
+                              alt={user?.fullName || 'User'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span>{user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'ME'}</span>
                           )}
                         </div>
-                        <p className="text-[11px] font-mono text-stone-400 truncate mt-0.5">{user?.email}</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="font-semibold text-stone-900 truncate">{user?.fullName || 'Attendee'}</p>
+                            {userHasOrganizerAccess && (
+                              <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-stone-900 text-stone-50 font-medium shrink-0">
+                                Host
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] font-mono text-stone-500 truncate">
+                            {user?.username ? `@${user.username}` : user?.email}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="py-1.5 px-1.5 space-y-0.5">
+                        <Link
+                          to="/user/profile"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-stone-700 hover:bg-stone-100 hover:text-stone-950 transition font-medium"
+                        >
+                          <UserIcon size={14} className="text-stone-500" />
+                          <span>Profile &amp; Settings</span>
+                        </Link>
                         <Link
                           to="/user/tickets"
                           onClick={() => setIsProfileOpen(false)}
@@ -546,12 +612,23 @@ export default function UserLayout() {
                   )}
                 </div>
               ) : (
-                <Link
-                  to="/account/login"
-                  className="px-4 py-1.5 rounded-full bg-stone-900 text-stone-50 text-xs font-medium hover:bg-stone-800 transition-all shadow-xs"
-                >
-                  Sign In
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/account/login"
+                    state={{ from: location }}
+                    className="px-3.5 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300 text-stone-700 hover:text-stone-950 text-xs font-medium transition shadow-2xs cursor-pointer"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/account/signup"
+                    state={{ from: location }}
+                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-50 text-xs font-medium transition shadow-xs group cursor-pointer active:scale-95"
+                  >
+                    <span>Sign Up</span>
+                    <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
               )}
             </div>
 
@@ -640,7 +717,7 @@ export default function UserLayout() {
                 onSubmit={(e) => {
                   e.preventDefault()
                   setIsMobileMenuOpen(false)
-                  navigate(`/user/discover?q=${encodeURIComponent(headerSearch.trim())}`)
+                  navigate(`/discover?q=${encodeURIComponent(headerSearch.trim())}`)
                 }} 
                 className="mt-4 relative group"
               >
@@ -654,22 +731,67 @@ export default function UserLayout() {
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
               </form>
 
+              {/* Navigation Links in Mobile Drawer */}
+              <div className="mt-4 space-y-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon
+                  return (
+                    <NavLink
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                          isActive
+                            ? 'bg-stone-900 text-stone-50 font-semibold shadow-xs'
+                            : 'text-stone-700 hover:bg-stone-100'
+                        }`
+                      }
+                    >
+                      <Icon size={16} />
+                      <span>{link.name}</span>
+                    </NavLink>
+                  )
+                })}
+              </div>
+
               {/* Authenticated User Badge in Mobile Drawer */}
               {isAuthenticated && (
-                <div className="my-4 flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 shadow-2xs">
-                  <div className="h-9 w-9 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-                    {user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'ME'}
+                <Link
+                  to="/user/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="my-4 flex items-center gap-3 p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 shadow-2xs transition active:scale-[0.98] group"
+                >
+                  <div className="h-10 w-10 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 overflow-hidden border border-stone-200 shadow-2xs">
+                    {user?.avatarUrl || user?.avatar_url ? (
+                      <img
+                        src={user.avatarUrl || user.avatar_url}
+                        alt={user?.fullName || 'User'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'ME'}</span>
+                    )}
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-stone-900 truncate">{user?.fullName || 'Attendee'}</span>
+                      <span className="text-xs font-semibold text-stone-900 truncate group-hover:text-amber-900 transition-colors">
+                        {user?.fullName || 'Attendee'}
+                      </span>
                       {userHasOrganizerAccess && (
-                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-stone-200 text-stone-800 font-medium">Host</span>
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-stone-900 text-stone-50 font-medium">
+                          Host
+                        </span>
                       )}
                     </div>
-                    <span className="text-[11px] font-mono text-stone-500 truncate">{user?.email}</span>
+                    <span className="text-[11px] font-mono text-stone-500 truncate">
+                      {user?.username ? `@${user.username}` : user?.email}
+                    </span>
                   </div>
-                </div>
+                  <span className="text-[11px] font-mono font-medium text-stone-400 group-hover:text-stone-900 transition-colors">
+                    Edit &rarr;
+                  </span>
+                </Link>
               )}
 
               {/* Mode Switch or Become Organizer Card */}
@@ -907,22 +1029,8 @@ export default function UserLayout() {
               <Outlet />
             </main>
 
-            {/* Footer (hidden on mobile discover to allow 100dvh full-screen feed, visible on desktop and other pages) */}
-            <footer className={`border-t border-stone-200 bg-stone-100/60 mt-auto pb-28 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`}>
-              <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 text-center sm:text-left">
-                <div className="flex items-center gap-2">
-                  <span className="font-serif font-semibold text-stone-900">Evento</span>
-                  <span>&mdash; Curated experiences, live ticketing &amp; community gatherings.</span>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-                  <Link to="/user/discover" className="hover:text-stone-900 transition-colors">Explore</Link>
-                  <Link to="/terms" className="hover:text-stone-900 transition-colors">Terms</Link>
-                  <Link to="/privacy" className="hover:text-stone-900 transition-colors">Privacy</Link>
-                  <span className="font-mono text-stone-400">&copy; {new Date().getFullYear()}</span>
-                </div>
-              </div>
-            </footer>
+            {/* Reusable Detailed Footer (hidden on mobile discover to allow 100dvh full-screen feed, visible on desktop and other pages) */}
+            <Footer className={`mt-auto pb-24 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`} />
 
             {/* Instagram-Style Mobile Bottom Navigation Bar */}
             <nav 
@@ -930,13 +1038,26 @@ export default function UserLayout() {
               className="fixed bottom-0 inset-x-0 z-40 md:hidden h-16 bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
             >
               <div className="grid grid-cols-5 items-center justify-around w-full max-w-md mx-auto">
-                {navLinks.map((link) => {
+                {mobileBottomLinks.map((link) => {
                   const Icon = link.icon
-                  const isActive = location.pathname === link.path || (link.path === '/user/home' && (location.pathname === '/' || location.pathname === '/user/home'))
+                  const isActive = (link.path === '/' && location.pathname === '/') || 
+                                   (link.path !== '/' && location.pathname.startsWith(link.path))
+                  
+                  const handleClick = (e) => {
+                    if (link.isAuthGated && !isAuthenticated) {
+                      e.preventDefault()
+                      openAuthPrompt({
+                        actionType: link.authAction || 'general',
+                        redirectPath: link.path,
+                      })
+                    }
+                  }
+
                   return (
                     <Link
-                      key={link.path}
+                      key={link.name}
                       to={link.path}
+                      onClick={handleClick}
                       className={`flex flex-col items-center justify-center gap-1 py-1 px-1 rounded-xl transition-all duration-200 select-none active:scale-90 ${
                         isActive
                           ? 'text-stone-950 font-semibold'

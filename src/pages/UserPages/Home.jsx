@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   Flame,
@@ -14,14 +14,18 @@ import {
   Building2,
   RefreshCw,
   AlertCircle,
+  Search,
 } from 'lucide-react'
 import API from '../../services/api'
 import HomeHeroBanner from '../../components/home/HomeHeroBanner'
+import HomeCategorySection from '../../components/home/HomeCategorySection'
 import HomeEventSection from '../../components/home/HomeEventSection'
 
 export default function Home() {
+  const navigate = useNavigate()
   const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
 
+  const [searchQuery, setSearchQuery] = useState('')
   const [allEvents, setAllEvents] = useState([])
   const [featuredHero, setFeaturedHero] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -128,8 +132,8 @@ export default function Home() {
   const trendingEvents = useMemo(() => {
     return [...allEvents]
       .sort((a, b) => {
-        const scoreA = (a.is_featured || a.isFeatured ? 50 : 0) + (a.likesCount || 0) * 3 + (a.ticketsSold || 0) * 2
-        const scoreB = (b.is_featured || b.isFeatured ? 50 : 0) + (b.likesCount || 0) * 3 + (b.ticketsSold || 0) * 2
+        const scoreA = (a.is_featured || a.isFeatured ? 50 : 0) + (a.likesCount || 0) * 3 + (a.commentsCount || 0) * 2
+        const scoreB = (b.is_featured || b.isFeatured ? 50 : 0) + (b.likesCount || 0) * 3 + (b.commentsCount || 0) * 2
         return scoreB - scoreA
       })
       .slice(0, 8)
@@ -173,10 +177,48 @@ export default function Home() {
     )
   }
 
+  // Handle standalone search submit
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/discover?q=${encodeURIComponent(searchQuery.trim())}`)
+    } else {
+      navigate('/discover')
+    }
+  }
+
   return (
-    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12">
+    <div className="max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 space-y-8 sm:space-y-10">
       {/* 1. Hero Spotlight Auto-scrolling Banner */}
       <HomeHeroBanner featuredEvents={heroSlides} />
+
+      {/* 2. Standalone Search Bar */}
+      <div className="max-w-3xl mx-auto w-full">
+        <form
+          onSubmit={handleSearch}
+          className="flex items-center bg-white border border-stone-200/90 rounded-2xl p-1.5 sm:p-2 shadow-xs hover:shadow-md hover:border-stone-300 transition-all duration-200"
+        >
+          <div className="pl-3 pr-2 text-stone-400">
+            <Search className="w-5 h-5" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search events, festivals, workshops, cities..."
+            className="w-full bg-transparent text-stone-900 placeholder:text-stone-400 text-sm sm:text-base outline-none pr-2"
+          />
+          <button
+            type="submit"
+            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all duration-150 shrink-0 shadow-xs cursor-pointer"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {/* 3. Browse by Category Section */}
+      <HomeCategorySection />
 
       {/* Error Notice with Retry */}
       {error && (
@@ -196,13 +238,13 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2. Trending / Selling Fast Section */}
+      {/* 4. Trending / Selling Fast Section */}
       <HomeEventSection
         title="Trending Events"
         subtitle="The most popular experiences and hot-ticket stages right now"
         icon={Flame}
         badge="Popular"
-        viewAllLink="/user/discover?sort=featured"
+        viewAllLink="/discover?sort=featured"
         events={trendingEvents}
         isLoading={isLoading}
         onBookmarkChange={handleBookmarkChange}
@@ -215,7 +257,7 @@ export default function Home() {
           subtitle="Acoustic sets, electronic festivals, and world-class tours"
           icon={Music}
           badge="Live"
-          viewAllLink="/user/discover?category=Music%20%26%20Concerts"
+          viewAllLink="/discover?category=Music%20%26%20Concerts"
           events={musicEvents}
           isLoading={isLoading}
           onBookmarkChange={handleBookmarkChange}
@@ -278,7 +320,7 @@ export default function Home() {
           subtitle="Developer symposiums, AI summits, and startup networkings"
           icon={Laptop}
           badge="Tech"
-          viewAllLink="/user/discover?category=Tech%20%26%20Conferences"
+          viewAllLink="/discover?category=Tech%20%26%20Conferences"
           events={techEvents}
           isLoading={isLoading}
           onBookmarkChange={handleBookmarkChange}
@@ -292,7 +334,7 @@ export default function Home() {
           subtitle="Top DJs, rooftop lounges, and weekend after-parties"
           icon={Moon}
           badge="Nightlife"
-          viewAllLink="/user/discover?category=Nightlife"
+          viewAllLink="/discover?category=Nightlife"
           events={nightlifeEvents}
           isLoading={isLoading}
           onBookmarkChange={handleBookmarkChange}
@@ -306,7 +348,7 @@ export default function Home() {
           subtitle="Masterclasses, culinary tastings, and hands-on skill labs"
           icon={Wrench}
           badge="Explore"
-          viewAllLink="/user/discover?category=Workshops"
+          viewAllLink="/discover?category=Workshops"
           events={workshopEvents}
           isLoading={isLoading}
           onBookmarkChange={handleBookmarkChange}

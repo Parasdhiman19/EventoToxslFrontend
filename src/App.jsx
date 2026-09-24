@@ -5,8 +5,7 @@ import API from './services/api'
 import { setCredentials, setInitialized, logout } from './redux/slice/authSlice'
 
 // Route Guards
-import GuestRoute from './components/GuestRoute'
-import ProtectedRoute from './components/ProtectedRoute'
+import { GuestRoute, ProtectedRoute } from './routes'
 
 // Landing Page
 import LandingPage from './pages/LandingPage'
@@ -15,6 +14,8 @@ import LandingPage from './pages/LandingPage'
 import AuthLayout from './layouts/AuthLayout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 // Manager Pages & Layout
 import ManagerLayout from './layouts/ManagerLayout'
@@ -36,6 +37,10 @@ import EventDetail from './pages/UserPages/EventDetail'
 import MyTickets from './pages/UserPages/MyTickets'
 import Saved from './pages/UserPages/Saved'
 import Orders from './pages/UserPages/Orders'
+import Profile from './pages/UserPages/Profile'
+
+import ScrollToTop from './components/ScrollToTop'
+import { AuthPromptProvider } from './context/AuthPromptContext'
 
 function App() {
   const dispatch = useDispatch()
@@ -77,56 +82,67 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Guest-Only / Public Routes (Landing, Login, Signup) */}
-        <Route element={<GuestRoute />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/landing" element={<Navigate to="/" replace />} />
-          <Route path="/account" element={<AuthLayout />}>
-            <Route index element={<Navigate to="login" replace />} />
-            <Route path="login" element={<Login />} />
-            <Route path="signup" element={<Signup />} />
+      <ScrollToTop />
+      <AuthPromptProvider>
+        <Routes>
+          {/* Public / Open Discovery Routes (Accessible to Guests & Authenticated Users Alike) */}
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/events/:eventId" element={<EventDetail />} />
+            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/about" element={<LandingPage />} />
           </Route>
-          <Route path="/Account/*" element={<Navigate to="/account" replace />} />
-        </Route>
 
-        {/* Manager Routes (Protected - Requires Organizer Capability) */}
-        <Route element={<ProtectedRoute requiresOrganizer={true} />}>
-          <Route path="/manager" element={<ManagerLayout />}>
-            <Route index element={<Navigate to="overview" replace />} />
-            <Route path="overview" element={<Overview />} />
-            <Route path="events" element={<MyEvents />} />
-            <Route path="events/create" element={<CreateEvent />} />
-            <Route path="events/:eventId" element={<EventDashboard />} />
-            <Route path="events/:eventId/edit" element={<EditEvent />} />
-            <Route path="tickets" element={<TicketSales />} />
-            <Route path="attendees" element={<Attendees />} />
-            <Route path="payouts" element={<PayoutsAndRevenue />} />
-            <Route path="settings" element={<OrganizerSettings />} />
+          {/* Guest-Only Auth Routes (Login, Signup, Password Recovery) */}
+          <Route element={<GuestRoute />}>
+            <Route path="/account" element={<AuthLayout />}>
+              <Route index element={<Navigate to="login" replace />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
+            </Route>
+            <Route path="/Account/*" element={<Navigate to="/account" replace />} />
           </Route>
-          <Route path="/Manager/*" element={<Navigate to="/manager" replace />} />
-        </Route>
 
-        {/* User / Attendee Routes (Protected - Accessible to ALL Authenticated Users) */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/user" element={<UserLayout />}>
-            <Route index element={<Navigate to="home" replace />} />
-            <Route path="home" element={<Home />} />
-            <Route path="discover" element={<Discover />} />
-            <Route path="events/:eventId" element={<EventDetail />} />
-            <Route path="tickets" element={<MyTickets />} />
-            <Route path="saved" element={<Saved />} />
-            <Route path="orders" element={<Orders />} />
+          {/* Manager Routes (Protected - Requires Organizer Capability) */}
+          <Route element={<ProtectedRoute requiresOrganizer={true} />}>
+            <Route path="/manager" element={<ManagerLayout />}>
+              <Route index element={<Navigate to="overview" replace />} />
+              <Route path="overview" element={<Overview />} />
+              <Route path="events" element={<MyEvents />} />
+              <Route path="events/create" element={<CreateEvent />} />
+              <Route path="events/:eventId" element={<EventDashboard />} />
+              <Route path="events/:eventId/edit" element={<EditEvent />} />
+              <Route path="tickets" element={<TicketSales />} />
+              <Route path="attendees" element={<Attendees />} />
+              <Route path="payouts" element={<PayoutsAndRevenue />} />
+              <Route path="settings" element={<OrganizerSettings />} />
+            </Route>
+            <Route path="/Manager/*" element={<Navigate to="/manager" replace />} />
           </Route>
-          <Route path="/events/:eventId" element={<UserLayout />}>
-            <Route index element={<EventDetail />} />
-          </Route>
-          <Route path="/User/*" element={<Navigate to="/user" replace />} />
-        </Route>
 
-        {/* 404 / Catch-all Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* User Protected Routes (Tickets, Saved Bookmarks, Order Invoices) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/user" element={<UserLayout />}>
+              <Route index element={<Navigate to="/" replace />} />
+              <Route path="home" element={<Navigate to="/" replace />} />
+              <Route path="discover" element={<Navigate to="/discover" replace />} />
+              <Route path="events/:eventId" element={<EventDetail />} />
+              <Route path="tickets" element={<MyTickets />} />
+              <Route path="saved" element={<Saved />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+            <Route path="/User/*" element={<Navigate to="/" replace />} />
+          </Route>
+
+          {/* 404 / Catch-all Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthPromptProvider>
     </BrowserRouter>
   )
 }

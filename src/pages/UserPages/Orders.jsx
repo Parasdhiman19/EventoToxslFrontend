@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Receipt, Ticket, Calendar, DollarSign, Download, Printer, X, ExternalLink } from 'lucide-react'
 import API from '../../services/api'
+import ReceiptModal from '../../components/modals/ReceiptModal'
 
 export default function Orders() {
   const [orders, setOrders] = useState([])
@@ -240,7 +241,7 @@ export default function Orders() {
             <p className="text-xs text-stone-500">When you book tickets for any experience, your invoices will show here.</p>
           </div>
           <Link
-            to="/user/discover"
+            to="/discover"
             className="inline-block rounded-md bg-stone-900 px-5 py-2.5 text-xs font-mono font-medium uppercase tracking-wider text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs"
           >
             Explore Events &rarr;
@@ -249,92 +250,10 @@ export default function Orders() {
       )}
 
       {/* Invoice Receipt Modal */}
-      {selectedReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-lg rounded-xl bg-white text-stone-900 overflow-hidden shadow-2xl border border-stone-200 p-6 sm:p-8 space-y-6 relative">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedReceipt(null)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-900 p-1 cursor-pointer font-mono"
-            >
-              ✕
-            </button>
-
-            {/* Receipt Header */}
-            <div className="flex items-center justify-between border-b border-stone-200 pb-4">
-              <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded bg-stone-900 text-stone-50 flex items-center justify-center font-sans font-bold text-xs">
-                  E
-                </span>
-                <span className="font-serif font-semibold text-base">Evento Checkout</span>
-              </div>
-              <div className="text-right">
-                <span className="text-[10px] font-mono uppercase text-stone-400 block">Receipt</span>
-                <span className="text-xs font-mono font-medium text-stone-900">{selectedReceipt.id}</span>
-              </div>
-            </div>
-
-            {/* Event Summary */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400">Event Experience</span>
-              <h3 className="font-serif text-lg font-medium text-stone-900">{selectedReceipt.eventTitle || selectedReceipt.event}</h3>
-              <p className="text-xs text-stone-500">{selectedReceipt.venue || 'Main Venue'}</p>
-              <p className="text-xs font-mono text-stone-500">Date: {selectedReceipt.eventDate || selectedReceipt.date}</p>
-            </div>
-
-            {/* Line Items Breakdown */}
-            <div className="rounded-md bg-stone-50 border border-stone-200/80 p-4 space-y-2 text-xs">
-              <div className="flex items-center justify-between font-mono">
-                <span className="text-stone-600">
-                  {selectedReceipt.tier} (&times;{selectedReceipt.quantity || selectedReceipt.qty})
-                </span>
-                <span className="text-stone-900 font-medium">
-                  {selectedReceipt.unitPrice}
-                </span>
-              </div>
-              <div className="flex items-center justify-between font-mono text-stone-500">
-                <span>Platform &amp; Gate Service Fees</span>
-                <span>{selectedReceipt.fees || '$0.00'}</span>
-              </div>
-              <div className="border-t border-stone-200 pt-2 flex items-center justify-between font-mono font-semibold text-stone-900 text-sm">
-                <span>Total Amount Paid</span>
-                <span>{selectedReceipt.total}</span>
-              </div>
-            </div>
-
-            {/* Payment Meta */}
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-t border-stone-100 pt-2">
-              <div>
-                <span className="text-stone-400 text-[10px] uppercase block">Payment Method</span>
-                <span className="text-stone-700">{selectedReceipt.paymentMethod || 'Instant Pass'}</span>
-              </div>
-              <div className="text-right">
-                <span className="text-stone-400 text-[10px] uppercase block">Timestamp</span>
-                <span className="text-stone-700">{selectedReceipt.date} • {selectedReceipt.time}</span>
-              </div>
-            </div>
-
-            {/* Print / Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="rounded-md border border-stone-300 px-4 py-2 text-xs font-mono font-medium text-stone-700 hover:bg-stone-50 transition-colors cursor-pointer"
-              >
-                Print Receipt
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedReceipt(null)}
-                className="rounded-md bg-stone-900 px-4 py-2 text-xs font-mono font-medium text-stone-50 hover:bg-stone-800 transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReceiptModal
+        receipt={selectedReceipt}
+        onClose={() => setSelectedReceipt(null)}
+      />
     </div>
   )
 }

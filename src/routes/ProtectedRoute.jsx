@@ -26,18 +26,17 @@ export default function ProtectedRoute({ requiresOrganizer, allowedRoles, childr
   // 3. Organizer Capability check: if route requires organizer capability
   const isUserAnOrganizer = isOrganizer || role === 'manager'
   if (requiresOrganizer && !isUserAnOrganizer) {
-    return <Navigate to="/user/discover" replace />
+    return <Navigate to="/discover" replace />
   }
 
   // Legacy allowedRoles support
   if (allowedRoles && Array.isArray(allowedRoles)) {
     const managerOnly = allowedRoles.includes('manager') && !allowedRoles.includes('user')
     if (managerOnly && !isUserAnOrganizer) {
-      return <Navigate to="/user/discover" replace />
+      return <Navigate to="/discover" replace />
     }
   }
 
   // 4. Authenticated & permitted: render children or Outlet
   return children ? children : <Outlet />
 }
-

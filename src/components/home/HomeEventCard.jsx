@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Calendar, MapPin, Bookmark, Flame } from 'lucide-react'
 import { toggleEventBookmark } from '../../services/socialApi'
+import { useAuthPrompt } from '../../context/AuthPromptContext'
 
-const DEFAULT_BANNER =
-  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
+const DEFAULT_BANNER = '/emptybanner.jpg'
 
 export default function HomeEventCard({
   event,
@@ -13,6 +13,7 @@ export default function HomeEventCard({
   className = '',
 }) {
   const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { openAuthPrompt } = useAuthPrompt()
   const [imageError, setImageError] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(Boolean(event.isBookmarked || event.is_bookmarked))
   const [isSaving, setIsSaving] = useState(false)
@@ -33,7 +34,11 @@ export default function HomeEventCard({
     e.stopPropagation()
 
     if (!isAuthenticated) {
-      alert('Please log in to save events to your list.')
+      openAuthPrompt({
+        actionType: 'bookmark',
+        title: 'Save to Your Wishlist',
+        subtitle: `Sign in to bookmark "${event.title || 'this experience'}" and get notified before tickets run out.`,
+      })
       return
     }
 
@@ -122,7 +127,7 @@ export default function HomeEventCard({
       <div className="flex flex-col flex-1 p-3.5 justify-between gap-3 transition-colors duration-300">
         <div className="space-y-1.5">
           {/* Event Title */}
-          <h3 className="font-semibold text-stone-900 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-stone-900 text-[15px] leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors tracking-tight">
             {event.title}
           </h3>
 

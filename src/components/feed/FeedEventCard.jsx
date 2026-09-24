@@ -19,6 +19,7 @@ import {
   Check
 } from 'lucide-react'
 import { toggleEventLike } from '../../services/socialApi'
+import { useAuthPrompt } from '../../context/AuthPromptContext'
 
 // Helper to parse date badge
 function parseDateBadge(dateStr) {
@@ -44,8 +45,7 @@ function parseDateBadge(dateStr) {
   return { month: 'EVT', day: '•' }
 }
 
-const DEFAULT_BANNER =
-  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80'
+const DEFAULT_BANNER = '/emptybanner.jpg'
 
 function FeedEventCard({
   event,
@@ -57,6 +57,7 @@ function FeedEventCard({
   onEventSocialUpdate,
 }) {
   const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { openAuthPrompt } = useAuthPrompt()
   const [imageError, setImageError] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [isLikingLocal, setIsLikingLocal] = useState(false)
@@ -82,7 +83,11 @@ function FeedEventCard({
   const handleToggleLike = async (e, heartRef) => {
     e.stopPropagation()
     if (!isAuthenticated) {
-      alert('Please log in to like experiences.')
+      openAuthPrompt({
+        actionType: 'like',
+        title: 'Like this Experience',
+        subtitle: `Sign in to support "${event.title || 'this live stage'}" and add it to your liked experiences.`,
+      })
       return
     }
 
@@ -168,24 +173,28 @@ function FeedEventCard({
       {/* ========================================================================= */}
       <div className="lg:hidden relative h-[calc(100dvh-8rem)] w-full snap-start snap-always overflow-hidden flex flex-col justify-between select-none bg-stone-950">
         
-        {/* 1. Full-Bleed Background Hero Canvas */}
+        {/* 1. Ambient Background Layer (fills letterbox/pillarbox space for 16:9 images) */}
         <img
           src={imageUrl}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110 pointer-events-none"
-        />
-        <img
-          src={imageUrl}
-          alt={event.title}
-          loading="lazy"
-          decoding="async"
-          onError={() => setImageError(true)}
-          className="absolute inset-0 w-full h-full object-cover opacity-90 scale-102"
+          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-125 pointer-events-none"
         />
 
-        {/* 2. Cinematic Multi-Stop Dark Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-60% to-black/35 pointer-events-none" />
+        {/* Main Full Image: Uncropped 16:9 ratio with object-contain */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <img
+            src={imageUrl}
+            alt={event.title}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImageError(true)}
+            className="w-full max-h-full object-contain drop-shadow-2xl"
+          />
+        </div>
+
+        {/* 2. Cinematic Dark Gradient Overlay for Crisp Badges & Bottom Text */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent via-50% to-black/40 pointer-events-none" />
 
         {/* 3. Top Floating Badges */}
         <div className="relative z-10 p-4 flex items-start justify-between gap-2">

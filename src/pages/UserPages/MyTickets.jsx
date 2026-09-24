@@ -315,7 +315,7 @@ export default function MyTickets() {
             <p className="text-xs text-stone-500">Discover upcoming stages and curate your weekend agenda.</p>
           </div>
           <Link
-            to="/user/discover"
+            to="/discover"
             className="inline-block rounded-md bg-stone-900 px-5 py-2.5 text-xs font-mono font-medium uppercase tracking-wider text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs"
           >
             Explore Events &rarr;

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { toggleEventLike } from '../../services/socialApi'
 import CommentDrawer from './CommentDrawer'
+import { useAuthPrompt } from '../../context/AuthPromptContext'
 
 export default function FeedRightSidebar({
   activeEvent,
@@ -27,6 +28,7 @@ export default function FeedRightSidebar({
   onEventUpdate,
 }) {
   const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { openAuthPrompt } = useAuthPrompt()
   
   // Real backend social state
   const [likesCount, setLikesCount] = useState(0)
@@ -63,7 +65,11 @@ export default function FeedRightSidebar({
     if (!activeEvent?.id) return
 
     if (!isAuthenticated) {
-      alert('Please log in to like experiences.')
+      openAuthPrompt({
+        actionType: 'like',
+        title: 'Like this Experience',
+        subtitle: `Sign in to show support for "${activeEvent.title || 'this live stage'}" and help more attendees discover it.`,
+      })
       return
     }
 

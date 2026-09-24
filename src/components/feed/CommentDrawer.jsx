@@ -24,6 +24,7 @@ import {
   deleteEventComment,
   toggleCommentLike,
 } from '../../services/socialApi'
+import { useAuthPrompt } from '../../context/AuthPromptContext'
 
 export default function CommentDrawer({
   isOpen,
@@ -32,6 +33,7 @@ export default function CommentDrawer({
   onCommentCountChange,
 }) {
   const { user, isAuthenticated } = useSelector((state) => state.auth || {})
+  const { openAuthPrompt } = useAuthPrompt()
   const [comments, setComments] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [page, setPage] = useState(1)
@@ -126,7 +128,11 @@ export default function CommentDrawer({
     if (!trimmed || isSubmitting || !event?.id) return
 
     if (!isAuthenticated) {
-      alert('Please log in to participate in the event discussion.')
+      openAuthPrompt({
+        actionType: 'comment',
+        title: 'Join the Discussion',
+        subtitle: `Sign in to post a comment or chat with attendees about "${event?.title || 'this live stage'}".`,
+      })
       return
     }
 
@@ -176,7 +182,11 @@ export default function CommentDrawer({
   // Handle comment like toggle
   const handleToggleLike = async (commentId, isReply = false, parentId = null) => {
     if (!isAuthenticated) {
-      alert('Please log in to upvote comments.')
+      openAuthPrompt({
+        actionType: 'like',
+        title: 'Support this Comment',
+        subtitle: 'Sign in to upvote comments and replies from fellow attendees.',
+      })
       return
     }
 
@@ -366,8 +376,16 @@ export default function CommentDrawer({
                   {/* Top Comment Author & Time */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-stone-200 text-stone-700 font-bold text-xs flex items-center justify-center uppercase select-none">
-                        {(comment.authorName || 'U')[0]}
+                      <div className="w-7 h-7 rounded-full bg-stone-200 text-stone-700 font-bold text-xs flex items-center justify-center uppercase select-none overflow-hidden shrink-0 border border-stone-300/60 shadow-2xs">
+                        {comment.user?.avatarUrl || comment.user?.avatar_url ? (
+                          <img
+                            src={comment.user.avatarUrl || comment.user.avatar_url}
+                            alt={comment.authorName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{(comment.authorName || 'U')[0]}</span>
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
@@ -471,9 +489,17 @@ export default function CommentDrawer({
 
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={() => {
+                            if (!isAuthenticated) {
+                              openAuthPrompt({
+                                actionType: 'comment',
+                                title: 'Reply to Comment',
+                                subtitle: `Sign in to reply to @${comment.authorName || 'this attendee'}.`,
+                              })
+                              return
+                            }
                             setReplyingTo({ id: comment.id, authorName: comment.authorName })
-                          }
+                          }}
                           className="inline-flex items-center gap-1 hover:text-stone-900 transition cursor-pointer"
                         >
                           <CornerDownRight size={12} />
@@ -496,18 +522,31 @@ export default function CommentDrawer({
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-semibold text-stone-900 text-[11px]">
-                                {reply.authorName}
-                              </span>
-                              {reply.user?.isOrganizer && (
-                                <span className="inline-flex items-center gap-0.5 px-1 py-0.1 rounded bg-amber-100 text-amber-900 text-[9px] font-mono font-medium">
-                                  Host
+                            <div className="flex items-center gap-2">
+                              <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-700 font-bold text-[10px] flex items-center justify-center uppercase select-none overflow-hidden shrink-0 border border-stone-300/60">
+                                {reply.user?.avatarUrl || reply.user?.avatar_url ? (
+                                  <img
+                                    src={reply.user.avatarUrl || reply.user.avatar_url}
+                                    alt={reply.authorName}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <span>{(reply.authorName || 'U')[0]}</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-semibold text-stone-900 text-[11px]">
+                                  {reply.authorName}
                                 </span>
-                              )}
-                              <span className="text-[10px] font-mono text-stone-400">
-                                &bull; {reply.createdAtFormatted}
-                              </span>
+                                {reply.user?.isOrganizer && (
+                                  <span className="inline-flex items-center gap-0.5 px-1 py-0.1 rounded bg-amber-100 text-amber-900 text-[9px] font-mono font-medium">
+                                    Host
+                                  </span>
+                                )}
+                                <span className="text-[10px] font-mono text-stone-400">
+                                  &bull; {reply.createdAtFormatted}
+                                </span>
+                              </div>
                             </div>
 
                             {!reply.isDeleted && (reply.canEdit || reply.canDelete) && (

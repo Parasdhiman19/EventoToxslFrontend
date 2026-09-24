@@ -114,7 +114,7 @@ export default function Saved() {
                 {/* Event Image */}
                 <div className="relative h-48 w-full overflow-hidden bg-stone-100">
                   <img
-                    src={ev.image || ev.banner || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'}
+                    src={ev.image || ev.banner || '/emptybanner.jpg'}
                     alt={ev.title}
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -180,7 +180,7 @@ export default function Saved() {
             </p>
           </div>
           <Link
-            to="/user/discover"
+            to="/discover"
             className="inline-block rounded-md bg-stone-900 px-5 py-2.5 text-xs font-mono font-medium uppercase tracking-wider text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs"
           >
             Explore Events &rarr;

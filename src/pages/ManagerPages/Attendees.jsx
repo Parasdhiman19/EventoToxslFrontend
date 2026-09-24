@@ -18,6 +18,7 @@ import {
   ShieldCheck
 } from 'lucide-react'
 import API from '../../services/api'
+import { exportToCsv } from '../../utils/exportCsv'
 
 export default function Attendees() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -164,25 +165,18 @@ export default function Attendees() {
 
     const headers = ['Ticket Code', 'Attendee Name', 'Email', 'Event', 'Tier', 'Gate / Seat', 'Status', 'Check-In Time', 'Order Date']
     const rows = attendeesList.map((att) => [
-      `"${att.ticketCode || att.id || ''}"`,
-      `"${att.attendeeName || att.name || ''}"`,
-      `"${att.email || ''}"`,
-      `"${att.eventTitle || att.event || ''}"`,
-      `"${att.tier || ''}"`,
-      `"${att.seatOrGate || att.gate || ''}"`,
-      `"${att.checkedIn ? 'Checked In' : 'Pending'}"`,
-      `"${att.checkInTime || 'N/A'}"`,
-      `"${att.orderDate || ''}"`,
+      att.ticketCode || att.id || '',
+      att.attendeeName || att.name || '',
+      att.email || '',
+      att.eventTitle || att.event || '',
+      att.tier || '',
+      att.seatOrGate || att.gate || '',
+      att.checkedIn ? 'Checked In' : 'Pending',
+      att.checkInTime || 'N/A',
+      att.orderDate || '',
     ])
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n')
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `Evento_Guest_Manifest_${new Date().toISOString().slice(0, 10)}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    exportToCsv(headers, rows, `evento_attendee_manifest_${activeEventObj ? activeEventObj.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'all'}`)
   }
 
   return (

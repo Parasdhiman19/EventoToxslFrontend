@@ -1,50 +1,73 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
-  Sparkles,
-  Search,
   Calendar,
   MapPin,
+  Users,
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Music,
-  Laptop,
-  Utensils,
-  Moon,
-  Palette,
-  Wrench,
+  Sparkles
 } from 'lucide-react'
 
-const QUICK_CATEGORIES = [
-  { name: 'Music', slug: 'Music & Concerts', icon: Music },
-  { name: 'Tech', slug: 'Tech & Conferences', icon: Laptop },
-  { name: 'Nightlife', slug: 'Nightlife', icon: Moon },
-  { name: 'Food & Drinks', slug: 'Food & Tasting', icon: Utensils },
-  { name: 'Art & Design', slug: 'Art & Exhibitions', icon: Palette },
-  { name: 'Workshops', slug: 'Workshops', icon: Wrench },
+const DEFAULT_HERO_IMAGE = '/emptybanner.jpg'
+
+// Sample curated experiences fallback for rich 3-card peek deck
+const FALLBACK_SLIDES = [
+  {
+    id: 1,
+    title: 'Tech Summit 2026',
+    category: 'Tech & Conferences',
+    dateFormatted: 'Sep 25, 2026',
+    venueName: 'A.S. LDFJLKADS;JF;, SALOON',
+    city: 'PATIALA',
+    startingPrice: '$35.00',
+    banner: '/emptybanner.jpg',
+    attendees: '250+ Attendees',
+  },
+  {
+    id: 2,
+    title: 'Summer Vibes Fest',
+    category: 'Music & Concerts',
+    dateFormatted: 'Aug 15, 2026',
+    venueName: 'Open Air Grounds',
+    city: 'Chandigarh',
+    startingPrice: '$50.00',
+    banner: '/emptybanner.jpg',
+    attendees: '1,200+ Attendees',
+  },
+  {
+    id: 3,
+    title: 'Neon Horizon: Live Electronic Odyssey',
+    category: 'Music & Concerts',
+    dateFormatted: 'Oct 14, 2026',
+    venueName: 'The Soundstage Arena',
+    city: 'Chandigarh',
+    startingPrice: '$45.00',
+    banner: '/emptybanner.jpg',
+    attendees: '500+ Attendees',
+  },
 ]
 
-const DEFAULT_HERO_IMAGE =
-  'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1600&q=80'
-
 export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = null }) {
-  const [searchTerm, setSearchTerm] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
-  const navigate = useNavigate()
+  const [touchStartX, setTouchStartX] = useState(null)
 
   // Normalize events list (supports array or single object fallback)
-  const slides = featuredEvents && featuredEvents.length > 0 
-    ? featuredEvents.slice(0, 5) 
-    : featuredEvent 
-    ? [featuredEvent] 
-    : []
+  const rawSlides = featuredEvents && featuredEvents.length > 0
+    ? featuredEvents.slice(0, 6)
+    : featuredEvent
+      ? [featuredEvent]
+      : []
+
+  const slides = rawSlides.length >= 3
+    ? rawSlides
+    : rawSlides.length > 0
+      ? [...rawSlides, ...FALLBACK_SLIDES].slice(0, 4)
+      : FALLBACK_SLIDES
 
   const totalSlides = slides.length
-  const currentSlide = totalSlides > 0 ? slides[currentIndex] : null
 
-  // Next and Prev handlers
+  // Navigation handlers
   const handleNext = useCallback(() => {
     if (totalSlides <= 1) return
     setCurrentIndex((prev) => (prev + 1) % totalSlides)
@@ -64,177 +87,187 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
     return () => clearInterval(timer)
   }, [totalSlides, isPaused, handleNext])
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    const query = searchTerm.trim()
-    if (query) {
-      navigate(`/user/discover?q=${encodeURIComponent(query)}`)
-    } else {
-      navigate('/user/discover')
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') handlePrev()
+      if (e.key === 'ArrowRight') handleNext()
     }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handlePrev, handleNext])
+
+  // Touch Swipe handlers for mobile
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX)
   }
 
-  const bgImage = currentSlide?.image || currentSlide?.banner || DEFAULT_HERO_IMAGE
-  const eventTitle = currentSlide?.title || 'Discover Unforgettable Live Experiences'
-  const eventCategory = currentSlide?.category || 'Featured Spotlight'
-  const eventDate = currentSlide?.dateFormatted || currentSlide?.date || 'Happening This Season'
-  const eventLocation = currentSlide?.is_online
-    ? 'Online Stream'
-    : currentSlide?.city
-    ? `${currentSlide?.venueName || currentSlide?.venue || 'Venue'}, ${currentSlide?.city}`
-    : 'Multiple Locations'
-  const eventPrice = currentSlide?.startingPrice || currentSlide?.priceRange || 'Explore Tickets'
+  const handleTouchEnd = (e) => {
+    if (touchStartX === null) return
+    const diff = touchStartX - e.changedTouches[0].clientX
+    if (diff > 45) {
+      handleNext()
+    } else if (diff < -45) {
+      handlePrev()
+    }
+    setTouchStartX(null)
+  }
+
+  // Calculate Symmetrical 3D Coverflow Placement (Unified Anchor GPU Transforms for Smooth Interpolation)
+  const getCardPlacementClass = (index) => {
+    let offset = index - currentIndex
+    if (offset > totalSlides / 2) offset -= totalSlides
+    if (offset < -totalSlides / 2) offset += totalSlides
+
+    if (offset === 0) {
+      // Main Center Card: Dominant, Elevated, Full Opacity, Sharp & Unfaded with subtle realistic shadow
+      return 'left-1/2 -translate-x-1/2 scale-100 [transform:translateZ(0)_rotateY(0deg)] z-30 opacity-100 pointer-events-auto border-white/20 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.18),0_4px_14px_-4px_rgba(0,0,0,0.08)] ring-1 ring-black/5'
+    } else if (offset === -1) {
+      // Left Preview Card: Tucked nicely closer to center on all screen sizes
+      return 'left-1/2 max-sm:-translate-x-[150%] max-sm:scale-90 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[57%] md:-translate-x-[60%] lg:-translate-x-[62%] xl:-translate-x-[63%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
+    } else if (offset === 1) {
+      // Right Preview Card: Tucked nicely closer to center on all screen sizes
+      return 'left-1/2 max-sm:translate-x-[50%] max-sm:scale-90 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[43%] md:-translate-x-[40%] lg:-translate-x-[38%] xl:-translate-x-[37%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(-14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
+    } else if (offset < 0) {
+      // Non-adjacent slides on the left: Smoothly receded offscreen
+      return 'left-1/2 -translate-x-[150%] scale-[0.70] [transform:perspective(1200px)_rotateY(25deg)] opacity-0 pointer-events-none z-0'
+    } else {
+      // Non-adjacent slides on the right: Smoothly receded offscreen
+      return 'left-1/2 translate-x-[50%] scale-[0.70] [transform:perspective(1200px)_rotateY(-25deg)] opacity-0 pointer-events-none z-0'
+    }
+  }
 
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full rounded-3xl overflow-hidden bg-stone-900 text-white shadow-xl group"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full select-none py-1 sm:py-2 overflow-hidden"
     >
-      {/* Background Image with Dark Vignette Gradients */}
-      <div className="absolute inset-0 z-0">
-        <img
-          key={bgImage}
-          src={bgImage}
-          alt={eventTitle}
-          className="w-full h-full object-cover opacity-35 scale-105 transform transition-all duration-1000 ease-out"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-900/40" />
-        <div className="absolute inset-0 bg-radial-at-c from-transparent via-stone-950/50 to-stone-950/90" />
-      </div>
+      {/* Main 3-Card Carousel Track */}
+      <div className="relative w-full h-[320px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center [perspective:1400px]">
 
-      {/* Navigation Arrows for Slider */}
-      {totalSlides > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="Previous slide"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/20 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 active:scale-95"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+        {/* Carousel Cards Deck */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          {slides.map((slide, idx) => {
+            const isCenter = idx === currentIndex
+            const placementClass = getCardPlacementClass(idx)
+            const slideImg = slide.image || slide.banner || DEFAULT_HERO_IMAGE
+            const slideTitle = slide.title || 'Curated Experience'
+            const slideCategory = slide.category || 'Curated Experience'
+            const slideDate = slide.dateFormatted || slide.date || 'TBA'
+            const slideLocation = slide.is_online
+              ? 'Virtual Stream'
+              : `${slide.venueName || slide.venue || 'Venue'}, ${slide.city || 'City'}`
+            const slidePrice = slide.startingPrice || slide.priceRange || '$0.00'
+            const attendees = slide.attendees || '250+ Attendees'
 
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Next slide"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/20 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 active:scale-95"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </>
-      )}
-
-      {/* Main Content Area */}
-      <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 lg:py-16 max-w-5xl mx-auto flex flex-col items-center text-center space-y-6">
-        {/* Spotlight Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-white tracking-wide uppercase font-mono shadow-xs">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>{eventCategory}</span>
-        </div>
-
-        {/* Hero Title */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white max-w-3xl leading-[1.15] min-h-[72px] sm:min-h-[110px] flex items-center justify-center">
-          {eventTitle}
-        </h1>
-
-        {/* Event Meta Details (Date & Venue) */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-stone-300 font-medium">
-          <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
-            <Calendar className="w-4 h-4 text-stone-400" />
-            <span>{eventDate}</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
-            <MapPin className="w-4 h-4 text-stone-400" />
-            <span>{eventLocation}</span>
-          </div>
-        </div>
-
-        {/* Primary Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          {currentSlide?.id ? (
-            <Link
-              to={`/events/${currentSlide.id}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/30 transition-all active:scale-95"
-            >
-              <span>Get Tickets • {eventPrice}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          ) : (
-            <Link
-              to="/user/discover"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/30 transition-all active:scale-95"
-            >
-              <span>Explore All Events</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          )}
-
-          <Link
-            to="/user/discover"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-sm font-medium backdrop-blur-md transition-all active:scale-95"
-          >
-            <span>Browse All Categories</span>
-          </Link>
-        </div>
-
-        {/* Integrated Quick Search Bar */}
-        <div className="w-full max-w-xl pt-2">
-          <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-            <Search className="absolute left-4 w-4 h-4 text-stone-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search concerts, festivals, workshops, cities..."
-              className="w-full pl-11 pr-24 py-3 bg-white/95 text-stone-900 placeholder:text-stone-400 rounded-xl text-xs sm:text-sm font-medium shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            />
-            <button
-              type="submit"
-              className="absolute right-1.5 px-3.5 py-1.5 bg-stone-900 hover:bg-black text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* Quick Category Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-          {QUICK_CATEGORIES.map((cat) => {
-            const Icon = cat.icon
             return (
-              <Link
-                key={cat.name}
-                to={`/user/discover?category=${encodeURIComponent(cat.slug)}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-stone-300 hover:text-white text-xs font-medium backdrop-blur-md transition-all active:scale-95"
+              <div
+                key={slide.id || idx}
+                onClick={() => !isCenter && setCurrentIndex(idx)}
+                className={`absolute w-[94%] sm:w-[86%] lg:w-[80%] h-[300px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-900 ${placementClass}`}
               >
-                <Icon className="w-3.5 h-3.5 text-stone-400" />
-                <span>{cat.name}</span>
-              </Link>
+                {/* Card Background Banner (Full Quality, Unfaded) */}
+                <img
+                  src={slideImg}
+                  alt={slideTitle}
+                  className="absolute inset-0 w-full h-full object-cover object-center rounded-2xl sm:rounded-3xl"
+                />
+
+                {/* Localized Bottom Gradient for Crisp Text Legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 via-45% to-transparent rounded-2xl sm:rounded-3xl" />
+
+                {/* Card Content Overlay */}
+                <div className="relative z-10 p-4 sm:p-7 lg:p-10 h-full flex flex-col justify-between text-left">
+
+                  {/* Top Badges */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-stone-100 font-semibold shadow-md">
+                      <Sparkles size={11} className="text-amber-400 sm:w-3 sm:h-3" />
+                      <span>{slideCategory}</span>
+                    </span>
+
+                    <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono font-bold text-amber-300 shadow-md">
+                      {slidePrice}
+                    </span>
+                  </div>
+
+                  {/* Bottom Information Details */}
+                  <div className="space-y-1.5 sm:space-y-3.5">
+                    {/* Live Kicker */}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                      <span className="text-[9px] sm:text-[11px] font-mono uppercase tracking-widest text-amber-300 font-bold drop-shadow-sm">
+                        Live Experience
+                      </span>
+                    </div>
+
+                    {/* Bold Modern Poster Title */}
+                    <h2 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight sm:tracking-tight text-white leading-[1.05] line-clamp-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
+                      {slideTitle}
+                    </h2>
+
+                    {/* Meta details chips */}
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-mono text-stone-100">
+                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/50 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium">
+                        <Calendar size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
+                        <span>{slideDate}</span>
+                      </div>
+                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/50 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium truncate max-w-[170px] sm:max-w-[260px]">
+                        <MapPin size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
+                        <span className="truncate">{slideLocation}</span>
+                      </div>
+                      <div className="hidden md:flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm font-medium">
+                        <Users size={13} className="text-amber-400 shrink-0" />
+                        <span>{attendees}</span>
+                      </div>
+                    </div>
+
+                    {/* Active Center CTA Action Buttons */}
+                    {isCenter && (
+                      <div className="pt-1 sm:pt-2 flex items-center gap-2 sm:gap-3">
+                        <Link
+                          to={`/events/${slide.id}`}
+                          className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-blue-600/40 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                        >
+                          <span>Get Passes</span>
+                          <ArrowRight size={13} className="sm:w-4 sm:h-4" />
+                        </Link>
+                        <Link
+                          to="/discover"
+                          className="px-3.5 sm:px-5 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-black/50 hover:bg-black/70 border border-white/30 text-white text-[11px] sm:text-sm font-semibold uppercase tracking-wider font-mono backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm"
+                        >
+                          <span>Discover</span>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )
           })}
         </div>
-
-        {/* Slide Pagination Dots / Indicators */}
-        {totalSlides > 1 && (
-          <div className="flex items-center justify-center gap-2 pt-3">
-            {slides.map((slide, idx) => (
-              <button
-                key={slide.id || idx}
-                type="button"
-                onClick={() => setCurrentIndex(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentIndex === idx
-                    ? 'w-8 bg-blue-500'
-                    : 'w-2 bg-white/30 hover:bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Synchronized Pagination Indicators on Light Background */}
+      {totalSlides > 1 && (
+        <div className="relative z-10 flex items-center justify-center gap-2 pt-4">
+          {slides.map((slide, idx) => (
+            <button
+              key={slide.id || idx}
+              type="button"
+              onClick={() => setCurrentIndex(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`rounded-full transition-all duration-300 cursor-pointer ${currentIndex === idx
+                  ? 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-600 shadow-xs'
+                  : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-200/80 hover:bg-blue-300'
+                }`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

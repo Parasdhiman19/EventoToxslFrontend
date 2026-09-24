@@ -6,6 +6,8 @@ import {
   Ticket, DollarSign, Calendar, Clock, User, Mail, CreditCard 
 } from 'lucide-react'
 import API from '../../services/api'
+import ReceiptModal from '../../components/modals/ReceiptModal'
+import { exportToCsv } from '../../utils/exportCsv'
 
 export default function TicketSales() {
   const [selectedEvent, setSelectedEvent] = useState('all')
@@ -94,24 +96,17 @@ export default function TicketSales() {
       t.id,
       t.date,
       t.time,
-      `"${t.customer}"`,
+      t.customer,
       t.email,
-      `"${t.event || t.eventTitle}"`,
-      `"${t.tier}"`,
+      t.event || t.eventTitle,
+      t.tier,
       t.qty,
-      `"${t.total}"`,
-      `"${t.paymentMethod}"`,
+      t.total,
+      t.paymentMethod,
       t.status,
     ])
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n')
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `evento_sales_ledger_${new Date().toISOString().slice(0, 10)}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    exportToCsv(headers, rows, 'evento_sales_ledger')
   }
 
   const handleDownloadInvoices = () => {
@@ -562,100 +557,10 @@ export default function TicketSales() {
       </section>
 
       {/* Order Receipt Detail Modal */}
-      {selectedReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full border border-stone-200 overflow-hidden space-y-0 animate-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-stone-200 flex items-center justify-between bg-stone-50/70">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400">
-                  Official Receipt
-                </span>
-                <h3 className="font-serif text-lg font-semibold text-stone-900">
-                  {selectedReceipt.id}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedReceipt(null)}
-                className="p-1.5 text-stone-400 hover:text-stone-900 rounded-md hover:bg-stone-200/60 transition cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 space-y-4 text-xs font-mono">
-              {/* Event & Tier */}
-              <div className="p-3.5 rounded-lg bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-[10px] uppercase text-stone-400 block font-mono">Event Stage</span>
-                <p className="text-sm font-serif font-semibold text-stone-900">
-                  {selectedReceipt.event || selectedReceipt.eventTitle}
-                </p>
-                <p className="text-[11px] text-stone-500">
-                  Tier: <span className="text-stone-900 font-medium">{selectedReceipt.tier}</span>
-                </p>
-              </div>
-
-              {/* Grid Info */}
-              <div className="grid grid-cols-2 gap-3 text-stone-700">
-                <div className="p-3 rounded bg-stone-50 border border-stone-200/60 space-y-0.5">
-                  <span className="text-[10px] uppercase text-stone-400 block">Attendee</span>
-                  <span className="font-medium text-stone-900 block truncate">{selectedReceipt.customer}</span>
-                  <span className="text-[11px] text-stone-500 block truncate">{selectedReceipt.email}</span>
-                </div>
-
-                <div className="p-3 rounded bg-stone-50 border border-stone-200/60 space-y-0.5">
-                  <span className="text-[10px] uppercase text-stone-400 block">Timestamp</span>
-                  <span className="font-medium text-stone-900 block">{selectedReceipt.date}</span>
-                  <span className="text-[11px] text-stone-500 block">{selectedReceipt.time || 'Completed'}</span>
-                </div>
-              </div>
-
-              {/* Line Items */}
-              <div className="border-t border-b border-stone-200/80 py-3 space-y-2">
-                <div className="flex justify-between text-stone-600">
-                  <span>Unit Price:</span>
-                  <span className="text-stone-900">{selectedReceipt.unitPrice || selectedReceipt.total}</span>
-                </div>
-                <div className="flex justify-between text-stone-600">
-                  <span>Quantity:</span>
-                  <span className="text-stone-900">{selectedReceipt.qty}</span>
-                </div>
-                {selectedReceipt.fees && selectedReceipt.fees !== '$0.00' && (
-                  <div className="flex justify-between text-stone-600">
-                    <span>Platform Fees:</span>
-                    <span className="text-stone-900">{selectedReceipt.fees}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm font-semibold text-stone-900 pt-1 border-t border-stone-100">
-                  <span>Total Paid:</span>
-                  <span className="text-stone-950">{selectedReceipt.total}</span>
-                </div>
-              </div>
-
-              {/* Footer Meta */}
-              <div className="flex items-center justify-between text-[11px] text-stone-500">
-                <span>Payment: <strong className="text-stone-700">{selectedReceipt.paymentMethod}</strong></span>
-                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider text-[10px]">
-                  {selectedReceipt.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-stone-50 border-t border-stone-200 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedReceipt(null)}
-                className="px-4 py-2 bg-stone-900 text-stone-50 rounded-md text-xs font-mono font-medium hover:bg-stone-800 transition cursor-pointer"
-              >
-                Close Receipt
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReceiptModal
+        receipt={selectedReceipt}
+        onClose={() => setSelectedReceipt(null)}
+      />
     </div>
   )
 }

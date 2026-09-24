@@ -70,7 +70,7 @@ export default function AuthLayout() {
             </span>
             Evento
           </Link>
-          <Link to="/user/discover" className="text-xs font-medium text-stone-600 hover:text-stone-900 transition-colors">
+          <Link to="/discover" className="text-xs font-medium text-stone-600 hover:text-stone-900 transition-colors">
             Browse Events &rarr;
           </Link>
         </div>

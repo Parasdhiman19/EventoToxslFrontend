@@ -44,8 +44,8 @@ function Login() {
 
         // Seamless navigation: if manager/organizer, go to manager overview, else intended path
         const isOrganizerUser = user?.isOrganizer || user?.is_organizer || user?.role === 'manager'
-        const defaultPath = isOrganizerUser ? '/manager/overview' : '/user/home'
-        const targetPath = location.state?.from?.pathname || defaultPath
+        const defaultPath = isOrganizerUser ? '/manager/overview' : '/'
+        const targetPath = location.state?.from?.pathname || (typeof location.state?.from === 'string' ? location.state.from : null) || defaultPath
         navigate(targetPath, { replace: true })
       } catch (err) {
         const message =

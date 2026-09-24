@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Navigate, Outlet } from 'react-router-dom'
 
 export default function GuestRoute({ children }) {
-  const { isAuthenticated, role, isInitialized } = useSelector((state) => state.auth)
+  const { isAuthenticated, isInitialized } = useSelector((state) => state.auth)
 
   // 1. While auth state is initializing with the backend, show clean loading state
   if (!isInitialized) {
@@ -17,9 +17,9 @@ export default function GuestRoute({ children }) {
     )
   }
 
-  // 2. If authenticated, redirect away from guest/auth pages to authenticated home page
+  // 2. If authenticated, redirect away from guest/auth pages to home page
   if (isAuthenticated) {
-    return <Navigate to="/user/home" replace />
+    return <Navigate to="/" replace />
   }
 
   // 3. Unauthenticated user: allow access

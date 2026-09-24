@@ -5,6 +5,7 @@ import {
   Trash2, Archive, AlertTriangle, X, CheckCircle2
 } from 'lucide-react'
 import API from '../../services/api'
+import DeleteArchiveEventModal from '../../components/modals/DeleteArchiveEventModal'
 
 export default function MyEvents() {
   const [events, setEvents] = useState([])
@@ -15,9 +16,6 @@ export default function MyEvents() {
 
   // Delete / Archive Modal State
   const [deletingEvent, setDeletingEvent] = useState(null)
-  const [deleteMode, setDeleteMode] = useState('archive') // 'archive' | 'permanent'
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [deleteError, setDeleteError] = useState(null)
 
   const fetchEvents = async () => {
     setIsLoading(true)
@@ -32,26 +30,13 @@ export default function MyEvents() {
     }
   }
 
-  const handleDeleteSubmit = async () => {
-    if (!deletingEvent) return
-    setIsDeleting(true)
-    setDeleteError(null)
-    try {
-      const isPermanent = deleteMode === 'permanent'
-      const res = await API.delete(`events/manager/${deletingEvent.id}/?permanent=${isPermanent}`)
-      if (isPermanent || res.data?.deleted) {
-        setEvents((prev) => prev.filter((e) => e.id !== deletingEvent.id))
-      } else {
-        setEvents((prev) =>
-          prev.map((e) => (e.id === deletingEvent.id ? { ...e, status: 'past' } : e))
-        )
-      }
-      setDeletingEvent(null)
-    } catch (err) {
-      const msg = err.response?.data?.detail || err.response?.data?.message || 'Failed to delete event. Please try again.'
-      setDeleteError(msg)
-    } finally {
-      setIsDeleting(false)
+  const handleDeleteSuccess = ({ eventId, deleted, isPermanent }) => {
+    if (deleted || isPermanent) {
+      setEvents((prev) => prev.filter((e) => e.id !== eventId))
+    } else {
+      setEvents((prev) =>
+        prev.map((e) => (e.id === eventId ? { ...e, status: 'past' } : e))
+      )
     }
   }
 
@@ -542,155 +527,13 @@ export default function MyEvents() {
 
       {/* ========================================================================= */}
       {/* DELETE / ARCHIVE EVENT CONFIRMATION MODAL */}
-      {/* ========================================================================= */}
-      {deletingEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-stone-100 flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-red-50 text-red-600 border border-red-100">
-                  <AlertTriangle size={18} />
-                </div>
-                <div>
-                  <h3 className="font-serif text-base font-semibold text-stone-900">
-                    Delete or Archive Stage
-                  </h3>
-                  <p className="text-[11px] font-mono text-stone-400">
-                    EV-{deletingEvent.id} • {deletingEvent.title}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDeletingEvent(null)}
-                disabled={isDeleting}
-                className="p-1 text-stone-400 hover:text-stone-700 rounded-lg hover:bg-stone-100 transition cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-5 space-y-4">
-              {deleteError && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
-                  <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                  <span>{deleteError}</span>
-                </div>
-              )}
-
-              <p className="text-xs text-stone-600">
-                Please select how you would like to handle this stage:
-              </p>
-
-              {/* Mode Selection Cards */}
-              <div className="space-y-2.5">
-                {/* Option 1: Archive (Recommended) */}
-                <div
-                  onClick={() => setDeleteMode('archive')}
-                  className={`p-3.5 rounded-xl border transition cursor-pointer flex items-start gap-3 ${
-                    deleteMode === 'archive'
-                      ? 'border-stone-900 bg-stone-50/80 ring-1 ring-stone-900'
-                      : 'border-stone-200 hover:border-stone-300 bg-white'
-                  }`}
-                >
-                  <div className="mt-0.5">
-                    <input
-                      type="radio"
-                      name="deleteMode"
-                      checked={deleteMode === 'archive'}
-                      onChange={() => setDeleteMode('archive')}
-                      className="text-stone-900 focus:ring-stone-900 cursor-pointer"
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-stone-900">Archive Stage (Recommended)</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        Safe
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-0.5">
-                      Ends ticket sales immediately and sets status to Ended. Preserves all attendee check-in records, past bookings, and financial transaction histories.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Option 2: Permanent Delete */}
-                <div
-                  onClick={() => setDeleteMode('permanent')}
-                  className={`p-3.5 rounded-xl border transition cursor-pointer flex items-start gap-3 ${
-                    deleteMode === 'permanent'
-                      ? 'border-red-600 bg-red-50/40 ring-1 ring-red-600'
-                      : 'border-stone-200 hover:border-stone-300 bg-white'
-                  }`}
-                >
-                  <div className="mt-0.5">
-                    <input
-                      type="radio"
-                      name="deleteMode"
-                      checked={deleteMode === 'permanent'}
-                      onChange={() => setDeleteMode('permanent')}
-                      className="text-red-600 focus:ring-red-600 cursor-pointer"
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-red-700">Permanently Erase Stage</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-red-100 text-red-800 border border-red-200">
-                        Destructive
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-0.5">
-                      Permanently erases the stage, tier quotas, and assigned gate roster from the database. This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-stone-50/80 border-t border-stone-100 flex items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setDeletingEvent(null)}
-                disabled={isDeleting}
-                className="px-4 py-2 text-xs font-mono text-stone-600 hover:text-stone-900 transition rounded-xl border border-stone-200 bg-white hover:bg-stone-50 cursor-pointer disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteSubmit}
-                disabled={isDeleting}
-                className={`px-4 py-2 text-xs font-mono font-medium text-white transition rounded-xl shadow-2xs inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
-                  deleteMode === 'permanent'
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-stone-900 hover:bg-stone-800'
-                }`}
-              >
-                {isDeleting ? (
-                  <>
-                    <Loader2 size={13} className="animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : deleteMode === 'permanent' ? (
-                  <>
-                    <Trash2 size={13} />
-                    <span>Permanently Delete</span>
-                  </>
-                ) : (
-                  <>
-                    <Archive size={13} />
-                    <span>Archive Stage</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete / Archive Event Modal */}
+      <DeleteArchiveEventModal
+        isOpen={Boolean(deletingEvent)}
+        event={deletingEvent}
+        onClose={() => setDeletingEvent(null)}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   )
 }

@@ -328,7 +328,7 @@ export default function ManagerLayout() {
                     Portals &amp; Views
                   </p>
                   <Link
-                    to="/user/discover"
+                    to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-mono font-medium text-stone-300 bg-stone-800/80 hover:bg-stone-800 hover:text-stone-100 border border-stone-700/60 transition"
                   >
@@ -394,7 +394,7 @@ export default function ManagerLayout() {
           <div className="flex items-center gap-3">
             {/* Redesigned Switch to User Mode Navbar Pill Button */}
             <Link
-              to="/user/discover"
+              to="/"
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/90 text-stone-800 hover:text-stone-950 text-xs font-mono font-medium border border-stone-300/80 transition-all shadow-2xs group cursor-pointer"
               title="Switch to Attendee / User View"
             >
@@ -457,7 +457,7 @@ export default function ManagerLayout() {
                       Account Settings
                     </Link>
                     <Link
-                      to="/user/discover"
+                      to="/"
                       onClick={() => setIsProfileOpen(false)}
                       className="flex items-center gap-2.5 px-4 py-2 text-stone-700 hover:bg-stone-50 transition border-t border-stone-100"
                     >

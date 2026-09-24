@@ -6,6 +6,7 @@ import {
   Calendar, Users, DollarSign, ExternalLink
 } from 'lucide-react'
 import API from '../../services/api'
+import { exportToCsv } from '../../utils/exportCsv'
 
 export default function Overview() {
   const [stats, setStats] = useState([
@@ -59,22 +60,15 @@ export default function Overview() {
     const headers = ['Order Number', 'Attendee', 'Email', 'Event Stage', 'Tier', 'Amount', 'Timestamp']
     const rows = recentTransactions.map((tx) => [
       tx.id,
-      `"${tx.buyer}"`,
+      tx.buyer,
       tx.email,
-      `"${tx.event}"`,
-      `"${tx.tier}"`,
-      `"${tx.amount}"`,
-      `"${tx.time}"`,
+      tx.event,
+      tx.tier,
+      tx.amount,
+      tx.time,
     ])
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n')
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `evento_overview_report_${new Date().toISOString().slice(0, 10)}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    exportToCsv(headers, rows, 'evento_overview_report')
   }
 
   return (
