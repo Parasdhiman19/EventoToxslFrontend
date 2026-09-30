@@ -37,6 +37,7 @@ export default function FeedRightSidebar({
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [isLiking, setIsLiking] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   const cardRef = useRef(null)
   const heartRef = useRef(null)
@@ -45,6 +46,7 @@ export default function FeedRightSidebar({
   // Sync real social metrics whenever activeEvent changes
   useEffect(() => {
     if (activeEvent?.id) {
+      setLogoError(false)
       setLikesCount(activeEvent.likesCount || 0)
       setIsLiked(!!activeEvent.isLiked)
       setCommentsCount(activeEvent.commentsCount || 0)
@@ -275,22 +277,40 @@ export default function FeedRightSidebar({
             </div>
 
             {/* Host Studio Profile Snippet */}
-            <div className="pt-2.5 border-t border-stone-100 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-stone-900 to-stone-800 text-stone-50 flex items-center justify-center font-serif text-xs font-bold shadow-2xs shrink-0 select-none">
-                {activeEvent.organizer ? activeEvent.organizer.charAt(0).toUpperCase() : 'E'}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-semibold text-stone-900 truncate">
-                    {activeEvent.organizer || 'Curated Producer'}
-                  </h4>
-                  <ShieldCheck size={12} className="text-emerald-600 shrink-0" />
+            {(() => {
+              const organizerName = activeEvent.organizer || 'Curated Producer'
+              const organizerInitial = organizerName.charAt(0).toUpperCase()
+              const organizerLogo = !logoError && (activeEvent.organizerLogo || activeEvent.organizer_logo)
+              const organizerHandle = activeEvent.organizerHandle || activeEvent.organizer_handle || organizerName.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+              return (
+                <div className="pt-2.5 border-t border-stone-100 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-900 to-stone-800 text-amber-400 flex items-center justify-center font-serif text-sm font-bold shadow-2xs shrink-0 select-none overflow-hidden ring-1 ring-stone-200">
+                    {organizerLogo ? (
+                      <img
+                        src={organizerLogo}
+                        alt={organizerName}
+                        onError={() => setLogoError(true)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      organizerInitial
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-xs font-semibold text-stone-900 truncate">
+                        {organizerName}
+                      </h4>
+                      <ShieldCheck size={13} className="text-blue-500 fill-blue-500/15 shrink-0" />
+                    </div>
+                    <p className="text-[10px] text-stone-500 font-mono truncate">
+                      @{organizerHandle} &bull; Verified Host
+                    </p>
+                  </div>
                 </div>
-                <p className="text-[10px] text-stone-500 font-mono truncate">
-                  Evento Verified Partner
-                </p>
-              </div>
-            </div>
+              )
+            })()}
 
           </div>
 

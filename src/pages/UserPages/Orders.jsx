@@ -112,8 +112,14 @@ export default function Orders() {
                     {/* Event & Pass Tier */}
                     <td className="px-5 py-4 min-w-[240px]">
                       <div className="font-medium text-stone-900 text-sm leading-snug">{order.eventTitle || order.event}</div>
-                      <div className="text-[11px] text-stone-500 font-mono mt-0.5">
-                        {order.tier} &times; {order.quantity || order.qty}
+                      <div className="flex items-center gap-2 text-[11px] text-stone-500 font-mono mt-0.5">
+                        <span>{order.tier} &times; {order.quantity || order.qty}</span>
+                        {order.organizer && (
+                          <>
+                            <span>&bull;</span>
+                            <span className="text-stone-400 truncate max-w-[140px]">{order.organizer}</span>
+                          </>
+                        )}
                       </div>
                     </td>
 

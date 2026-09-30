@@ -177,19 +177,20 @@ export default function Profile() {
   }
 
   // Save Profile Details
-  const handleSaveProfile = async (e) => {
-    e?.preventDefault()
+  const handleSaveProfile = async (e, overrides = {}) => {
+    e?.preventDefault?.()
     setIsSavingProfile(true)
     setErrorMessage('')
 
+    const merged = { ...formData, ...overrides }
     try {
       const payload = {
-        fullName: formData.fullName.trim(),
-        username: formData.username.trim().toLowerCase().replace(/^@/, ''),
-        bio: formData.bio.trim(),
-        phone: formData.phone.trim(),
-        city: formData.city.trim(),
-        emailNotifications: formData.emailNotifications,
+        fullName: (merged.fullName || '').trim(),
+        username: (merged.username || '').trim().toLowerCase().replace(/^@/, ''),
+        bio: (merged.bio || '').trim(),
+        phone: (merged.phone || '').trim(),
+        city: (merged.city || '').trim(),
+        emailNotifications: merged.emailNotifications,
       }
 
       const res = await API.patch('auth/me/', payload)
@@ -883,8 +884,9 @@ export default function Profile() {
                   type="checkbox"
                   checked={formData.emailNotifications}
                   onChange={(e) => {
-                    setFormData({ ...formData, emailNotifications: e.target.checked })
-                    handleSaveProfile()
+                    const nextVal = e.target.checked
+                    setFormData((prev) => ({ ...prev, emailNotifications: nextVal }))
+                    handleSaveProfile(null, { emailNotifications: nextVal })
                   }}
                   className="sr-only peer"
                 />

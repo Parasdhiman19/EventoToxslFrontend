@@ -13,19 +13,67 @@ import {
   Menu,
   X,
   Compass,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck
 } from 'lucide-react'
 import API from '../services/api'
-import { logout } from '../redux/slice/authSlice'
+import { logout, updateUser } from '../redux/slice/authSlice'
+import { getAvatarInitials } from '../utils/avatar'
+import NotificationBell from '../components/notifications/NotificationBell'
 
 export default function ManagerLayout() {
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [sidebarLogoError, setSidebarLogoError] = useState(false)
+  const [navLogoError, setNavLogoError] = useState(false)
+  const [mobileLogoError, setMobileLogoError] = useState(false)
+  const [dropdownLogoError, setDropdownLogoError] = useState(false)
+  
   const profileRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+
+  const studioImage = user?.studioLogo || user?.logoUrl || user?.logo_url || user?.avatarUrl || user?.avatar_url || ''
+  const displayName = user?.organizationName || user?.organization_name || user?.fullName || user?.full_name || 'Host Studio'
+  const userInitials = getAvatarInitials(displayName || user?.fullName || 'Host Studio', 'HS')
+
+  useEffect(() => {
+    setSidebarLogoError(false)
+    setNavLogoError(false)
+    setMobileLogoError(false)
+    setDropdownLogoError(false)
+  }, [studioImage])
+
+  // Sync studio profile on mount
+  useEffect(() => {
+    let isMounted = true
+    const syncStudioProfile = async () => {
+      try {
+        const res = await API.get('auth/settings/')
+        if (isMounted && res.data?.profile) {
+          const profile = res.data.profile
+          dispatch(updateUser({
+            organizationName: profile.organizationName || profile.organization_name,
+            organization_name: profile.organizationName || profile.organization_name,
+            studioLogo: profile.logoUrl || profile.logo_url,
+            logoUrl: profile.logoUrl || profile.logo_url,
+            logo_url: profile.logoUrl || profile.logo_url,
+            organizerHandle: profile.handle,
+            organizer_handle: profile.handle,
+          }))
+        }
+      } catch {
+        // Silently ignore network / auth race conditions
+      }
+    }
+    syncStudioProfile()
+    return () => {
+      isMounted = false
+    }
+  }, [dispatch])
 
   // Automatically close mobile menu on route change
   useEffect(() => {
@@ -42,7 +90,6 @@ export default function ManagerLayout() {
     dispatch(logout())
     navigate('/account/login')
   }
-
 
   // Lock body scroll when mobile full-screen drawer is open
   useEffect(() => {
@@ -123,6 +170,11 @@ export default function ManagerLayout() {
         </svg>
       ),
     },
+    {
+      name: 'Notifications',
+      path: '/manager/notifications',
+      icon: <Bell className="h-4 w-4" />,
+    },
   ]
 
   return (
@@ -136,6 +188,9 @@ export default function ManagerLayout() {
           Evento <span className="text-stone-400 font-sans text-[10px] uppercase tracking-wider ml-0.5">Manager</span>
         </Link>
         <div className="flex items-center gap-2">
+          {/* Mobile Notification Bell */}
+          <NotificationBell variant="dark" />
+
           {/* Quick Create Event Mobile Button */}
           <Link
             to="/manager/events/create"
@@ -169,6 +224,7 @@ export default function ManagerLayout() {
           </button>
         </div>
       </header>
+
 
       {/* Desktop Persistent Sidebar (Hidden on Mobile) */}
       <aside className="hidden lg:flex w-72 h-screen shrink-0 bg-stone-900 text-stone-100 flex-col justify-between border-r border-stone-800 static">
@@ -222,12 +278,21 @@ export default function ManagerLayout() {
 
           {/* Sidebar Footer Account Badge */}
           <div className="pt-3 border-t border-stone-800">
-            <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-stone-800/40 border border-stone-800">
-              <div className="w-7 h-7 rounded-full bg-stone-700 flex items-center justify-center text-[11px] font-semibold text-stone-200 font-mono shrink-0">
-                {user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'NP'}
-              </div>
+            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-stone-800/40 border border-stone-800/80">
+              {studioImage && !sidebarLogoError ? (
+                <img
+                  src={studioImage}
+                  alt={displayName}
+                  className="w-7 h-7 rounded-lg object-cover ring-1 ring-stone-700 shrink-0"
+                  onError={() => setSidebarLogoError(true)}
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-lg bg-stone-800 text-stone-200 flex items-center justify-center text-[11px] font-semibold font-mono shrink-0 ring-1 ring-stone-700">
+                  {userInitials}
+                </div>
+              )}
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-medium text-stone-200 truncate">{user?.fullName || 'Nexus Productions'}</span>
+                <span className="text-xs font-medium text-stone-200 truncate">{displayName}</span>
                 <span className="text-[10px] text-stone-500 font-mono truncate">{user?.email || 'manager@evento.com'}</span>
               </div>
             </div>
@@ -352,12 +417,21 @@ export default function ManagerLayout() {
 
             {/* Footer Profile & Logout Area */}
             <div className="pt-4 border-t border-stone-800 space-y-3 mt-6">
-              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-stone-800/60 border border-stone-800">
-                <div className="w-8 h-8 rounded-full bg-stone-700 flex items-center justify-center text-xs font-semibold text-stone-200 font-mono shrink-0">
-                  {user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'NP'}
-                </div>
+              <div className="flex items-center gap-3 p-2.5 rounded-xl bg-stone-800/60 border border-stone-800">
+                {studioImage && !mobileLogoError ? (
+                  <img
+                    src={studioImage}
+                    alt={displayName}
+                    className="w-8 h-8 rounded-lg object-cover ring-1 ring-stone-700 shrink-0"
+                    onError={() => setMobileLogoError(true)}
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center text-xs font-semibold text-stone-200 font-mono shrink-0 ring-1 ring-stone-700">
+                    {userInitials}
+                  </div>
+                )}
                 <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-xs font-semibold text-stone-200 truncate">{user?.fullName || 'Nexus Productions'}</span>
+                  <span className="text-xs font-semibold text-stone-200 truncate">{displayName}</span>
                   <span className="text-[11px] text-stone-400 font-mono truncate">{user?.email || 'manager@evento.com'}</span>
                 </div>
               </div>
@@ -415,6 +489,11 @@ export default function ManagerLayout() {
 
             <div className="h-4 w-px bg-stone-200" />
 
+            {/* Notification Bell (Desktop) */}
+            <NotificationBell />
+
+            <div className="h-4 w-px bg-stone-200" />
+
             {/* Profile Dropdown Component */}
             <div className="relative" ref={profileRef}>
               <button
@@ -422,24 +501,55 @@ export default function ManagerLayout() {
                 onClick={() => setIsProfileOpen((prev) => !prev)}
                 className="flex items-center gap-2 p-1.5 pl-2 rounded-full border border-stone-200 bg-stone-50 hover:bg-white hover:border-stone-300 transition shadow-2xs cursor-pointer focus:outline-none"
               >
-                <div className="w-6 h-6 rounded-full bg-stone-900 text-stone-50 text-[11px] font-medium flex items-center justify-center font-mono">
-                  {user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'NP'}
-                </div>
-                <span className="text-xs font-medium text-stone-800">
-                  {user?.fullName || 'Nexus Productions'}
+                {studioImage && !navLogoError ? (
+                  <img
+                    src={studioImage}
+                    alt={displayName}
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-stone-200 shrink-0"
+                    onError={() => setNavLogoError(true)}
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-stone-900 text-stone-50 text-[11px] font-medium flex items-center justify-center font-mono shrink-0">
+                    {userInitials}
+                  </div>
+                )}
+                <span className="text-xs font-medium text-stone-800 max-w-[140px] truncate">
+                  {displayName}
                 </span>
                 <ChevronDown size={13} className={`text-stone-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Dropdown Menu Modal */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white border border-stone-200 shadow-lg py-1 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-4 py-2.5 border-b border-stone-100">
-                    <p className="font-medium text-stone-900 truncate">{user?.fullName || 'Nexus Productions'}</p>
-                    <p className="text-[11px] font-mono text-stone-400 truncate">{user?.email || 'manager@evento.com'}</p>
+                <div className="absolute right-0 mt-2 w-60 rounded-xl bg-white border border-stone-200 shadow-xl py-1 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-4 py-3 border-b border-stone-100 flex items-center gap-3">
+                    {studioImage && !dropdownLogoError ? (
+                      <img
+                        src={studioImage}
+                        alt={displayName}
+                        className="w-8 h-8 rounded-lg object-cover ring-1 ring-stone-200 shrink-0"
+                        onError={() => setDropdownLogoError(true)}
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-stone-900 text-stone-50 text-xs font-semibold flex items-center justify-center font-mono shrink-0">
+                        {userInitials}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-stone-900 truncate text-xs">{displayName}</p>
+                      <p className="text-[11px] font-mono text-stone-400 truncate">{user?.email || 'manager@evento.com'}</p>
+                    </div>
                   </div>
 
                   <div className="py-1">
+                    <Link
+                      to="/manager/notifications"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-stone-700 hover:bg-stone-50 transition"
+                    >
+                      <Bell size={14} className="text-stone-400" />
+                      Notifications
+                    </Link>
                     <Link
                       to="/manager/settings"
                       onClick={() => setIsProfileOpen(false)}
@@ -456,6 +566,19 @@ export default function ManagerLayout() {
                       <Settings size={14} className="text-stone-400" />
                       Account Settings
                     </Link>
+                    {(user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin') && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center justify-between px-4 py-2 text-purple-950 font-semibold bg-purple-50 hover:bg-purple-100 transition border-t border-purple-100"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ShieldCheck size={14} className="text-purple-700" />
+                          Super Admin Console
+                        </span>
+                        <span>&rarr;</span>
+                      </Link>
+                    )}
                     <Link
                       to="/"
                       onClick={() => setIsProfileOpen(false)}
@@ -465,6 +588,7 @@ export default function ManagerLayout() {
                       Switch to User Mode
                     </Link>
                   </div>
+
 
                   <div className="border-t border-stone-100 pt-1">
                     <button

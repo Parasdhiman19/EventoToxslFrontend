@@ -28,26 +28,36 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [allEvents, setAllEvents] = useState([])
   const [featuredHero, setFeaturedHero] = useState(null)
+  const [customBanners, setCustomBanners] = useState([])
+  const [customRecommendations, setCustomRecommendations] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch all live events and hero spotlight from backend
+  // Fetch all live events, hero spotlight, and dynamic admin content
   const loadHomeData = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      // 1. Fetch featured hero event
+      // 1. Fetch featured hero event & dynamic admin homepage content
       const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
-      
+      const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
+
       // 2. Fetch list of published events
       const eventsPromise = API.get('events/', {
         params: { page_size: 50, sort: 'upcoming' },
       })
 
-      const [heroRes, eventsRes] = await Promise.all([heroPromise, eventsPromise])
+      const [heroRes, contentRes, eventsRes] = await Promise.all([heroPromise, contentPromise, eventsPromise])
 
       if (heroRes?.data) {
         setFeaturedHero(heroRes.data)
+      }
+
+      if (contentRes?.data?.banners) {
+        setCustomBanners(contentRes.data.banners)
+      }
+      if (contentRes?.data?.recommendations) {
+        setCustomRecommendations(contentRes.data.recommendations)
       }
 
       let eventsList = []
@@ -69,16 +79,24 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
+        const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
         const eventsPromise = API.get('events/', {
           params: { page_size: 50, sort: 'upcoming' },
         })
 
-        const [heroRes, eventsRes] = await Promise.all([heroPromise, eventsPromise])
+        const [heroRes, contentRes, eventsRes] = await Promise.all([heroPromise, contentPromise, eventsPromise])
 
         if (!isMounted) return
 
         if (heroRes?.data) {
           setFeaturedHero(heroRes.data)
+        }
+
+        if (contentRes?.data?.banners) {
+          setCustomBanners(contentRes.data.banners)
+        }
+        if (contentRes?.data?.recommendations) {
+          setCustomRecommendations(contentRes.data.recommendations)
         }
 
         let eventsList = []
@@ -106,8 +124,24 @@ export default function Home() {
     }
   }, [])
 
-  // Featured slides for Hero Carousel (combines hero endpoint + top featured/upcoming events)
+  // Featured slides for Hero Carousel (uses admin banners if configured, otherwise fallback to featured events)
   const heroSlides = useMemo(() => {
+    if (customBanners && customBanners.length > 0) {
+      return customBanners.map((b) => ({
+        id: b.eventId || b.id,
+        title: b.title,
+        category: b.subtitle || 'Featured Spotlight',
+        banner: b.imageUrl,
+        image: b.imageUrl,
+        ctaText: b.ctaText || 'Get Tickets',
+        customUrl: b.customUrl,
+        dateFormatted: 'Curated Experience',
+        venueName: b.eventTitle ? `Stage: ${b.eventTitle}` : 'Special Event',
+        city: '',
+        startingPrice: 'Spotlight',
+      }))
+    }
+
     const list = []
     if (featuredHero) {
       list.push(featuredHero)
@@ -126,7 +160,22 @@ export default function Home() {
       })
     }
     return list.slice(0, 5)
-  }, [featuredHero, allEvents])
+  }, [customBanners, featuredHero, allEvents])
+
+  // Recommended events curated by Super Admin
+  const curatedRecommendedEvents = useMemo(() => {
+    if (customRecommendations && customRecommendations.length > 0) {
+      const list = []
+      customRecommendations.forEach((rec) => {
+        const found = allEvents.find((e) => e.id === rec.eventId)
+        if (found && !list.some((item) => item.id === found.id)) {
+          list.push(found)
+        }
+      })
+      if (list.length > 0) return list
+    }
+    return []
+  }, [customRecommendations, allEvents])
 
   // Category segmentations
   const trendingEvents = useMemo(() => {
@@ -238,6 +287,20 @@ export default function Home() {
         </div>
       )}
 
+      {/* 3.5. Curated Recommendations (if set by Super Admin) */}
+      {curatedRecommendedEvents.length > 0 && (
+        <HomeEventSection
+          title="Curated Recommendations"
+          subtitle="Hand-picked events and editor's top choices this week"
+          icon={Sparkles}
+          badge="Featured Choice"
+          viewAllLink="/discover"
+          events={curatedRecommendedEvents}
+          isLoading={isLoading}
+          onBookmarkChange={handleBookmarkChange}
+        />
+      )}
+
       {/* 4. Trending / Selling Fast Section */}
       <HomeEventSection
         title="Trending Events"
@@ -265,7 +328,7 @@ export default function Home() {
       )}
 
       {/* 4. Host Organizer Promo Banner */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-stone-950 via-stone-900 to-orange-950/90 text-white p-8 sm:p-12 shadow-xl border border-stone-800/80">
+      <section className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-stone-950 via-stone-900 to-orange-950/90 text-white p-8 sm:p-12 shadow-xl border border-stone-800/80">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-semibold uppercase font-mono">

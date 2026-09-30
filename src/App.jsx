@@ -28,6 +28,24 @@ import OrganizerSettings from './pages/ManagerPages/OrganizerSettings'
 import CreateEvent from './pages/ManagerPages/CreateEvent'
 import EventDashboard from './pages/ManagerPages/EventDashboard'
 import EditEvent from './pages/ManagerPages/EditEvent'
+import ManagerNotifications from './pages/ManagerPages/Notifications'
+
+// Super Admin Pages & Layout
+import AdminLayout from './layouts/AdminLayout'
+import {
+  AdminDashboard,
+  AdminEvents,
+  AdminBanners,
+  AdminRecommendedEvents,
+  AdminUsers,
+  AdminOrganizers,
+  AdminTransactions,
+  AdminPayouts,
+  AdminAttendance,
+  AdminReports,
+  AdminSettings,
+  AdminAuditLogs,
+} from './pages/AdminPages'
 
 // User Pages & Layout
 import UserLayout from './layouts/UserLayout'
@@ -38,6 +56,8 @@ import MyTickets from './pages/UserPages/MyTickets'
 import Saved from './pages/UserPages/Saved'
 import Orders from './pages/UserPages/Orders'
 import Profile from './pages/UserPages/Profile'
+import UserNotifications from './pages/UserPages/Notifications'
+
 
 import ScrollToTop from './components/ScrollToTop'
 import { AuthPromptProvider } from './context/AuthPromptContext'
@@ -95,22 +115,46 @@ function App() {
             <Route path="/about" element={<LandingPage />} />
           </Route>
 
-          {/* Guest-Only Auth Routes (Login, Signup, Password Recovery) */}
+          {/* Guest-Only Auth Routes (Login, Signup, Forgot Password) */}
           <Route element={<GuestRoute />}>
             <Route path="/account" element={<AuthLayout />}>
               <Route index element={<Navigate to="login" replace />} />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<Signup />} />
               <Route path="forgot-password" element={<ForgotPassword />} />
-              <Route path="reset-password" element={<ResetPassword />} />
             </Route>
             <Route path="/Account/*" element={<Navigate to="/account" replace />} />
+          </Route>
+
+          {/* Reset Password Route (Accessible directly via email link token) */}
+          <Route path="/account" element={<AuthLayout />}>
+            <Route path="reset-password" element={<ResetPassword />} />
+          </Route>
+
+          {/* Super Admin Routes (Protected - Requires Super Admin Privilege) */}
+          <Route element={<ProtectedRoute requiresAdmin={true} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="events" element={<AdminEvents />} />
+              <Route path="banners" element={<AdminBanners />} />
+              <Route path="recommendations" element={<AdminRecommendedEvents />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="organizers" element={<AdminOrganizers />} />
+              <Route path="transactions" element={<AdminTransactions />} />
+              <Route path="payouts" element={<AdminPayouts />} />
+              <Route path="attendance" element={<AdminAttendance />} />
+              <Route path="reports" element={<AdminReports />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="audit-logs" element={<AdminAuditLogs />} />
+            </Route>
+            <Route path="/Admin/*" element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
 
           {/* Manager Routes (Protected - Requires Organizer Capability) */}
           <Route element={<ProtectedRoute requiresOrganizer={true} />}>
             <Route path="/manager" element={<ManagerLayout />}>
-              <Route index element={<Navigate to="overview" replace />} />
+              <Route index element={<Navigate to="/manager/overview" replace />} />
               <Route path="overview" element={<Overview />} />
               <Route path="events" element={<MyEvents />} />
               <Route path="events/create" element={<CreateEvent />} />
@@ -120,11 +164,12 @@ function App() {
               <Route path="attendees" element={<Attendees />} />
               <Route path="payouts" element={<PayoutsAndRevenue />} />
               <Route path="settings" element={<OrganizerSettings />} />
+              <Route path="notifications" element={<ManagerNotifications />} />
             </Route>
             <Route path="/Manager/*" element={<Navigate to="/manager" replace />} />
           </Route>
 
-          {/* User Protected Routes (Tickets, Saved Bookmarks, Order Invoices) */}
+          {/* User Protected Routes (Tickets, Saved Bookmarks, Order Invoices, Notifications) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/user" element={<UserLayout />}>
               <Route index element={<Navigate to="/" replace />} />
@@ -135,9 +180,18 @@ function App() {
               <Route path="saved" element={<Saved />} />
               <Route path="orders" element={<Orders />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="notifications" element={<UserNotifications />} />
             </Route>
             <Route path="/User/*" element={<Navigate to="/" replace />} />
+            {/* Direct convenience route aliases */}
+            <Route path="/profile" element={<Navigate to="/user/profile" replace />} />
+            <Route path="/settings" element={<Navigate to="/user/profile" replace />} />
+            <Route path="/tickets" element={<Navigate to="/user/tickets" replace />} />
+            <Route path="/saved" element={<Navigate to="/user/saved" replace />} />
+            <Route path="/orders" element={<Navigate to="/user/orders" replace />} />
+            <Route path="/notifications" element={<Navigate to="/user/notifications" replace />} />
           </Route>
+
 
           {/* 404 / Catch-all Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

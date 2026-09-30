@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { updateUser } from '../../redux/slice/authSlice'
 import {
   Building2,
   CreditCard,
@@ -28,6 +30,7 @@ import {
 } from './OrganizerSettings/index'
 
 export default function OrganizerSettings() {
+  const dispatch = useDispatch()
   const [activeSection, setActiveSection] = useState('profile')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -158,6 +161,18 @@ export default function OrganizerSettings() {
         setLogoPreview(profile.logoUrl || profile.logo_url)
       }
 
+      if (profile.organizationName || profile.organization_name || profile.logoUrl || profile.logo_url) {
+        dispatch(updateUser({
+          organizationName: profile.organizationName || profile.organization_name,
+          organization_name: profile.organizationName || profile.organization_name,
+          studioLogo: profile.logoUrl || profile.logo_url,
+          logoUrl: profile.logoUrl || profile.logo_url,
+          logo_url: profile.logoUrl || profile.logo_url,
+          organizerHandle: profile.handle,
+          organizer_handle: profile.handle,
+        }))
+      }
+
       setTicketingSettings({
         passPlatformFeeToBuyer: profile.passPlatformFeeToBuyer ?? profile.pass_platform_fee_to_buyer ?? true,
         allowTicketTransfers: profile.allowTicketTransfers ?? profile.allow_ticket_transfers ?? true,
@@ -278,6 +293,16 @@ export default function OrganizerSettings() {
         logoUrl: updated.logoUrl || updated.logo_url || (payload.logoUrl === '' ? '' : prev.logoUrl),
       }))
       setLogoPreview(updated.logoUrl || updated.logo_url || (payload.logoUrl === '' ? '' : ''))
+
+      dispatch(updateUser({
+        organizationName: updated.organizationName || updated.organization_name || prev.organizationName,
+        organization_name: updated.organizationName || updated.organization_name || prev.organizationName,
+        studioLogo: updated.logoUrl || updated.logo_url || (payload.logoUrl === '' ? '' : prev.logoUrl),
+        logoUrl: updated.logoUrl || updated.logo_url || (payload.logoUrl === '' ? '' : prev.logoUrl),
+        logo_url: updated.logoUrl || updated.logo_url || (payload.logoUrl === '' ? '' : prev.logoUrl),
+        organizerHandle: updated.handle || prev.handle,
+        organizer_handle: updated.handle || prev.handle,
+      }))
 
       setSavedNotification(successMsg)
       setTimeout(() => setSavedNotification(''), 4000)
@@ -586,30 +611,35 @@ export default function OrganizerSettings() {
         </div>
       )}
 
-      {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-xl border border-stone-200/80 w-full sm:w-fit overflow-x-auto">
-        {sections.map((tab) => {
-          const Icon = tab.icon
-          const isActive = activeSection === tab.id
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                setActiveSection(tab.id)
-                setErrorMessage('')
-              }}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? 'bg-stone-900 text-stone-50 shadow-sm'
-                  : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/50'
-              }`}
-            >
-              <Icon size={14} className={isActive ? 'text-stone-50' : 'text-stone-400'} />
-              <span>{tab.label}</span>
-            </button>
-          )
-        })}
+      {/* Navigation Sub-Tabs (Zero-Scroll Responsive Grid & Flex) */}
+      <div className="w-full">
+        <nav
+          aria-label="Organizer Settings Sections"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-1.5 p-1.5 bg-stone-100/90 rounded-xl border border-stone-200/80 w-full"
+        >
+          {sections.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeSection === tab.id
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setActiveSection(tab.id)
+                  setErrorMessage('')
+                }}
+                className={`flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 sm:py-2 rounded-lg text-xs font-medium transition-all cursor-pointer select-none active:scale-95 text-center sm:text-left ${
+                  isActive
+                    ? 'bg-stone-900 text-stone-50 shadow-xs font-semibold'
+                    : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/60 bg-white/60 sm:bg-transparent'
+                }`}
+              >
+                <Icon size={14} className={`shrink-0 ${isActive ? 'text-stone-50' : 'text-stone-500'}`} />
+                <span className="truncate">{tab.label}</span>
+              </button>
+            )
+          })}
+        </nav>
       </div>
 
       {/* SECTION 1: STUDIO PROFILE */}

@@ -4,6 +4,7 @@ const initialState = {
   user: null,
   role: null,
   isOrganizer: false,
+  isSuperAdmin: false,
   accessToken: null,
   isAuthenticated: false,
   isInitialized: false,
@@ -31,6 +32,7 @@ const authSlice = createSlice({
         state.user = user
         state.role = user?.role || (user?.isOrganizer ? 'manager' : 'user')
         state.isOrganizer = Boolean(user?.isOrganizer || user?.is_organizer || user?.role === 'manager')
+        state.isSuperAdmin = Boolean(user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin')
       }
       if (accessToken) {
         state.accessToken = accessToken
@@ -46,6 +48,7 @@ const authSlice = createSlice({
         state.user = user
         state.role = user?.role || (user?.isOrganizer ? 'manager' : 'user')
         state.isOrganizer = Boolean(user?.isOrganizer || user?.is_organizer || user?.role === 'manager')
+        state.isSuperAdmin = Boolean(user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin')
       }
       if (accessToken) {
         state.accessToken = accessToken
@@ -60,6 +63,7 @@ const authSlice = createSlice({
       state.user = { ...state.user, ...updatedUser }
       state.role = updatedUser?.role || state.role || 'user'
       state.isOrganizer = Boolean(updatedUser?.isOrganizer !== undefined ? updatedUser.isOrganizer : state.isOrganizer)
+      state.isSuperAdmin = Boolean(updatedUser?.isSuperAdmin !== undefined ? updatedUser.isSuperAdmin : state.isSuperAdmin)
     },
     setInitialized: (state, action) => {
       state.isInitialized = action.payload !== undefined ? action.payload : true
@@ -69,6 +73,7 @@ const authSlice = createSlice({
       state.user = null
       state.role = null
       state.isOrganizer = false
+      state.isSuperAdmin = false
       state.accessToken = null
       state.isAuthenticated = false
       state.isInitialized = true

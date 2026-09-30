@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   Calendar, 
   Clock, 
@@ -7,7 +7,8 @@ import {
   Share2,
   Bookmark,
   Sparkles,
-  Armchair
+  Armchair,
+  ShieldCheck
 } from 'lucide-react'
 
 export default function EventDetailHero({
@@ -20,7 +21,13 @@ export default function EventDetailHero({
   onShare,
   onToggleBookmark
 }) {
+  const [logoError, setLogoError] = useState(false)
+
   if (!event) return null
+
+  const organizerName = event.organizer || 'Nexus Productions'
+  const organizerLogo = !logoError && (event.organizerLogo || event.organizer_logo)
+  const organizerHandle = event.organizerHandle || event.organizer_handle || organizerName.toLowerCase().replace(/[^a-z0-9]/g, '')
 
   return (
     <div className="space-y-8">
@@ -75,6 +82,24 @@ export default function EventDetailHero({
 
         <div className="relative z-10 p-4 sm:p-8 lg:p-10 space-y-2 sm:space-y-4 max-w-3xl">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            {/* Host Studio Verified Capsule */}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono text-stone-100 shadow-xs">
+              {organizerLogo ? (
+                <img
+                  src={organizerLogo}
+                  alt={organizerName}
+                  onError={() => setLogoError(true)}
+                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover ring-1 ring-white/40 shrink-0"
+                />
+              ) : (
+                <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-stone-800 text-amber-400 font-serif text-[9px] font-bold flex items-center justify-center shrink-0">
+                  {organizerName.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="truncate max-w-[180px]">{organizerName}</span>
+              <ShieldCheck size={13} className="text-blue-400 fill-blue-400/20 shrink-0" />
+            </div>
+
             <span className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-stone-900/80 backdrop-blur-md border border-stone-700/80 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-amber-400 shadow-xs">
               <Sparkles size={10} className="sm:w-3 sm:h-3" />
               {event.category || 'Curated Experience'}

@@ -1,4 +1,5 @@
-import { ChevronDown, Building2 } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronDown, Building2, ShieldCheck } from 'lucide-react'
 
 export default function OrganizerTicketGroup({
   organizer,
@@ -6,11 +7,14 @@ export default function OrganizerTicketGroup({
   onToggle,
   children,
 }) {
+  const [logoError, setLogoError] = useState(false)
+
   if (!organizer) return null
 
-  const { organizerName, totalTicketsCount, events = [] } = organizer
+  const { organizerName, organizerLogo, totalTicketsCount, events = [] } = organizer
   const organizerInitial = organizerName ? organizerName.charAt(0).toUpperCase() : 'O'
   const eventCount = events.length
+  const showLogo = !logoError && organizerLogo
 
   return (
     <div className="rounded-2xl border border-stone-200/90 bg-white overflow-hidden shadow-2xs hover:border-stone-300 transition-all duration-200">
@@ -32,15 +36,25 @@ export default function OrganizerTicketGroup({
             <ChevronDown className="w-4 h-4" />
           </div>
 
-          {/* Organizer Initial Badge */}
-          <div className="w-8 h-8 rounded-xl bg-stone-900 text-stone-50 font-serif font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-            {organizerInitial}
+          {/* Organizer Logo / Initial Badge */}
+          <div className="w-9 h-9 rounded-xl bg-stone-900 text-amber-400 font-serif font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs overflow-hidden ring-1 ring-stone-200">
+            {showLogo ? (
+              <img
+                src={organizerLogo}
+                alt={organizerName}
+                onError={() => setLogoError(true)}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              organizerInitial
+            )}
           </div>
 
           {/* Organizer Title & Events Subtitle */}
           <div className="truncate">
-            <h2 className="font-semibold text-stone-900 text-base sm:text-lg tracking-tight truncate">
-              {organizerName}
+            <h2 className="font-semibold text-stone-900 text-base sm:text-lg tracking-tight truncate flex items-center gap-1.5">
+              <span>{organizerName}</span>
+              <ShieldCheck size={14} className="text-blue-500 fill-blue-500/15 shrink-0" />
             </h2>
             <p className="text-[11px] text-stone-500 flex items-center gap-1.5 font-mono">
               <Building2 className="w-3 h-3 text-stone-400" />

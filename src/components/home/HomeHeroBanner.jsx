@@ -167,17 +167,17 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
               <div
                 key={slide.id || idx}
                 onClick={() => !isCenter && setCurrentIndex(idx)}
-                className={`absolute w-[94%] sm:w-[86%] lg:w-[80%] h-[300px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-900 ${placementClass}`}
+                className={`absolute w-[94%] sm:w-[86%] lg:w-[80%] h-[300px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-lg sm:rounded-xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-900 ${placementClass}`}
               >
                 {/* Card Background Banner (Full Quality, Unfaded) */}
                 <img
                   src={slideImg}
                   alt={slideTitle}
-                  className="absolute inset-0 w-full h-full object-cover object-center rounded-2xl sm:rounded-3xl"
+                  className="absolute inset-0 w-full h-full object-cover object-center rounded-lg sm:rounded-xl"
                 />
 
                 {/* Localized Bottom Gradient for Crisp Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 via-45% to-transparent rounded-2xl sm:rounded-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 via-45% to-transparent rounded-lg sm:rounded-xl" />
 
                 {/* Card Content Overlay */}
                 <div className="relative z-10 p-4 sm:p-7 lg:p-10 h-full flex flex-col justify-between text-left">
@@ -261,8 +261,8 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
               className={`rounded-full transition-all duration-300 cursor-pointer ${currentIndex === idx
-                  ? 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-600 shadow-xs'
-                  : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-200/80 hover:bg-blue-300'
+                ? 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-600 shadow-xs'
+                : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-200/80 hover:bg-blue-300'
                 }`}
             />
           ))}

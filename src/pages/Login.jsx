@@ -42,9 +42,10 @@ function Login() {
         // Store user and access token in in-memory Redux state
         dispatch(setCredentials({ user, accessToken: access }))
 
-        // Seamless navigation: if manager/organizer, go to manager overview, else intended path
+        // Seamless navigation: if admin go to admin dashboard, if manager go to overview, else intended path
+        const isSuperAdminUser = user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin'
         const isOrganizerUser = user?.isOrganizer || user?.is_organizer || user?.role === 'manager'
-        const defaultPath = isOrganizerUser ? '/manager/overview' : '/'
+        const defaultPath = isSuperAdminUser ? '/admin/dashboard' : (isOrganizerUser ? '/manager/overview' : '/')
         const targetPath = location.state?.from?.pathname || (typeof location.state?.from === 'string' ? location.state.from : null) || defaultPath
         navigate(targetPath, { replace: true })
       } catch (err) {

@@ -22,6 +22,8 @@ export default function ReceiptModal({ receipt, onClose }) {
   const fees = receipt.fees || '$0.00'
   const total = receipt.total || receipt.totalPaid || receipt.total_amount || '$0.00'
   const paymentMethod = receipt.paymentMethod || receipt.payment_method || 'Instant Pass'
+  const organizerName = receipt.organizer || receipt.organizerName || 'Nexus Productions'
+  const organizerLogo = receipt.organizerLogo || receipt.organizer_logo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-xs animate-in fade-in duration-150">
@@ -37,11 +39,22 @@ export default function ReceiptModal({ receipt, onClose }) {
 
         {/* Receipt Header */}
         <div className="flex items-center justify-between border-b border-stone-200 pb-4">
-          <div className="flex items-center gap-2">
-            <span className="h-6 w-6 rounded bg-stone-900 text-stone-50 flex items-center justify-center font-sans font-bold text-xs">
-              E
-            </span>
-            <span className="font-serif font-semibold text-base">Evento Checkout</span>
+          <div className="flex items-center gap-2.5">
+            <div className="h-7 w-7 rounded-lg bg-stone-900 text-amber-400 flex items-center justify-center font-serif font-bold text-xs overflow-hidden ring-1 ring-stone-200 shrink-0">
+              {organizerLogo ? (
+                <img
+                  src={organizerLogo}
+                  alt={organizerName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                organizerName.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div>
+              <span className="font-serif font-semibold text-base text-stone-900 block leading-tight">Evento Invoice</span>
+              <span className="text-[10px] font-mono text-stone-500">Issued by {organizerName}</span>
+            </div>
           </div>
           <div className="text-right">
             <span className="text-[10px] font-mono uppercase text-stone-400 block">Receipt</span>

@@ -15,10 +15,12 @@ import {
   Check, 
   Building2, 
   Ticket,
-  ShieldCheck
+  ShieldCheck,
+  Camera
 } from 'lucide-react'
 import API from '../../services/api'
 import { exportToCsv } from '../../utils/exportCsv'
+import QrScannerModal from '../../components/modals/QrScannerModal'
 
 export default function Attendees() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -39,11 +41,23 @@ export default function Attendees() {
   const [fetchError, setFetchError] = useState(null)
   const [actionLoadingId, setActionLoadingId] = useState(null)
 
-  // Scanner modal state
+  // Scanner modal states
   const [isScannerOpen, setIsScannerOpen] = useState(false)
+  const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false)
   const [scanCodeInput, setScanCodeInput] = useState('')
   const [scanResult, setScanResult] = useState(null)
   const [isScanning, setIsScanning] = useState(false)
+
+  // Live Camera Scan handler for QrScannerModal
+  const handleCameraScan = async (scannedCode) => {
+    const res = await API.post(`tickets/manager/attendees/${scannedCode}/check-in/`, {
+      mode: 'scan',
+      action: 'admit',
+    })
+    // Re-fetch manifest data in background
+    fetchAttendeesData()
+    return res.data
+  }
 
   // Keep state in sync with URL search params
   useEffect(() => {
@@ -104,7 +118,7 @@ export default function Attendees() {
             return {
               ...att,
               checkedIn: isNowCheckedIn,
-              checkInTime: res.data.checkInTime || (isNowCheckedIn ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null),
+              checkInTime: isNowCheckedIn ? (res.data.checkInTime || res.data.check_in_time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) : null,
             }
           }
           return att
@@ -210,16 +224,26 @@ export default function Attendees() {
             <Download size={13} />
             <span>Export Manifest (.CSV)</span>
           </button>
+
           <button
             type="button"
             onClick={() => {
               setScanResult(null)
               setIsScannerOpen(true)
             }}
-            className="rounded-md bg-stone-900 px-3.5 py-2 text-xs font-mono font-medium text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center gap-1.5"
+            className="rounded-md border border-stone-300 bg-white px-3.5 py-2 text-xs font-mono font-medium text-stone-800 hover:bg-stone-50 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center gap-1.5"
           >
             <QrCode size={14} />
-            <span>Launch Gate Scanner</span>
+            <span>Enter Code Manually</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCameraScannerOpen(true)}
+            className="rounded-md bg-stone-900 px-3.5 py-2 text-xs font-mono font-medium text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center gap-1.5"
+          >
+            <Camera size={14} className="text-amber-400" />
+            <span>Live Camera Scanner</span>
           </button>
         </div>
       </div>
@@ -620,6 +644,14 @@ export default function Attendees() {
           </div>
         </div>
       )}
+
+      {/* Live Camera QR Scanner Modal */}
+      <QrScannerModal
+        isOpen={isCameraScannerOpen}
+        onClose={() => setIsCameraScannerOpen(false)}
+        onScanResult={handleCameraScan}
+        activeEventTitle={activeEventObj ? activeEventObj.title : 'All Stages Gate'}
+      />
     </div>
   )
 }

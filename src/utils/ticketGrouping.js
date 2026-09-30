@@ -13,14 +13,20 @@ export function groupTicketsByOrganizerAndEvent(tickets = []) {
 
   for (const ticket of tickets) {
     const organizerName = (ticket.organizer || 'Independent Host').trim()
+    const organizerLogo = ticket.organizerLogo || ticket.organizer_logo || ''
+    const organizerHandle = ticket.organizerHandle || ticket.organizer_handle || ''
     const eventTitle = (ticket.eventTitle || ticket.event || 'Untitled Event').trim()
 
     // 1. Get or initialize Organizer entry
     if (!organizerMap.has(organizerName)) {
       organizerMap.set(organizerName, {
         organizerName,
+        organizerLogo,
+        organizerHandle,
         eventsMap: new Map(),
       })
+    } else if (organizerLogo && !organizerMap.get(organizerName).organizerLogo) {
+      organizerMap.get(organizerName).organizerLogo = organizerLogo
     }
     const organizerEntry = organizerMap.get(organizerName)
 
@@ -79,6 +85,8 @@ export function groupTicketsByOrganizerAndEvent(tickets = []) {
 
     result.push({
       organizerName: org.organizerName,
+      organizerLogo: org.organizerLogo,
+      organizerHandle: org.organizerHandle,
       totalTicketsCount: organizerTicketCount,
       events,
     })

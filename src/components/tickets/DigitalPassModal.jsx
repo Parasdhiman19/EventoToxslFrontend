@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   X,
@@ -10,9 +10,13 @@ import {
   CheckCircle2,
   Armchair,
   ExternalLink,
+  QrCode,
 } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 
 export default function DigitalPassModal({ ticket, onClose }) {
+  const [logoError, setLogoError] = useState(false)
+
   // Close modal on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -36,8 +40,10 @@ export default function DigitalPassModal({ ticket, onClose }) {
   const price = ticket.price || '$0.00'
   const attendeeName = ticket.attendeeName || ticket.name || 'Admit One'
   const seatInfo = ticket.seat || ticket.gate || ticket.seatOrGate || 'Main Gate'
-  const isCheckedIn = Boolean(ticket.checkedIn)
+  const isCheckedIn = Boolean(ticket.checkedIn || ticket.is_checked_in)
+  const checkInTime = ticket.checkInTime || ticket.check_in_time
   const organizerName = ticket.organizer || 'Event Host'
+  const organizerLogo = !logoError && (ticket.organizerLogo || ticket.organizer_logo)
 
   return (
     <div
@@ -71,27 +77,31 @@ export default function DigitalPassModal({ ticket, onClose }) {
             {eventTitle}
           </h3>
 
-          <p className="text-xs text-stone-400 truncate max-w-xs mx-auto">
-            Presented by <span className="text-stone-200 font-medium">{organizerName}</span>
-          </p>
+          <div className="flex items-center justify-center gap-1.5 text-xs text-stone-400 truncate max-w-xs mx-auto">
+            <span>Presented by</span>
+            {organizerLogo ? (
+              <img
+                src={organizerLogo}
+                alt={organizerName}
+                onError={() => setLogoError(true)}
+                className="w-4 h-4 rounded-full object-cover ring-1 ring-white/30 shrink-0"
+              />
+            ) : null}
+            <span className="text-stone-200 font-medium">{organizerName}</span>
+          </div>
         </div>
 
         {/* High-Contrast Barcode / QR Ticket Box */}
         <div className="bg-white text-stone-950 p-4 sm:p-6 rounded-xl text-center space-y-3.5 shadow-md">
-          {/* QR Code Graphic */}
-          <div className="h-36 w-36 sm:h-40 sm:w-40 mx-auto bg-stone-50 rounded-xl p-3 sm:p-3.5 flex items-center justify-center border border-stone-200">
-            <div className="grid grid-cols-5 gap-1.5 w-full h-full">
-              {Array.from({ length: 25 }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-xs ${
-                    idx % 2 === 0 || idx % 5 === 0 || idx === 12
-                      ? 'bg-stone-950'
-                      : 'bg-transparent'
-                  }`}
-                />
-              ))}
-            </div>
+          {/* Real Scannable QR Code */}
+          <div className="h-44 w-44 sm:h-48 sm:w-48 mx-auto bg-white rounded-xl p-3 flex items-center justify-center border border-stone-200 shadow-inner">
+            <QRCodeSVG
+              value={ticketCode}
+              size={168}
+              level="H"
+              includeMargin={false}
+              className="w-full h-full object-contain"
+            />
           </div>
 
           {/* Barcode / Ticket Code info */}
@@ -110,7 +120,9 @@ export default function DigitalPassModal({ ticket, onClose }) {
             {isCheckedIn ? (
               <span className="inline-flex items-center gap-1 text-xs font-mono font-semibold text-emerald-600">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Checked in at venue door</span>
+                <span>
+                  Checked in at venue door{checkInTime ? ` (${checkInTime})` : ''}
+                </span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-xs font-mono text-stone-500">

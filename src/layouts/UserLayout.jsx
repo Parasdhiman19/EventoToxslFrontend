@@ -17,12 +17,16 @@ import {
   CheckCircle2,
   Building2,
   ArrowRight,
-  Loader2
+  Loader2,
+  ShieldCheck,
+  Bell
 } from 'lucide-react'
 import API from '../services/api'
 import { logout, updateUser } from '../redux/slice/authSlice'
 import Footer from '../components/layout/Footer'
 import { useAuthPrompt } from '../context/AuthPromptContext'
+import NotificationBell from '../components/notifications/NotificationBell'
+
 
 export default function UserLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -81,7 +85,7 @@ export default function UserLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
-  const { user, isOrganizer, isAuthenticated } = useSelector((state) => state.auth)
+  const { user, isOrganizer, isSuperAdmin, isAuthenticated } = useSelector((state) => state.auth)
   const { openAuthPrompt } = useAuthPrompt()
 
   // Load events for instant search dropdown
@@ -481,6 +485,11 @@ export default function UserLayout() {
 
               <div className="h-5 w-px bg-stone-200 mx-0.5" />
 
+              {/* Notification Bell (Desktop) */}
+              {isAuthenticated && (
+                <NotificationBell />
+              )}
+
               {/* Profile Dropdown */}
               {isAuthenticated ? (
                 <div className="relative" ref={profileRef}>
@@ -537,6 +546,14 @@ export default function UserLayout() {
 
                       <div className="py-1.5 px-1.5 space-y-0.5">
                         <Link
+                          to="/user/notifications"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-stone-700 hover:bg-stone-100 hover:text-stone-950 transition font-medium"
+                        >
+                          <Bell size={14} className="text-stone-500" />
+                          <span>Notifications</span>
+                        </Link>
+                        <Link
                           to="/user/profile"
                           onClick={() => setIsProfileOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-stone-700 hover:bg-stone-100 hover:text-stone-950 transition font-medium"
@@ -570,7 +587,21 @@ export default function UserLayout() {
                         </Link>
                       </div>
 
-                      <div className="p-1.5">
+                      <div className="p-1.5 space-y-1">
+                        {(isSuperAdmin || user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin') && (
+                          <Link
+                            to="/admin/dashboard"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-purple-950 font-semibold bg-purple-50 hover:bg-purple-100/80 transition border border-purple-200"
+                          >
+                            <span className="flex items-center gap-2">
+                              <ShieldCheck size={14} className="text-purple-700" />
+                              Super Admin Console
+                            </span>
+                            <span>&rarr;</span>
+                          </Link>
+                        )}
+
                         {userHasOrganizerAccess ? (
                           <Link
                             to="/manager/overview"
@@ -632,8 +663,12 @@ export default function UserLayout() {
               )}
             </div>
 
-            {/* Mobile Menu Toggle Button with Expanding/Contracting morphing interaction */}
+            {/* Mobile Menu Toggle & Mobile Notification Bell */}
             <div className="flex md:hidden items-center gap-2">
+              {isAuthenticated && (
+                <NotificationBell />
+              )}
+
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

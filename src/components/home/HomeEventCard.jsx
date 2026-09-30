@@ -15,6 +15,7 @@ export default function HomeEventCard({
   const { isAuthenticated } = useSelector((state) => state.auth || {})
   const { openAuthPrompt } = useAuthPrompt()
   const [imageError, setImageError] = useState(false)
+  const [logoError, setLogoError] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(Boolean(event.isBookmarked || event.is_bookmarked))
   const [isSaving, setIsSaving] = useState(false)
 
@@ -25,9 +26,11 @@ export default function HomeEventCard({
   const venueDisplay = event.is_online
     ? 'Virtual Stream'
     : event.city
-    ? `${event.venueName || event.venue || 'Venue'}, ${event.city}`
-    : event.venueName || event.venue || 'Location TBA'
+      ? `${event.venueName || event.venue || 'Venue'}, ${event.city}`
+      : event.venueName || event.venue || 'Location TBA'
   const priceDisplay = event.startingPrice || event.priceRange || 'Free'
+  const organizerName = event.organizer || ''
+  const organizerLogo = !logoError && (event.organizerLogo || event.organizer_logo)
 
   const handleToggleBookmark = async (e) => {
     e.preventDefault()
@@ -95,11 +98,10 @@ export default function HomeEventCard({
             onClick={handleToggleBookmark}
             disabled={isSaving}
             aria-label="Save event"
-            className={`w-7 h-7 rounded-md flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
-              isBookmarked
-                ? 'bg-amber-500 text-white shadow-xs'
-                : 'bg-black/40 text-white hover:bg-black/60'
-            }`}
+            className={`w-7 h-7 rounded-md flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${isBookmarked
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-black/40 text-white hover:bg-black/60'
+              }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
@@ -126,6 +128,25 @@ export default function HomeEventCard({
       {/* Card Content */}
       <div className="flex flex-col flex-1 p-3.5 justify-between gap-3 transition-colors duration-300">
         <div className="space-y-1.5">
+          {/* Host studio mini pill */}
+          {organizerName && (
+            <div className="flex items-center gap-1.5 text-[11px] font-mono text-stone-500 line-clamp-1">
+              {organizerLogo ? (
+                <img
+                  src={organizerLogo}
+                  alt={organizerName}
+                  onError={() => setLogoError(true)}
+                  className="w-3.5 h-3.5 rounded-full object-cover ring-1 ring-stone-200 shrink-0"
+                />
+              ) : (
+                <span className="w-3.5 h-3.5 rounded-full bg-stone-900 text-amber-400 font-serif text-[8px] font-bold flex items-center justify-center shrink-0">
+                  {organizerName.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="truncate">{organizerName}</span>
+            </div>
+          )}
+
           {/* Event Title */}
           <h3 className="font-bold text-stone-900 text-[15px] leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors tracking-tight">
             {event.title}
