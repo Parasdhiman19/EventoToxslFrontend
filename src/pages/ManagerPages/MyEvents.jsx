@@ -30,12 +30,12 @@ export default function MyEvents() {
     }
   }
 
-  const handleDeleteSuccess = ({ eventId, deleted, isPermanent }) => {
+  const handleDeleteSuccess = ({ eventId, deleted, isPermanent, status: newStatus }) => {
     if (deleted || isPermanent) {
       setEvents((prev) => prev.filter((e) => e.id !== eventId))
     } else {
       setEvents((prev) =>
-        prev.map((e) => (e.id === eventId ? { ...e, status: 'past' } : e))
+        prev.map((e) => (e.id === eventId ? { ...e, status: newStatus || 'past' } : e))
       )
     }
   }
@@ -64,7 +64,7 @@ export default function MyEvents() {
       } else if (activeTab === 'staff') {
         matchesTab = event.userRole === 'staff'
       } else if (activeTab === 'past') {
-        matchesTab = event.status === 'past' && event.userRole !== 'staff'
+        matchesTab = (event.status === 'past' || event.status === 'cancelled') && event.userRole !== 'staff'
       }
 
       const q = searchQuery.toLowerCase().trim()
@@ -107,6 +107,12 @@ export default function MyEvents() {
         return (
           <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
             Draft
+          </span>
+        )
+      case 'cancelled':
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider bg-red-50 text-red-700 border border-red-200">
+            Cancelled
           </span>
         )
       case 'past':
