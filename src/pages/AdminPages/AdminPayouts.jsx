@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import API from '../../services/api'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   CreditCard,
   Search,
@@ -75,6 +77,18 @@ export default function AdminPayouts() {
       (p.destination_summary && p.destination_summary.toLowerCase().includes(q))
     )
   }, [payouts, search])
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedPayouts,
+    goToPage,
+    setPageSize,
+  } = usePagination(filteredPayouts, { initialPageSize: 15, resetDeps: [statusFilter, search] })
 
   const stats = useMemo(() => {
     const totalPending = payouts.filter((p) => p.status === 'Pending' || p.status === 'Processing')
@@ -227,7 +241,7 @@ export default function AdminPayouts() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono text-[11px]">
-                {filteredPayouts.map((p) => {
+                {paginatedPayouts.map((p) => {
                   const initials = getAvatarInitials(p.organizer_name || 'Host')
                   return (
                     <tr key={p.id} className="hover:bg-stone-50/80 transition">
@@ -301,6 +315,19 @@ export default function AdminPayouts() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          pageSize={pageSize}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="payouts"
+        />
       </div>
 
       {/* Payout Processing Slide-over Drawer */}

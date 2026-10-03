@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import API from '../../services/api'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   Calendar,
   Search,
@@ -30,6 +32,18 @@ export default function AdminEvents() {
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [actionLoadingId, setActionLoadingId] = useState(null)
   const [feedback, setFeedback] = useState('')
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedEvents,
+    goToPage,
+    setPageSize,
+  } = usePagination(events, { initialPageSize: 15, resetDeps: [statusFilter, search] })
 
   const fetchEvents = async () => {
     setLoading(true)
@@ -208,7 +222,7 @@ export default function AdminEvents() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {events.map((ev) => {
+                {paginatedEvents.map((ev) => {
                   let statusBadgeClass = 'bg-stone-100 text-stone-700 border-stone-200'
                   if (ev.status === 'published') statusBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200'
                   if (ev.status === 'draft') statusBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200'
@@ -317,6 +331,19 @@ export default function AdminEvents() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          pageSize={pageSize}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="events"
+        />
       </div>
 
       {/* Slide-over Inspection Sheet */}

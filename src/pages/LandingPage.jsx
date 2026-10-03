@@ -108,7 +108,7 @@ export default function LandingPage() {
                   <span>Gross Payouts & Settlement</span>
                 </div>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Direct revenue pipelines with transparent platform fees, automated invoicing, and instant bank transfers.
+                  Direct revenue pipelines with transparent platform fees, automated invoicing, and instant PayPal disbursements.
                 </p>
               </div>
             </div>

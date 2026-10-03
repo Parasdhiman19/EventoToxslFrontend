@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import API from '../../services/api'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   FileText,
   Search,
@@ -51,6 +53,18 @@ export default function AdminAuditLogs() {
       l.actionType?.toLowerCase().includes(actionFilter.toLowerCase())
     )
   }, [logs, actionFilter])
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedLogs,
+    goToPage,
+    setPageSize,
+  } = usePagination(filteredLogs, { initialPageSize: 20, resetDeps: [actionFilter, search] })
 
   return (
     <div className="space-y-6">
@@ -143,7 +157,7 @@ export default function AdminAuditLogs() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {filteredLogs.map((log) => {
+                {paginatedLogs.map((log) => {
                   const initials = getAvatarInitials(log.actorName || 'Admin')
                   return (
                     <tr
@@ -200,6 +214,20 @@ export default function AdminAuditLogs() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 20, 50, 100]}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="audit logs"
+        />
       </div>
 
       {/* Audit Log Slide-over Drawer */}

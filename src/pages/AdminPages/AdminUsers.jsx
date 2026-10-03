@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import API from '../../services/api'
 import { getAvatarInitials } from '../../utils/avatar'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   Users,
   Search,
@@ -33,6 +35,18 @@ export default function AdminUsers() {
   const [newRole, setNewRole] = useState('user')
   const [feedback, setFeedback] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedUsers,
+    goToPage,
+    setPageSize,
+  } = usePagination(users, { initialPageSize: 15, resetDeps: [roleFilter, statusFilter, search] })
 
   const fetchUsers = async () => {
     setLoading(true)
@@ -266,7 +280,7 @@ export default function AdminUsers() {
         <>
           {/* MOBILE VIEW: Clean, Compact User Cards */}
           <div className="block md:hidden space-y-3">
-            {users.map((u) => {
+            {paginatedUsers.map((u) => {
               const initials = getAvatarInitials(u.fullName || u.email, 'U')
               return (
                 <div
@@ -382,7 +396,7 @@ export default function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {users.map((u) => {
+                  {paginatedUsers.map((u) => {
                     const initials = getAvatarInitials(u.fullName || u.email, 'U')
                     return (
                       <tr key={u.id} className="hover:bg-stone-50/70 transition">
@@ -476,6 +490,34 @@ export default function AdminUsers() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            <AdminPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              pageSize={pageSize}
+              onPageChange={goToPage}
+              onPageSizeChange={setPageSize}
+              itemLabel="users"
+            />
+          </div>
+
+          {/* Mobile Pagination */}
+          <div className="block md:hidden bg-white rounded-xl border border-stone-200/80 shadow-2xs overflow-hidden">
+            <AdminPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              pageSize={pageSize}
+              onPageChange={goToPage}
+              onPageSizeChange={setPageSize}
+              itemLabel="users"
+            />
           </div>
         </>
       )}

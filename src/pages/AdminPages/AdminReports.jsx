@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import API from '../../services/api'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   Flag,
   Search,
@@ -80,6 +82,18 @@ export default function AdminReports() {
       return matchesStatus && matchesSearch
     })
   }, [reports, statusFilter, search])
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedReports,
+    goToPage,
+    setPageSize,
+  } = usePagination(filteredReports, { initialPageSize: 15, resetDeps: [statusFilter, search] })
 
   const stats = useMemo(() => {
     const pendingCount = reports.filter((r) => r.status !== 'Resolved' && r.status !== 'Dismissed').length
@@ -229,7 +243,7 @@ export default function AdminReports() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono text-[11px]">
-                {filteredReports.map((r) => (
+                {paginatedReports.map((r) => (
                   <tr key={r.id} className="hover:bg-stone-50/80 transition">
                     <td className="py-3 px-4 font-bold text-stone-900">
                       <span className="px-2 py-0.5 rounded bg-stone-100 border border-stone-200 text-stone-800">
@@ -281,6 +295,19 @@ export default function AdminReports() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          pageSize={pageSize}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="reports"
+        />
       </div>
 
       {/* Resolution Slide-over Drawer */}

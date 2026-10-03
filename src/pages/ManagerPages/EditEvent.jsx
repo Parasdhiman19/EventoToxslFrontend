@@ -4,7 +4,7 @@ import { useFormik } from 'formik'
 import {
   ArrowLeft,
   Save,
-  Trash2,
+  Archive,
   AlertCircle,
   Loader2,
   Armchair,
@@ -387,9 +387,9 @@ export default function EditEvent() {
           <button
             type="button"
             onClick={() => setIsDeleteModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-mono uppercase tracking-wider rounded-md transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-stone-300 text-stone-700 hover:bg-stone-50 text-xs font-mono uppercase tracking-wider rounded-md transition cursor-pointer"
           >
-            <Trash2 size={13} /> Delete / Archive
+            <Archive size={13} /> Archive / Cancel Stage
           </button>
           <button
             type="submit"
@@ -518,9 +518,9 @@ export default function EditEvent() {
         <button
           type="button"
           onClick={() => setIsDeleteModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-mono uppercase tracking-wider rounded-md transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-stone-300 text-stone-700 hover:bg-stone-50 text-xs font-mono uppercase tracking-wider rounded-md transition cursor-pointer"
         >
-          <Trash2 size={13} /> Delete / Archive
+          <Archive size={13} /> Archive / Cancel Stage
         </button>
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <Link

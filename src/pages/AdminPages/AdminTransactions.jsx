@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import API from '../../services/api'
+import usePagination from '../../hooks/usePagination'
+import AdminPagination from '../../components/admin/AdminPagination'
 import {
   Receipt,
   Search,
@@ -26,6 +28,18 @@ export default function AdminTransactions() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedTx, setSelectedTx] = useState(null)
   const [copiedId, setCopiedId] = useState('')
+
+  const {
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages,
+    startIndex,
+    endIndex,
+    paginatedData: paginatedTransactions,
+    goToPage,
+    setPageSize,
+  } = usePagination(transactions, { initialPageSize: 15, resetDeps: [statusFilter, search] })
 
   const fetchTransactions = async () => {
     setLoading(true)
@@ -209,7 +223,7 @@ export default function AdminTransactions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono text-[11px]">
-                {transactions.map((tx) => {
+                {paginatedTransactions.map((tx) => {
                   const captureId = tx.paypalCaptureId || tx.paypalOrderId
                   return (
                     <tr
@@ -290,6 +304,19 @@ export default function AdminTransactions() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          pageSize={pageSize}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="transactions"
+        />
       </div>
 
       {/* Slide-over Inspection Drawer */}

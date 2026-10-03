@@ -5,7 +5,17 @@
  * @param {string} filenamePrefix - Prefix for the downloaded file (e.g. 'evento_sales')
  */
 export function exportToCsv(headers, rows, filenamePrefix = 'evento_export') {
-  if (!rows || rows.length === 0) {
+  // Defensive check: normalize if called as (filename, headers, rows)
+  if (typeof headers === 'string' && Array.isArray(rows) && Array.isArray(filenamePrefix)) {
+    const actualPrefix = headers.replace(/\.csv$/i, '')
+    const actualHeaders = rows
+    const actualRows = filenamePrefix
+    headers = actualHeaders
+    rows = actualRows
+    filenamePrefix = actualPrefix
+  }
+
+  if (!rows || !Array.isArray(rows) || rows.length === 0 || !Array.isArray(headers)) {
     return false
   }
 

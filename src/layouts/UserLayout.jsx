@@ -19,7 +19,8 @@ import {
   ArrowRight,
   Loader2,
   ShieldCheck,
-  Bell
+  Bell,
+  HelpCircle
 } from 'lucide-react'
 import API from '../services/api'
 import { logout, updateUser } from '../redux/slice/authSlice'
@@ -592,13 +593,13 @@ export default function UserLayout() {
                           <Link
                             to="/admin/dashboard"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center justify-between px-3 py-2 rounded-xl text-purple-950 font-semibold bg-purple-50 hover:bg-purple-100/80 transition border border-purple-200"
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-stone-900 font-semibold bg-stone-100 hover:bg-stone-200/80 transition border border-stone-200"
                           >
                             <span className="flex items-center gap-2">
-                              <ShieldCheck size={14} className="text-purple-700" />
-                              Super Admin Console
+                              <ShieldCheck size={14} className="text-amber-600" />
+                              <span className="font-mono text-xs uppercase tracking-wide">Super Admin Console</span>
                             </span>
-                            <span>&rarr;</span>
+                            <span className="text-stone-400 font-mono">&rarr;</span>
                           </Link>
                         )}
 
@@ -766,38 +767,14 @@ export default function UserLayout() {
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
               </form>
 
-              {/* Navigation Links in Mobile Drawer */}
-              <div className="mt-4 space-y-1">
-                {navLinks.map((link) => {
-                  const Icon = link.icon
-                  return (
-                    <NavLink
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                          isActive
-                            ? 'bg-stone-900 text-stone-50 font-semibold shadow-xs'
-                            : 'text-stone-700 hover:bg-stone-100'
-                        }`
-                      }
-                    >
-                      <Icon size={16} />
-                      <span>{link.name}</span>
-                    </NavLink>
-                  )
-                })}
-              </div>
-
               {/* Authenticated User Badge in Mobile Drawer */}
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <Link
                   to="/user/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="my-4 flex items-center gap-3 p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 shadow-2xs transition active:scale-[0.98] group"
+                  className="mt-4 flex items-center gap-3 p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 shadow-2xs transition active:scale-[0.98] group"
                 >
-                  <div className="h-10 w-10 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 overflow-hidden border border-stone-200 shadow-2xs">
+                  <div className="h-11 w-11 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 overflow-hidden border border-stone-200 shadow-2xs">
                     {user?.avatarUrl || user?.avatar_url ? (
                       <img
                         src={user.avatarUrl || user.avatar_url}
@@ -813,11 +790,15 @@ export default function UserLayout() {
                       <span className="text-xs font-semibold text-stone-900 truncate group-hover:text-amber-900 transition-colors">
                         {user?.fullName || 'Attendee'}
                       </span>
-                      {userHasOrganizerAccess && (
+                      {(isSuperAdmin || user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin') ? (
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-semibold border border-amber-200/80">
+                          Admin
+                        </span>
+                      ) : userHasOrganizerAccess ? (
                         <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-stone-900 text-stone-50 font-medium">
                           Host
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <span className="text-[11px] font-mono text-stone-500 truncate">
                       {user?.username ? `@${user.username}` : user?.email}
@@ -827,36 +808,87 @@ export default function UserLayout() {
                     Edit &rarr;
                   </span>
                 </Link>
-              )}
+              ) : null}
 
-              {/* Mode Switch or Become Organizer Card */}
-              <div className="pt-2">
+              {/* Role Portals & Administration */}
+              <div className="mt-4 space-y-2">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-stone-400 px-1">
+                  Portals &amp; Roles
+                </p>
+
+                {/* Super Admin Console (Mobile) */}
+                {(isSuperAdmin || user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin') && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-stone-900 text-stone-50 text-xs font-mono uppercase tracking-wider font-semibold shadow-sm hover:bg-stone-800 active:scale-[0.98] transition border border-stone-800"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <ShieldCheck size={16} className="text-amber-400" />
+                      <span>Super Admin Console</span>
+                    </span>
+                    <span className="text-stone-400 font-mono">&rarr;</span>
+                  </Link>
+                )}
+
+                {/* Manager Mode or Become Organizer */}
                 {userHasOrganizerAccess ? (
                   <Link
                     to="/manager/overview"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-stone-900 text-stone-50 text-xs font-mono uppercase tracking-wider font-semibold shadow-sm hover:bg-stone-800 active:scale-[0.98] transition"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-stone-100 hover:bg-stone-200/80 text-stone-900 text-xs font-mono uppercase tracking-wider font-semibold border border-stone-200/90 active:scale-[0.98] transition shadow-2xs"
                   >
-                    <span className="flex items-center gap-2">
-                      <Building2 size={16} />
-                      Switch to Manager Mode
+                    <span className="flex items-center gap-2.5">
+                      <Building2 size={16} className="text-stone-700" />
+                      <span>Manager Dashboard</span>
                     </span>
-                    <span>&rarr;</span>
+                    <span className="text-stone-400 font-mono">&rarr;</span>
                   </Link>
                 ) : (
                   <button
                     type="button"
                     onClick={handleOpenBecomeOrganizer}
-                    className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-amber-50 text-amber-900 text-xs font-mono uppercase tracking-wider font-semibold border border-amber-200 hover:bg-amber-100/70 active:scale-[0.98] transition cursor-pointer"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-amber-50 text-amber-950 text-xs font-mono uppercase tracking-wider font-semibold border border-amber-200/90 hover:bg-amber-100/80 active:scale-[0.98] transition cursor-pointer"
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2.5">
                       <Sparkles size={16} className="text-amber-600" />
-                      Become an Organizer
+                      <span>Become an Organizer</span>
                     </span>
-                    <span>&rarr;</span>
+                    <span className="text-amber-700 font-mono">&rarr;</span>
                   </button>
                 )}
               </div>
+
+              {/* Account Actions & Utilities (Non-duplicate with bottom bar) */}
+              {isAuthenticated && (
+                <div className="mt-4 pt-3 border-t border-stone-100 space-y-1">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-stone-400 px-1 pb-1">
+                    Account &amp; Settings
+                  </p>
+                  <Link
+                    to="/user/notifications"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-950 transition"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Bell size={16} className="text-stone-500" />
+                      <span>Notifications</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-stone-400">&rarr;</span>
+                  </Link>
+                  <Link
+                    to="/user/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-950 transition"
+                  >
+                    <span className="flex items-center gap-3">
+                      <UserIcon size={16} className="text-stone-500" />
+                      <span>Profile &amp; Settings</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-stone-400">&rarr;</span>
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Bottom Actions: Sign Out or Auth Buttons */}

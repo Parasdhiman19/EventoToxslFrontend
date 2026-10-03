@@ -392,6 +392,19 @@ export default function ManagerLayout() {
                   <p className="text-[10px] font-mono uppercase tracking-widest text-stone-500 px-3 pb-1">
                     Portals &amp; Views
                   </p>
+                  {(user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin') && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-mono font-medium text-amber-300 bg-stone-800/90 hover:bg-stone-800 hover:text-amber-200 border border-stone-700/80 transition"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <ShieldCheck size={15} className="text-amber-400" />
+                        <span>Super Admin Console</span>
+                      </span>
+                      <ArrowUpRight size={14} className="text-amber-400" />
+                    </Link>
+                  )}
                   <Link
                     to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -570,13 +583,13 @@ export default function ManagerLayout() {
                       <Link
                         to="/admin/dashboard"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center justify-between px-4 py-2 text-purple-950 font-semibold bg-purple-50 hover:bg-purple-100 transition border-t border-purple-100"
+                        className="flex items-center justify-between px-4 py-2 text-stone-900 font-semibold bg-stone-100 hover:bg-stone-200/80 transition border-t border-stone-200 font-mono text-xs"
                       >
                         <span className="flex items-center gap-2">
-                          <ShieldCheck size={14} className="text-purple-700" />
-                          Super Admin Console
+                          <ShieldCheck size={14} className="text-amber-600" />
+                          <span>Super Admin Console</span>
                         </span>
-                        <span>&rarr;</span>
+                        <span className="text-stone-400">&rarr;</span>
                       </Link>
                     )}
                     <Link

@@ -258,7 +258,7 @@ export default function PayoutsAndRevenue() {
       p.status || 'Completed',
     ])
 
-    exportToCsv(`evento_payout_statement_${new Date().toISOString().slice(0, 10)}.csv`, headers, rows)
+    exportToCsv(headers, rows, 'evento_payout_statement')
   }
 
   // Filtered History

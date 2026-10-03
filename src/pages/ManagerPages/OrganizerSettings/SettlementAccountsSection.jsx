@@ -14,7 +14,7 @@ export default function SettlementAccountsSection({
           <div>
             <h2 className="font-serif text-lg font-medium text-stone-900">Payout Settlement Methods</h2>
             <p className="text-xs text-stone-500">
-              Connect your PayPal business email or direct bank deposit account to receive ticket sale disbursements.
+              Connect your PayPal account to receive ticket sale disbursements automatically.
             </p>
           </div>
           <button
@@ -31,9 +31,9 @@ export default function SettlementAccountsSection({
         {settlementAccounts.length === 0 ? (
           <div className="p-8 text-center rounded-xl bg-stone-50 border border-dashed border-stone-300 space-y-2">
             <CreditCard size={32} className="mx-auto text-stone-400" />
-            <p className="text-xs font-medium text-stone-800">No payout method connected</p>
+            <p className="text-xs font-medium text-stone-800">No PayPal account connected</p>
             <p className="text-[11px] text-stone-500 max-w-sm mx-auto">
-              Connect your PayPal merchant account so you can receive ticket revenue disbursements automatically.
+              Connect your PayPal account so you can receive ticket revenue disbursements automatically.
             </p>
           </div>
         ) : (
@@ -52,7 +52,7 @@ export default function SettlementAccountsSection({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-stone-900">
-                          {account.displayTitle || account.bankName || 'PayPal Account'}
+                          {account.displayTitle || 'PayPal Account'}
                         </span>
                         {isPrimary && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">
@@ -61,7 +61,7 @@ export default function SettlementAccountsSection({
                         )}
                       </div>
                       <p className="text-[11px] text-stone-500 font-mono mt-0.5">
-                        {account.paypalEmail || account.maskedAccount || account.accountNumber}
+                        {account.paypalEmail || account.paypal_email}
                       </p>
                     </div>
                   </div>

@@ -201,6 +201,9 @@ export default function EventFormScheduleVenueSection({ formik }) {
               { value: '23:59', label: '11:59 PM (Midnight)' },
             ]}
           />
+          <p className="text-[11px] text-stone-500 font-mono leading-tight">
+            Optional. If blank, stage remains active until 11:59 PM on event day or until manually ended.
+          </p>
         </div>
       </div>
 

@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { Trash2, Archive, AlertTriangle, AlertCircle, X, Loader2 } from 'lucide-react'
+import { Archive, AlertTriangle, AlertCircle, X, Loader2 } from 'lucide-react'
 import API from '../../services/api'
 
 /**
- * Reusable modal for archiving or permanently deleting an event stage.
+ * Reusable modal for archiving or cancelling an event stage.
  * Handles API call, safety warnings, and loading/error states.
  * 
  * @param {Object} props
  * @param {boolean} props.isOpen - Whether modal is visible
  * @param {Object} props.event - The event object ({ id, title })
  * @param {Function} props.onClose - Modal close handler
- * @param {Function} props.onSuccess - Callback after successful archive/deletion
+ * @param {Function} props.onSuccess - Callback after successful archive/cancellation
  */
 export default function DeleteArchiveEventModal({
   isOpen,
@@ -18,7 +18,7 @@ export default function DeleteArchiveEventModal({
   onClose,
   onSuccess,
 }) {
-  const [deleteMode, setDeleteMode] = useState('archive') // 'archive' | 'cancel' | 'permanent'
+  const [deleteMode, setDeleteMode] = useState('archive') // 'archive' | 'cancel'
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
 
@@ -30,15 +30,14 @@ export default function DeleteArchiveEventModal({
     setIsDeleting(true)
     setDeleteError(null)
     try {
-      const isPermanent = deleteMode === 'permanent'
-      const res = await API.delete(`events/manager/${event.id}/?action=${deleteMode}&permanent=${isPermanent}`)
+      const res = await API.delete(`events/manager/${event.id}/?action=${deleteMode}`)
       if (onSuccess) {
         onSuccess({
           eventId: event.id,
           action: deleteMode,
-          isPermanent,
-          deleted: isPermanent || res.data?.deleted,
-          status: isPermanent ? null : (res.data?.status || deleteMode),
+          isPermanent: false,
+          deleted: false,
+          status: res.data?.status || (deleteMode === 'cancel' ? 'cancelled' : 'past'),
           data: res.data,
         })
       }
@@ -68,7 +67,7 @@ export default function DeleteArchiveEventModal({
                 Manage Event Lifecycle
               </h3>
               <p className="text-xs text-stone-500 mt-0.5">
-                Choose how you want to archive, cancel, or remove this stage.
+                Choose how you want to archive or cancel this stage.
               </p>
             </div>
           </div>
@@ -175,54 +174,6 @@ export default function DeleteArchiveEventModal({
                 </p>
               </div>
             </div>
-
-            {/* Option 3: Permanent Delete */}
-            <div
-              onClick={() => {
-                if (!hasSales) setDeleteMode('permanent')
-              }}
-              className={`p-3.5 rounded-xl border transition flex items-start gap-3 ${
-                hasSales
-                  ? 'opacity-50 cursor-not-allowed bg-stone-50 border-stone-200'
-                  : deleteMode === 'permanent'
-                  ? 'border-red-600 bg-red-50/40 ring-1 ring-red-600 cursor-pointer'
-                  : 'border-stone-200 hover:border-stone-300 bg-white cursor-pointer'
-              }`}
-            >
-              <div className="mt-0.5">
-                <input
-                  type="radio"
-                  name="deleteMode"
-                  disabled={hasSales}
-                  checked={deleteMode === 'permanent'}
-                  onChange={() => {
-                    if (!hasSales) setDeleteMode('permanent')
-                  }}
-                  className="text-red-600 focus:ring-red-600 cursor-pointer disabled:opacity-40"
-                />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-red-700">
-                    Permanently Delete
-                  </span>
-                  {hasSales ? (
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-stone-200 text-stone-700 border border-stone-300">
-                      Blocked (Sales Exist)
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-red-100 text-red-800 border border-red-200">
-                      Destructive
-                    </span>
-                  )}
-                </div>
-                <p className="text-[11px] text-stone-500 mt-0.5">
-                  {hasSales
-                    ? 'Events with confirmed ticket sales cannot be permanently deleted to preserve financial and attendee records.'
-                    : 'Permanently erases the stage and tier configuration. Only available for empty drafts with zero ticket sales.'}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -241,9 +192,7 @@ export default function DeleteArchiveEventModal({
             onClick={handleDeleteSubmit}
             disabled={isDeleting}
             className={`px-4 py-2 text-xs font-mono font-medium text-white transition rounded-xl shadow-2xs inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
-              deleteMode === 'permanent'
-                ? 'bg-red-600 hover:bg-red-700'
-                : deleteMode === 'cancel'
+              deleteMode === 'cancel'
                 ? 'bg-amber-700 hover:bg-amber-800'
                 : 'bg-stone-900 hover:bg-stone-800'
             }`}
@@ -252,11 +201,6 @@ export default function DeleteArchiveEventModal({
               <>
                 <Loader2 size={13} className="animate-spin" />
                 <span>Processing...</span>
-              </>
-            ) : deleteMode === 'permanent' ? (
-              <>
-                <Trash2 size={13} />
-                <span>Permanently Delete</span>
               </>
             ) : deleteMode === 'cancel' ? (
               <>

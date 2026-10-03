@@ -8,7 +8,7 @@ import {
   MapPin,
   AlertCircle,
   Loader2,
-  Trash2,
+  Archive,
   Shield,
 } from 'lucide-react'
 import API from '../../services/api'
@@ -328,18 +328,20 @@ export default function EventDashboard() {
           </Link>
           <Link
             to={`/manager/events/${eventId}/edit`}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-stone-900 hover:bg-stone-800 text-stone-50 text-xs font-mono uppercase tracking-wider rounded-md transition shadow-2xs"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-stone-900 hover:bg-stone-800 text-stone-50 text-xs font-mono uppercase tracking-wider rounded-md transition shadow-2xs"
           >
             <Edit3 size={13} /> Edit Event
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsDeleteModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-200 hover:border-red-300 hover:bg-red-50 text-xs font-mono uppercase tracking-wider rounded-md bg-white text-red-600 transition cursor-pointer"
-            title="Delete / Archive Event"
-          >
-            <Trash2 size={13} /> Delete
-          </button>
+          {event.status === 'published' && (
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-amber-300 hover:border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-mono uppercase tracking-wider rounded-md transition cursor-pointer"
+              title="End / Conclude Event Stage"
+            >
+              <Archive size={13} className="text-amber-700" /> End Event
+            </button>
+          )}
         </div>
       </div>
 
@@ -366,7 +368,7 @@ export default function EventDashboard() {
         <div className="flex flex-wrap items-center gap-5 mt-2.5 text-xs text-stone-500 font-mono">
           <span className="flex items-center gap-1.5">
             <Calendar size={13} className="text-stone-400" /> {dateDisplay}{' '}
-            {timeDisplay && `• ${timeDisplay}`}
+            {timeDisplay ? `• ${timeDisplay}` : '• All Day (Ends 11:59 PM)'}
           </span>
           <span className="flex items-center gap-1.5">
             <MapPin size={13} className="text-stone-400" /> {venueLabel}
@@ -468,7 +470,13 @@ export default function EventDashboard() {
         isOpen={isDeleteModalOpen}
         event={{ id: eventId, title: event?.title || 'Untitled Stage' }}
         onClose={() => setIsDeleteModalOpen(false)}
-        onSuccess={() => navigate('/manager/events')}
+        onSuccess={({ deleted, isPermanent }) => {
+          if (deleted && isPermanent) {
+            navigate('/manager/events')
+          } else {
+            fetchEvent()
+          }
+        }}
       />
     </div>
   )

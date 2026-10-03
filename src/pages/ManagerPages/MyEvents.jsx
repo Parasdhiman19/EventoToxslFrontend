@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
-  Plus, Search, Loader2, AlertCircle, RefreshCw, Calendar, MapPin, DollarSign, Users,
-  Trash2, Archive, AlertTriangle, X, CheckCircle2
+  Plus, Search, Loader2, AlertCircle, RefreshCw, Calendar, DollarSign, Users, Archive
 } from 'lucide-react'
 import API from '../../services/api'
 import DeleteArchiveEventModal from '../../components/modals/DeleteArchiveEventModal'
@@ -345,18 +344,16 @@ export default function MyEvents() {
                                   >
                                     Dashboard &rarr;
                                   </Link>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setDeleteError(null)
-                                      setDeleteMode('archive')
-                                      setDeletingEvent(event)
-                                    }}
-                                    className="text-stone-400 hover:text-red-600 transition p-1 rounded hover:bg-stone-100 cursor-pointer"
-                                    title="Delete / Archive Stage"
-                                  >
-                                    <Trash2 size={13} />
-                                  </button>
+                                  {event.status === 'published' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setDeletingEvent(event)}
+                                      className="text-amber-700 hover:text-amber-900 hover:bg-amber-50 transition px-2 py-1 rounded text-[11px] font-mono uppercase tracking-wider border border-amber-200 cursor-pointer flex items-center gap-1"
+                                      title="Conclude / End Stage"
+                                    >
+                                      <Archive size={11} /> End
+                                    </button>
+                                  )}
                                 </>
                               )}
                             </div>
@@ -476,28 +473,26 @@ export default function MyEvents() {
                           <>
                             <Link
                               to={`/manager/events/${event.id}/edit`}
-                              className="flex-1 py-2 px-3 rounded-md border border-stone-300 bg-white text-stone-700 text-xs font-mono font-medium hover:bg-stone-50 text-center"
+                              className="flex-1 py-2 px-2.5 rounded-md border border-stone-300 bg-white text-stone-700 text-xs font-mono font-medium hover:bg-stone-50 text-center"
                             >
-                              Edit Event
+                              Edit
                             </Link>
                             <Link
                               to={`/manager/events/${event.id}`}
-                              className="flex-1 py-2 px-3 rounded-md bg-stone-900 text-stone-50 text-xs font-mono font-medium hover:bg-stone-800 text-center shadow-2xs"
+                              className="flex-1 py-2 px-2.5 rounded-md bg-stone-900 text-stone-50 text-xs font-mono font-medium hover:bg-stone-800 text-center shadow-2xs"
                             >
                               Dashboard &rarr;
                             </Link>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setDeleteError(null)
-                                setDeleteMode('archive')
-                                setDeletingEvent(event)
-                              }}
-                              className="p-2 border border-stone-200 text-stone-400 hover:text-red-600 hover:border-red-200 rounded-md bg-white transition cursor-pointer"
-                              title="Delete / Archive"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                            {event.status === 'published' && (
+                              <button
+                                type="button"
+                                onClick={() => setDeletingEvent(event)}
+                                className="px-3 py-2 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-md text-xs font-mono uppercase tracking-wider transition cursor-pointer flex items-center gap-1"
+                                title="End Stage"
+                              >
+                                <Archive size={13} /> End Stage
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
