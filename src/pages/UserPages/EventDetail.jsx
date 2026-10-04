@@ -75,7 +75,12 @@ export default function EventDetail() {
 
           // Default select the first available tier for GA mode
           if (eventRes.data.tiers && eventRes.data.tiers.length > 0) {
-            const firstAvailable = eventRes.data.tiers.find((t) => t.capacity - (t.sold_count || t.soldCount || 0) > 0)
+            const firstAvailable = eventRes.data.tiers.find((t) => {
+              if (t.isSoldOut || t.is_sold_out) return false
+              const cap = t.capacity ?? 100
+              const sold = t.sold_count ?? t.soldCount ?? 0
+              return cap - sold > 0
+            })
             setSelectedTierId(firstAvailable ? firstAvailable.id : eventRes.data.tiers[0].id)
           }
         }
@@ -162,8 +167,13 @@ export default function EventDetail() {
       return seatingData.seats.filter((s) => s.status === 'available').length
     }
     if (!selectedTier) return 0
-    const sold = selectedTier.sold_count ?? selectedTier.soldCount ?? 0
-    return Math.max(0, selectedTier.capacity - sold)
+    if (selectedTier.isSoldOut || selectedTier.is_sold_out) return 0
+    if (selectedTier.remainingSpots !== undefined) {
+      return Number(selectedTier.remainingSpots) || 0
+    }
+    const sold = Number(selectedTier.sold_count ?? selectedTier.soldCount ?? 0)
+    const cap = Number(selectedTier.capacity ?? 100)
+    return Math.max(0, cap - sold)
   }, [hasAssignedSeating, seatingData, selectedTier])
 
   const isSoldOut = remainingSpots === 0
@@ -211,6 +221,30 @@ export default function EventDetail() {
       components: 'buttons'
     }
   }, [paypalConfig?.clientId, paypalConfig?.currency])
+
+  const extractErrorMessage = (err, fallback = 'Could not complete ticket purchase. Please verify seat availability.') => {
+    const data = err?.response?.data
+    if (!data) return err?.message || fallback
+    if (typeof data === 'string') return data
+    if (data.detail) return Array.isArray(data.detail) ? data.detail[0] : data.detail
+    if (data.message) return Array.isArray(data.message) ? data.message[0] : data.message
+    if (data.non_field_errors) return Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors
+    if (data.seatIds) return Array.isArray(data.seatIds) ? data.seatIds[0] : data.seatIds
+    if (data.seat_ids) return Array.isArray(data.seat_ids) ? data.seat_ids[0] : data.seat_ids
+    if (data.tierId) return Array.isArray(data.tierId) ? data.tierId[0] : data.tierId
+    if (data.tier_id) return Array.isArray(data.tier_id) ? data.tier_id[0] : data.tier_id
+    if (data.quantity) return Array.isArray(data.quantity) ? data.quantity[0] : data.quantity
+    if (data.eventId) return Array.isArray(data.eventId) ? data.eventId[0] : data.eventId
+    
+    // First value in error object
+    const values = Object.values(data)
+    if (values.length > 0) {
+      const firstVal = values[0]
+      if (Array.isArray(firstVal) && firstVal.length > 0) return firstVal[0]
+      if (typeof firstVal === 'string') return firstVal
+    }
+    return fallback
+  }
 
   // Seat toggle handler for VenueSeatPicker
   const handleSeatToggle = (seat) => {
@@ -306,8 +340,8 @@ export default function EventDetail() {
 
       return res.data.paypalOrderId
     } catch (err) {
-      const errMsg = err.response?.data?.detail || err.response?.data?.message || 'Could not initiate PayPal session. Please try again.'
-      setSubmitError(Array.isArray(errMsg) ? errMsg[0] : errMsg)
+      const errMsg = extractErrorMessage(err, 'Could not initiate PayPal session. Please try again.')
+      setSubmitError(errMsg)
       throw err
     } finally {
       setIsSubmitting(false)
@@ -341,8 +375,8 @@ export default function EventDetail() {
         setSelectedSeatIds([])
       }
     } catch (err) {
-      const errMsg = err.response?.data?.detail || err.response?.data?.message || 'Payment capture failed. Please try again.'
-      setSubmitError(Array.isArray(errMsg) ? errMsg[0] : errMsg)
+      const errMsg = extractErrorMessage(err, 'Payment capture failed. Please try again.')
+      setSubmitError(errMsg)
     } finally {
       setIsSubmitting(false)
     }
@@ -434,14 +468,8 @@ export default function EventDetail() {
         setSelectedSeatIds([])
       }
     } catch (err) {
-      const errMsg = 
-        err.response?.data?.seatIds ||
-        err.response?.data?.quantity || 
-        err.response?.data?.eventId || 
-        err.response?.data?.detail || 
-        err.response?.data?.message || 
-        'Could not complete ticket purchase. Please verify seat availability.'
-      setSubmitError(Array.isArray(errMsg) ? errMsg[0] : errMsg)
+      const errMsg = extractErrorMessage(err, 'Could not complete ticket purchase. Please verify seat availability.')
+      setSubmitError(errMsg)
     } finally {
       setIsSubmitting(false)
     }
@@ -582,6 +610,28 @@ export default function EventDetail() {
             })}
           />
         </div>
+      </div>
+
+      {/* Sticky Mobile Booking Bar (visible only on mobile/tablet < lg) */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 lg:hidden bg-white/95 backdrop-blur-md border-t border-stone-200/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-mono text-stone-500 uppercase tracking-wider">
+            {hasAssignedSeating ? (selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Assigned Seating') : 'Total Cost'}
+          </div>
+          <div className="font-mono font-bold text-stone-900 text-base">
+            ${grandTotal.toFixed(2)}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            const el = document.getElementById('checkout-terminal')
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
+          className="px-5 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-mono text-xs font-bold uppercase tracking-wider hover:bg-stone-800 transition active:scale-95 shadow-md flex items-center gap-2 cursor-pointer"
+        >
+          <span>{isEventEnded ? 'Stage Ended' : isSoldOut ? 'Sold Out' : hasAssignedSeating && selectedSeats.length === 0 ? 'Select Seats' : 'Book Passes'}</span>
+        </button>
       </div>
 
       {/* Success Confirmation Modal */}

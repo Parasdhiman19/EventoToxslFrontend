@@ -64,9 +64,9 @@ export default function VenueSeatPicker({
     <div className="space-y-4 select-none">
       
       {/* Top Map Toolbar: Zoom Controls & Legend */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-stone-900 text-stone-200 border border-stone-800 text-xs font-mono">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 p-3 rounded-xl bg-stone-900 text-stone-200 border border-stone-800 text-xs font-mono">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-stone-400">Map Controls:</span>
+          <span className="text-[10px] uppercase tracking-wider text-stone-400">Controls:</span>
           <button
             type="button"
             onClick={handleZoomIn}
@@ -95,7 +95,7 @@ export default function VenueSeatPicker({
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 text-[11px]">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] pt-1 sm:pt-0 border-t sm:border-t-0 border-stone-800">
           {tiers.map((t) => (
             <div key={t.id || t.name} className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />

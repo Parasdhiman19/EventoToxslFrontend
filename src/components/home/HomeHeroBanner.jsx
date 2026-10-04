@@ -174,7 +174,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
       className="relative w-full select-none py-1 sm:py-2 overflow-hidden"
     >
       {/* Main Carousel Track */}
-      <div className="relative w-full h-[320px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center [perspective:1400px]">
+      <div className="relative w-full h-[330px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center [perspective:1400px]">
 
         {/* Carousel Cards Deck */}
         <div className="relative w-full h-full flex items-center justify-center">
@@ -203,7 +203,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
               <div
                 key={slide.isBranded ? slide.id : `slide-${slide.id || idx}-${idx}`}
                 onClick={() => !isCenter && setCurrentIndex(idx)}
-                className={`absolute w-[94%] sm:w-[86%] lg:w-[80%] h-[300px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-lg sm:rounded-xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-950 ${placementClass}`}
+                className={`absolute w-[95%] sm:w-[86%] lg:w-[80%] h-[310px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-lg sm:rounded-xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-950 ${placementClass}`}
               >
                 {/* Visual Backdrop: Artwork or Rich Atmospheric Mesh Gradient */}
                 {hasImage ? (
@@ -256,7 +256,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                     </div>
 
                     {/* Bold Modern Poster Title */}
-                    <h2 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[1.05] line-clamp-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
+                    <h2 className="text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[1.05] line-clamp-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
                       {slideTitle}
                     </h2>
 

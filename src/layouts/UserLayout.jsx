@@ -772,7 +772,7 @@ export default function UserLayout() {
             <main className={`flex-1 w-full max-w-[1600px] mx-auto ${
               isDiscoverPage 
                 ? 'px-0 py-0 lg:px-8 lg:py-8' 
-                : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8 pb-32 md:pb-8'
+                : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8 pb-28 md:pb-8'
             }`}>
               <Outlet context={{ openBecomeOrganizer: handleOpenBecomeOrganizer }} />
             </main>
@@ -780,13 +780,13 @@ export default function UserLayout() {
             {/* Reusable Detailed Footer (hidden on mobile discover to allow 100dvh full-screen feed, visible on desktop and other pages) */}
             <Footer 
               onOpenBecomeOrganizer={handleOpenBecomeOrganizer}
-              className={`mt-auto pb-24 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`} 
+              className={`mt-auto pb-28 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`} 
             />
 
             {/* Instagram-Style Mobile Bottom Navigation Bar */}
             <nav 
               aria-label="Mobile Bottom Navigation"
-              className="fixed bottom-0 inset-x-0 z-40 md:hidden h-16 bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
+              className="fixed bottom-0 inset-x-0 z-40 md:hidden h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
             >
               <div className="grid grid-cols-5 items-center justify-around w-full max-w-md mx-auto">
                 {mobileBottomLinks.map((link) => {

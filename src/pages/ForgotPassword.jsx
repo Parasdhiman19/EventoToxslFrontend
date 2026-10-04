@@ -453,7 +453,7 @@ function ForgotPassword() {
               Enter 6-Digit Code
             </label>
 
-            <div className="flex justify-between items-center gap-2 max-w-xs mx-auto">
+            <div className="flex justify-between items-center gap-1 sm:gap-2 max-w-xs mx-auto">
               {otpDigits.map((digit, idx) => (
                 <input
                   key={idx}
@@ -466,7 +466,7 @@ function ForgotPassword() {
                   onChange={(e) => handleOtpChange(idx, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                   onPaste={handleOtpPaste}
-                  className="w-11 h-13 text-center text-xl font-bold font-mono rounded-lg border border-stone-300 bg-white text-stone-900 shadow-xs focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 focus:outline-none transition-all"
+                  className="w-9 h-11 sm:w-11 sm:h-13 text-center text-lg sm:text-xl font-bold font-mono rounded-lg border border-stone-300 bg-white text-stone-900 shadow-xs focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 focus:outline-none transition-all"
                 />
               ))}
             </div>

@@ -94,10 +94,10 @@ export default function DigitalPassModal({ ticket, onClose }) {
         {/* High-Contrast Barcode / QR Ticket Box */}
         <div className="bg-white text-stone-950 p-4 sm:p-6 rounded-xl text-center space-y-3.5 shadow-md">
           {/* Real Scannable QR Code */}
-          <div className="h-44 w-44 sm:h-48 sm:w-48 mx-auto bg-white rounded-xl p-3 flex items-center justify-center border border-stone-200 shadow-inner">
+          <div className="w-36 h-36 sm:w-48 sm:h-48 mx-auto bg-white rounded-xl p-2 sm:p-3 flex items-center justify-center border border-stone-200 shadow-inner">
             <QRCodeSVG
               value={ticketCode}
-              size={168}
+              size={144}
               level="H"
               includeMargin={false}
               className="w-full h-full object-contain"

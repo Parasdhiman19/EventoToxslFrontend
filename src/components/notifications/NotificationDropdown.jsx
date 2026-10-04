@@ -23,7 +23,7 @@ export default function NotificationDropdown({
 
   return (
     <div
-      className="absolute right-0 top-full mt-2.5 w-[380px] max-w-[calc(100vw-24px)] rounded-2xl bg-white/95 backdrop-blur-xl border border-stone-200/90 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+      className="absolute right-0 sm:right-0 top-full mt-2.5 w-[calc(100vw-24px)] sm:w-[380px] max-w-[380px] rounded-2xl bg-white/95 backdrop-blur-xl border border-stone-200/90 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
       role="dialog"
       aria-label="Notification Center"
     >

@@ -303,7 +303,7 @@ export default function CommentDrawer({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div
         ref={drawerRef}
-        className="w-full sm:max-w-xl h-[88vh] sm:h-[680px] bg-white rounded-t-3xl sm:rounded-3xl border border-stone-200 shadow-2xl flex flex-col overflow-hidden"
+        className="w-full sm:max-w-xl h-[88dvh] max-h-[92dvh] sm:h-[680px] bg-white rounded-t-3xl sm:rounded-3xl border border-stone-200 shadow-2xl flex flex-col overflow-hidden"
       >
         {/* 1. DRAWER HEADER */}
         <div className="p-4 sm:p-5 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
@@ -651,7 +651,7 @@ export default function CommentDrawer({
         </div>
 
         {/* 3. COMMENT INPUT BAR */}
-        <div className="p-3 sm:p-4 border-t border-stone-200 bg-white">
+        <div className="p-3 sm:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-stone-200 bg-white">
           {replyingTo && (
             <div className="mb-2 px-3 py-1.5 rounded-xl bg-stone-100 border border-stone-200/80 flex items-center justify-between text-xs font-mono text-stone-600 animate-in fade-in duration-150">
               <span className="truncate">

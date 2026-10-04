@@ -249,45 +249,45 @@ export default function Attendees() {
       </div>
 
       {/* KPI Overview */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="rounded-lg border border-stone-200/80 bg-white p-5 shadow-2xs space-y-1.5">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">
+      <section className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="rounded-lg border border-stone-200/80 bg-white p-3.5 sm:p-5 shadow-2xs space-y-1 sm:space-y-1.5">
+          <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate block">
             Total Manifest
           </span>
-          <div className="text-2xl font-serif font-semibold text-stone-900 tracking-tight">
+          <div className="text-lg sm:text-2xl font-serif font-semibold text-stone-900 tracking-tight">
             {summaryMetrics.totalRegistered} Guests
           </div>
-          <p className="text-[11px] text-stone-400 font-mono">Issued across selected stage(s)</p>
+          <p className="text-[10px] sm:text-[11px] text-stone-400 font-mono truncate">Issued across selected stage(s)</p>
         </div>
 
-        <div className="rounded-lg border border-stone-200/80 bg-white p-5 shadow-2xs space-y-1.5">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">
-            Checked In (Passed Gate)
+        <div className="rounded-lg border border-stone-200/80 bg-white p-3.5 sm:p-5 shadow-2xs space-y-1 sm:space-y-1.5">
+          <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate block">
+            Checked In
           </span>
-          <div className="text-2xl font-serif font-semibold text-emerald-700 tracking-tight">
+          <div className="text-lg sm:text-2xl font-serif font-semibold text-emerald-700 tracking-tight">
             {summaryMetrics.totalCheckedIn}
           </div>
-          <p className="text-[11px] text-stone-400 font-mono">{summaryMetrics.checkInRate}% venue occupancy</p>
+          <p className="text-[10px] sm:text-[11px] text-stone-400 font-mono truncate">{summaryMetrics.checkInRate}% venue occupancy</p>
         </div>
 
-        <div className="rounded-lg border border-stone-200/80 bg-white p-5 shadow-2xs space-y-1.5">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">
-            Expected / Awaiting
+        <div className="rounded-lg border border-stone-200/80 bg-white p-3.5 sm:p-5 shadow-2xs space-y-1 sm:space-y-1.5">
+          <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate block">
+            Awaiting Entry
           </span>
-          <div className="text-2xl font-serif font-semibold text-stone-900 tracking-tight">
+          <div className="text-lg sm:text-2xl font-serif font-semibold text-stone-900 tracking-tight">
             {summaryMetrics.totalPending}
           </div>
-          <p className="text-[11px] text-stone-400 font-mono">Tickets not yet scanned</p>
+          <p className="text-[10px] sm:text-[11px] text-stone-400 font-mono truncate">Tickets pending scan</p>
         </div>
 
-        <div className="rounded-lg border border-stone-200/80 bg-white p-5 shadow-2xs space-y-1.5">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-stone-500">
+        <div className="rounded-lg border border-stone-200/80 bg-white p-3.5 sm:p-5 shadow-2xs space-y-1 sm:space-y-1.5">
+          <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate block">
             Check-In Rate
           </span>
-          <div className="text-2xl font-serif font-semibold text-stone-900 tracking-tight">
+          <div className="text-lg sm:text-2xl font-serif font-semibold text-stone-900 tracking-tight">
             {summaryMetrics.checkInRate}%
           </div>
-          <div className="w-full bg-stone-100 rounded-full h-1.5 mt-2">
+          <div className="w-full bg-stone-100 rounded-full h-1.5 mt-1.5 sm:mt-2">
             <div
               className="bg-stone-900 h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${summaryMetrics.checkInRate}%` }}
@@ -299,10 +299,10 @@ export default function Attendees() {
       {/* Guest Table Container */}
       <section className="rounded-lg border border-stone-200/80 bg-white shadow-2xs overflow-hidden space-y-4">
         {/* Filter Controls Bar */}
-        <div className="p-5 border-b border-stone-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 sm:p-5 border-b border-stone-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {/* Status Pills */}
-            <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-md border border-stone-200/80">
+            <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-md border border-stone-200/80 overflow-x-auto no-scrollbar max-w-full">
               {[
                 { key: 'all', label: 'All Guests' },
                 { key: 'checked_in', label: 'Inside Venue' },
@@ -312,7 +312,7 @@ export default function Attendees() {
                   key={tab.key}
                   type="button"
                   onClick={() => setStatusFilter(tab.key)}
-                  className={`px-3 py-1 text-xs font-medium rounded transition-all cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-medium rounded transition-all cursor-pointer whitespace-nowrap ${
                     statusFilter === tab.key
                       ? 'bg-stone-900 text-stone-50 shadow-sm font-semibold'
                       : 'text-stone-600 hover:text-stone-950'

@@ -125,12 +125,23 @@ function App() {
               <Route path="forgot-password" element={<ForgotPassword />} />
             </Route>
             <Route path="/Account/*" element={<Navigate to="/account" replace />} />
+            {/* Direct convenience aliases for mobile URL typing / sharing */}
+            <Route path="/login" element={<Navigate to="/account/login" replace />} />
+            <Route path="/Login" element={<Navigate to="/account/login" replace />} />
+            <Route path="/signin" element={<Navigate to="/account/login" replace />} />
+            <Route path="/SignIn" element={<Navigate to="/account/login" replace />} />
+            <Route path="/signup" element={<Navigate to="/account/signup" replace />} />
+            <Route path="/Signup" element={<Navigate to="/account/signup" replace />} />
+            <Route path="/register" element={<Navigate to="/account/signup" replace />} />
+            <Route path="/Register" element={<Navigate to="/account/signup" replace />} />
+            <Route path="/forgot-password" element={<Navigate to="/account/forgot-password" replace />} />
           </Route>
 
           {/* Reset Password Route (Accessible directly via email link token) */}
           <Route path="/account" element={<AuthLayout />}>
             <Route path="reset-password" element={<ResetPassword />} />
           </Route>
+          <Route path="/reset-password" element={<Navigate to="/account/reset-password" replace />} />
 
           {/* Super Admin Routes (Protected - Requires Super Admin Privilege) */}
           <Route element={<ProtectedRoute requiresAdmin={true} />}>

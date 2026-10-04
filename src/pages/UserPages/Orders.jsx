@@ -221,13 +221,13 @@ export default function Orders() {
                   <button
                     type="button"
                     onClick={() => setSelectedReceipt(order)}
-                    className="flex-1 py-2 px-3 rounded-md bg-stone-900 text-stone-50 text-xs font-mono font-medium hover:bg-stone-800 text-center cursor-pointer shadow-2xs"
+                    className="flex-1 py-2 px-2 sm:px-3 rounded-md bg-stone-900 text-stone-50 text-[11px] sm:text-xs font-mono font-medium hover:bg-stone-800 text-center cursor-pointer shadow-2xs truncate"
                   >
                     View Receipt
                   </button>
                   <Link
                     to="/user/tickets"
-                    className="flex-1 py-2 px-3 rounded-md border border-stone-300 bg-white text-stone-700 text-xs font-mono font-medium hover:bg-stone-50 text-center"
+                    className="flex-1 py-2 px-2 sm:px-3 rounded-md border border-stone-300 bg-white text-stone-700 text-[11px] sm:text-xs font-mono font-medium hover:bg-stone-50 text-center truncate"
                   >
                     My Passes &rarr;
                   </Link>

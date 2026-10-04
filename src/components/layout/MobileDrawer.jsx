@@ -43,11 +43,11 @@ export default function MobileDrawer({
 
       {/* Sliding & Expanding Panel from top */}
       <div 
-        className={`fixed inset-x-0 top-0 max-h-[92vh] w-full bg-white text-stone-900 rounded-b-3xl shadow-2xl border-b border-stone-200 overflow-y-auto transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed inset-x-0 top-0 max-h-[92dvh] w-full bg-white text-stone-900 rounded-b-3xl shadow-2xl border-b border-stone-200 overflow-y-auto overscroll-contain transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-full opacity-0 scale-98'
         }`}
       >
-        <div className="p-4 sm:p-5 flex flex-col justify-between space-y-6">
+        <div className="p-4 sm:p-5 flex flex-col justify-between space-y-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
           <div>
             {/* Header with Brand Logo & Close Button */}
             <div className="flex items-center justify-between pb-3.5 border-b border-stone-200">

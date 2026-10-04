@@ -69,7 +69,7 @@ export default function EventDetailHero({
       </div>
 
       {/* Main Event Showcase Banner */}
-      <div className="relative rounded-2xl overflow-hidden border border-stone-200/80 bg-stone-900 text-stone-100 shadow-md min-h-[220px] sm:min-h-[360px] md:min-h-[420px] flex flex-col justify-end">
+      <div className="relative rounded-2xl overflow-hidden border border-stone-200/80 bg-stone-900 text-stone-100 shadow-md min-h-[260px] sm:min-h-[360px] md:min-h-[420px] flex flex-col justify-end">
         <div className="absolute inset-0 z-0">
           <img
             src={event.image || event.banner || event.banner_image || '/emptybanner.jpg'}
@@ -96,7 +96,7 @@ export default function EventDetailHero({
                   {organizerName.charAt(0).toUpperCase()}
                 </span>
               )}
-              <span className="truncate max-w-[180px]">{organizerName}</span>
+              <span className="truncate max-w-[140px] sm:max-w-[220px]">{organizerName}</span>
               <ShieldCheck size={13} className="text-blue-400 fill-blue-400/20 shrink-0" />
             </div>
 
@@ -121,7 +121,7 @@ export default function EventDetailHero({
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight sm:tracking-tight text-white leading-[1.05] drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
+          <h1 className="text-xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white leading-[1.05] drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
             {event.title}
           </h1>
 

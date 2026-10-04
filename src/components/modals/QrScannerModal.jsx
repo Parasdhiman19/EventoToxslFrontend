@@ -405,19 +405,19 @@ export default function QrScannerModal({
 
           {/* Viewfinder Target Reticle HUD */}
           {!cameraError && (
-            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6">
-              <div className="relative w-60 h-60 sm:w-64 sm:h-64 border-2 border-dashed border-amber-400/50 rounded-2xl flex items-center justify-center bg-transparent shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
+            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4 sm:p-6">
+              <div className="relative w-52 h-52 sm:w-64 sm:h-64 border-2 border-dashed border-amber-400/50 rounded-2xl flex items-center justify-center bg-transparent shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
                 {/* 4 Corner Markers */}
-                <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-amber-400 rounded-tl-lg" />
-                <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-amber-400 rounded-tr-lg" />
-                <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-amber-400 rounded-bl-lg" />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-amber-400 rounded-br-lg" />
+                <div className="absolute -top-1 -left-1 w-5 h-5 sm:w-6 sm:h-6 border-t-4 border-l-4 border-amber-400 rounded-tl-lg" />
+                <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 border-t-4 border-r-4 border-amber-400 rounded-tr-lg" />
+                <div className="absolute -bottom-1 -left-1 w-5 h-5 sm:w-6 sm:h-6 border-b-4 border-l-4 border-amber-400 rounded-bl-lg" />
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 border-b-4 border-r-4 border-amber-400 rounded-br-lg" />
 
                 {/* Animated Scanning Beam */}
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent animate-pulse shadow-[0_0_8px_#fbbf24]" />
               </div>
 
-              <p className="mt-4 text-xs font-mono font-medium text-stone-300 drop-shadow-md bg-stone-950/70 px-3 py-1 rounded-full border border-stone-800">
+              <p className="mt-3 sm:mt-4 text-[11px] sm:text-xs font-mono font-medium text-stone-300 drop-shadow-md bg-stone-950/70 px-3 py-1 rounded-full border border-stone-800">
                 Align attendee pass QR code within frame
               </p>
             </div>

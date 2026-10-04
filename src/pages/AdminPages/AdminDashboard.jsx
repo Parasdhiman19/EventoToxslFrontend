@@ -135,32 +135,32 @@ export default function AdminDashboard() {
           <span className="text-[11px] sm:text-xs font-mono text-stone-500">Gross vs Net vs Escrow</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1.5 sm:space-y-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-500">Gross Platform Volume</div>
-            <div className="text-xl sm:text-2xl font-serif font-bold text-stone-900">{fin.grossVolume || '$0.00'}</div>
-            <div className="text-[11px] font-mono text-emerald-600 flex items-center gap-1">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="bg-white p-3.5 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1 sm:space-y-2">
+            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate">Gross Volume</div>
+            <div className="text-lg sm:text-2xl font-serif font-bold text-stone-900">{fin.grossVolume || '$0.00'}</div>
+            <div className="text-[10px] sm:text-[11px] font-mono text-emerald-600 flex items-center gap-1 truncate">
               <ArrowUpRight size={12} />
               <span>{fin.todaySales || '$0.00'} today</span>
             </div>
           </div>
 
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-emerald-200/80 bg-emerald-50/20 shadow-2xs space-y-1.5 sm:space-y-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-emerald-800">Platform Net Fee (3.5%)</div>
-            <div className="text-xl sm:text-2xl font-serif font-bold text-emerald-950">{fin.platformFeeRevenue || '$0.00'}</div>
-            <div className="text-[11px] font-mono text-emerald-700">Retained service fee</div>
+          <div className="bg-white p-3.5 sm:p-5 rounded-xl border border-emerald-200/80 bg-emerald-50/20 shadow-2xs space-y-1 sm:space-y-2">
+            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-emerald-800 truncate">Platform Fee (3.5%)</div>
+            <div className="text-lg sm:text-2xl font-serif font-bold text-emerald-950">{fin.platformFeeRevenue || '$0.00'}</div>
+            <div className="text-[10px] sm:text-[11px] font-mono text-emerald-700 truncate">Retained service fee</div>
           </div>
 
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1.5 sm:space-y-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-500">Disbursed to Creators</div>
-            <div className="text-xl sm:text-2xl font-serif font-bold text-stone-900">{fin.disbursedTotal || '$0.00'}</div>
-            <div className="text-[11px] font-mono text-stone-500">Settled via PayPal REST API</div>
+          <div className="bg-white p-3.5 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1 sm:space-y-2">
+            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate">Disbursed</div>
+            <div className="text-lg sm:text-2xl font-serif font-bold text-stone-900">{fin.disbursedTotal || '$0.00'}</div>
+            <div className="text-[10px] sm:text-[11px] font-mono text-stone-500 truncate">Via PayPal REST</div>
           </div>
 
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1.5 sm:space-y-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-500">Escrow Reserve Balance</div>
-            <div className="text-xl sm:text-2xl font-serif font-bold text-stone-900">{fin.pendingEscrow || '$0.00'}</div>
-            <div className="text-[11px] font-mono text-stone-500">{fin.pendingPayouts || '$0.00'} in pending requests</div>
+          <div className="bg-white p-3.5 sm:p-5 rounded-xl border border-stone-200/80 shadow-2xs space-y-1 sm:space-y-2">
+            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-stone-500 truncate">Escrow Reserve</div>
+            <div className="text-lg sm:text-2xl font-serif font-bold text-stone-900">{fin.pendingEscrow || '$0.00'}</div>
+            <div className="text-[10px] sm:text-[11px] font-mono text-stone-500 truncate">{fin.pendingPayouts || '$0.00'} pending</div>
           </div>
         </div>
       </div>

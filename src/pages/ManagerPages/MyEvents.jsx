@@ -185,7 +185,7 @@ export default function MyEvents() {
       {/* Filter Tabs & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Status Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-lg border border-stone-200/80 w-fit overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-lg border border-stone-200/80 w-full sm:w-fit overflow-x-auto no-scrollbar">
           {[
             { key: 'all', label: 'All Events' },
             { key: 'published', label: 'Active' },
@@ -461,7 +461,7 @@ export default function MyEvents() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-2 pt-1">
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
                         {event.userRole === 'staff' ? (
                           <Link
                             to={`/manager/attendees?event=${event.id}`}
@@ -473,13 +473,13 @@ export default function MyEvents() {
                           <>
                             <Link
                               to={`/manager/events/${event.id}/edit`}
-                              className="flex-1 py-2 px-2.5 rounded-md border border-stone-300 bg-white text-stone-700 text-xs font-mono font-medium hover:bg-stone-50 text-center"
+                              className="flex-1 min-w-[70px] py-2 px-2.5 rounded-md border border-stone-300 bg-white text-stone-700 text-xs font-mono font-medium hover:bg-stone-50 text-center"
                             >
                               Edit
                             </Link>
                             <Link
                               to={`/manager/events/${event.id}`}
-                              className="flex-1 py-2 px-2.5 rounded-md bg-stone-900 text-stone-50 text-xs font-mono font-medium hover:bg-stone-800 text-center shadow-2xs"
+                              className="flex-1 min-w-[100px] py-2 px-2.5 rounded-md bg-stone-900 text-stone-50 text-xs font-mono font-medium hover:bg-stone-800 text-center shadow-2xs"
                             >
                               Dashboard &rarr;
                             </Link>
@@ -487,7 +487,7 @@ export default function MyEvents() {
                               <button
                                 type="button"
                                 onClick={() => setDeletingEvent(event)}
-                                className="px-3 py-2 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-md text-xs font-mono uppercase tracking-wider transition cursor-pointer flex items-center gap-1"
+                                className="w-full sm:w-auto px-3 py-2 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-md text-xs font-mono uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-1"
                                 title="End Stage"
                               >
                                 <Archive size={13} /> End Stage

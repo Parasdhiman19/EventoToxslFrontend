@@ -46,7 +46,7 @@ export default function EventDetailCheckout({
   onNavigateToLogin
 }) {
   return (
-    <div className="rounded-xl border border-stone-300/80 bg-white shadow-md overflow-hidden">
+    <div id="checkout-terminal" className="rounded-xl border border-stone-300/80 bg-white shadow-md overflow-hidden scroll-mt-24">
       {/* Terminal Header */}
       <div className="p-5 bg-stone-900 text-stone-50 flex items-center justify-between border-b border-stone-800">
         <div className="flex items-center gap-2">
@@ -114,9 +114,10 @@ export default function EventDetailCheckout({
 
             {event?.tiers && event.tiers.length > 0 ? (
               event.tiers.map((tier) => {
-                const sold = tier.sold_count ?? tier.soldCount ?? 0
-                const spots = Math.max(0, tier.capacity - sold)
-                const tierSoldOut = spots === 0
+                const sold = Number(tier.sold_count ?? tier.soldCount ?? 0)
+                const cap = Number(tier.capacity ?? 100)
+                const spots = tier.remainingSpots !== undefined ? Number(tier.remainingSpots) : Math.max(0, cap - sold)
+                const tierSoldOut = Boolean(tier.isSoldOut || tier.is_sold_out || spots === 0)
                 const isSelected = selectedTierId === tier.id
 
                 return (
@@ -180,7 +181,7 @@ export default function EventDetailCheckout({
                     Number of Passes
                   </label>
                   <span className="text-[11px] font-mono text-stone-400">
-                    Max {Math.min(8, remainingSpots)} per order
+                    Max {Math.max(1, Math.min(8, remainingSpots || 8))} per order
                   </span>
                 </div>
 
@@ -201,7 +202,7 @@ export default function EventDetailCheckout({
                     <button
                       type="button"
                       onClick={() => onQuantityChange(quantity + 1)}
-                      disabled={quantity >= Math.min(8, remainingSpots)}
+                      disabled={quantity >= Math.max(1, Math.min(8, remainingSpots || 8))}
                       className="p-2.5 text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:hover:bg-white transition cursor-pointer"
                       aria-label="Increase quantity"
                     >

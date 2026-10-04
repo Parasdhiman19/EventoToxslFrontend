@@ -284,25 +284,25 @@ function Signup() {
                 <button
                   type="button"
                   onClick={() => formik.setFieldValue('role', 'user')}
-                  className={`py-2 px-3 text-xs font-medium rounded transition-all cursor-pointer ${
+                  className={`py-2 px-1.5 sm:px-3 text-[11px] sm:text-xs font-medium rounded transition-all cursor-pointer leading-tight text-center ${
                     formik.values.role === 'user'
-                      ? 'bg-stone-900 text-stone-50 shadow-sm'
+                      ? 'bg-stone-900 text-stone-50 shadow-sm font-semibold'
                       : 'text-stone-600 hover:text-stone-900'
                   }`}
                 >
-                  Explore & Buy Tickets
+                  Explore &amp; Buy Tickets
                 </button>
 
                 <button
                   type="button"
                   onClick={() => formik.setFieldValue('role', 'manager')}
-                  className={`py-2 px-3 text-xs font-medium rounded transition-all cursor-pointer ${
+                  className={`py-2 px-1.5 sm:px-3 text-[11px] sm:text-xs font-medium rounded transition-all cursor-pointer leading-tight text-center ${
                     formik.values.role === 'manager'
-                      ? 'bg-stone-900 text-stone-50 shadow-sm'
+                      ? 'bg-stone-900 text-stone-50 shadow-sm font-semibold'
                       : 'text-stone-600 hover:text-stone-900'
                   }`}
                 >
-                  Host & Sell Tickets
+                  Host &amp; Sell Tickets
                 </button>
               </div>
             </div>
@@ -579,7 +579,7 @@ function Signup() {
               Enter 6-Digit Code
             </label>
 
-            <div className="flex justify-between items-center gap-2 max-w-xs mx-auto">
+            <div className="flex justify-between items-center gap-1 sm:gap-2 max-w-xs mx-auto">
               {otpDigits.map((digit, idx) => (
                 <input
                   key={idx}
@@ -592,7 +592,7 @@ function Signup() {
                   onChange={(e) => handleOtpChange(idx, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                   onPaste={handleOtpPaste}
-                  className="w-11 h-13 text-center text-xl font-bold font-mono rounded-lg border border-stone-300 bg-white text-stone-900 shadow-xs focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 focus:outline-none transition-all"
+                  className="w-9 h-11 sm:w-11 sm:h-13 text-center text-lg sm:text-xl font-bold font-mono rounded-lg border border-stone-300 bg-white text-stone-900 shadow-xs focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 focus:outline-none transition-all"
                 />
               ))}
             </div>

@@ -180,21 +180,21 @@ export default function ManagerLayout() {
   return (
     <div className="min-h-screen w-full bg-stone-50 text-stone-900 selection:bg-stone-900 selection:text-stone-50 flex flex-col lg:flex-row antialiased">
       {/* Mobile Top Navigation Bar */}
-      <header className="lg:hidden flex items-center justify-between border-b border-stone-800 bg-stone-900 px-4 py-3 text-stone-100 sticky top-0 z-30 shadow-md">
-        <Link to="/manager/overview" className="inline-flex items-center gap-2 font-serif text-base font-medium tracking-tight active:scale-95 transition-transform">
-          <span className="h-6 w-6 rounded-lg bg-stone-100 text-stone-950 flex items-center justify-center font-sans text-xs font-bold shadow-xs">
+      <header className="lg:hidden flex items-center justify-between border-b border-stone-800 bg-stone-900 px-3 sm:px-4 py-3 text-stone-100 sticky top-0 z-30 shadow-md">
+        <Link to="/manager/overview" className="inline-flex items-center gap-2 font-serif text-sm sm:text-base font-medium tracking-tight active:scale-95 transition-transform min-w-0">
+          <span className="h-6 w-6 rounded-lg bg-stone-100 text-stone-950 flex items-center justify-center font-sans text-xs font-bold shadow-xs shrink-0">
             E
           </span>
-          Evento <span className="text-stone-400 font-sans text-[10px] uppercase tracking-wider ml-0.5">Manager</span>
+          <span className="truncate">Evento <span className="text-stone-400 font-sans text-[10px] uppercase tracking-wider ml-0.5 hidden xs:inline">Manager</span></span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Mobile Notification Bell */}
           <NotificationBell variant="dark" />
 
           {/* Quick Create Event Mobile Button */}
           <Link
             to="/manager/events/create"
-            className="p-1.5 rounded-lg bg-stone-800 text-stone-200 hover:text-stone-50 hover:bg-stone-700 active:scale-90 transition shadow-2xs"
+            className="p-1.5 rounded-lg bg-stone-800 text-stone-200 hover:text-stone-50 hover:bg-stone-700 active:scale-90 transition shadow-2xs shrink-0"
             title="Create Event"
             aria-label="Create New Event"
           >
@@ -203,7 +203,7 @@ export default function ManagerLayout() {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-stone-300 hover:text-stone-100 p-1.5 rounded-lg hover:bg-stone-800 active:scale-90 transition-all duration-300 focus:outline-none cursor-pointer"
+            className="text-stone-300 hover:text-stone-100 p-1.5 rounded-lg hover:bg-stone-800 active:scale-90 transition-all duration-300 focus:outline-none cursor-pointer shrink-0"
             aria-label={isMobileMenuOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
             aria-expanded={isMobileMenuOpen}
           >
@@ -319,12 +319,12 @@ export default function ManagerLayout() {
 
         {/* Sliding & Expanding Panel from top */}
         <div 
-          className={`fixed inset-x-0 top-0 max-h-[92vh] w-full bg-stone-900 text-stone-100 rounded-b-3xl shadow-2xl border-b border-stone-800 overflow-y-auto transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`fixed inset-x-0 top-0 max-h-[92dvh] w-full bg-stone-900 text-stone-100 rounded-b-3xl shadow-2xl border-b border-stone-800 overflow-y-auto overscroll-contain transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isMobileMenuOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-full opacity-0 scale-98'
           }`}
         >
           {/* Mobile Drawer Header */}
-          <div className="p-4 sm:p-5 flex flex-col justify-between space-y-5">
+          <div className="p-4 sm:p-5 flex flex-col justify-between space-y-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
             <div>
               {/* Header Bar with Logo and Close button */}
               <div className="flex items-center justify-between pb-3.5 border-b border-stone-800">
