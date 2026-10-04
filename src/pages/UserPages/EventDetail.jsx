@@ -225,7 +225,12 @@ export default function EventDetail() {
   const extractErrorMessage = (err, fallback = 'Could not complete ticket purchase. Please verify seat availability.') => {
     const data = err?.response?.data
     if (!data) return err?.message || fallback
-    if (typeof data === 'string') return data
+    if (typeof data === 'string') {
+      if (data.includes('<!doctype') || data.includes('<html') || data.includes('Server Error (500)')) {
+        return 'Server error processing your ticket order. Please try again in a few moments.'
+      }
+      return data
+    }
     if (data.detail) return Array.isArray(data.detail) ? data.detail[0] : data.detail
     if (data.message) return Array.isArray(data.message) ? data.message[0] : data.message
     if (data.non_field_errors) return Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors
@@ -241,7 +246,12 @@ export default function EventDetail() {
     if (values.length > 0) {
       const firstVal = values[0]
       if (Array.isArray(firstVal) && firstVal.length > 0) return firstVal[0]
-      if (typeof firstVal === 'string') return firstVal
+      if (typeof firstVal === 'string') {
+        if (firstVal.includes('<!doctype') || firstVal.includes('<html')) {
+          return 'Server error processing your ticket order. Please try again in a few moments.'
+        }
+        return firstVal
+      }
     }
     return fallback
   }
