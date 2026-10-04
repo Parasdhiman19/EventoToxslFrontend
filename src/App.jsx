@@ -70,10 +70,14 @@ function App() {
     let isMounted = true
 
     const initializeAuthSession = async () => {
+      const storedRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('evento_refresh_token') : null
+      const storedAccessToken = typeof window !== 'undefined' ? localStorage.getItem('evento_access_token') : null
+
       try {
-        // 1. Obtain a fresh access token from the secure HttpOnly refresh_token cookie
-        const refreshRes = await API.post('auth/token/refresh/')
+        // 1. Obtain a fresh access token from HttpOnly cookie or local storage fallback
+        const refreshRes = await API.post('auth/token/refresh/', storedRefreshToken ? { refresh: storedRefreshToken } : {})
         const access = refreshRes.data.access
+        const refresh = refreshRes.data.refresh || storedRefreshToken
 
         // 2. Query user profile with the fresh access token
         const meRes = await API.get('auth/me/', {
@@ -81,11 +85,17 @@ function App() {
         })
 
         if (isMounted) {
-          dispatch(setCredentials({ user: meRes.data, accessToken: access }))
+          dispatch(setCredentials({ 
+            user: meRes.data, 
+            accessToken: access, 
+            refreshToken: refresh 
+          }))
         }
-      } catch {
+      } catch (err) {
         if (isMounted) {
-          dispatch(logout())
+          if (err?.response?.status === 401 || !storedAccessToken) {
+            dispatch(logout())
+          }
         }
       } finally {
         if (isMounted) {

@@ -170,10 +170,10 @@ function Signup() {
         otp: otp,
       })
 
-      const { user, access } = response.data
+      const { user, access, refresh } = response.data
 
       // Store user and access token in Redux state
-      dispatch(setCredentials({ user, accessToken: access }))
+      dispatch(setCredentials({ user, accessToken: access, refreshToken: refresh }))
 
       // Redirection: Host -> Manager Studio, User -> Intended Path or Home
       const isOrganizerUser = user?.isOrganizer || user?.is_organizer || user?.role === 'manager'

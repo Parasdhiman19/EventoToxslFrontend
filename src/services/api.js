@@ -88,20 +88,23 @@
         isRefreshing = true
 
         try {
-          // Request new access token - browser automatically sends HttpOnly refresh_token cookie
+          // Request new access token - browser sends HttpOnly refresh_token cookie, plus local storage fallback
+          const storedRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('evento_refresh_token') : null
           const res = await axios.post(
             `${API_BASE_URL}auth/token/refresh/`,
-            {},
+            storedRefreshToken ? { refresh: storedRefreshToken } : {},
             { withCredentials: true }
           )
 
           const newAccessToken = res.data.access
+          const newRefreshToken = res.data.refresh || storedRefreshToken
 
           // Update Redux state with new access token
           const currentUser = store.getState().auth?.user
           store.dispatch(setCredentials({ 
             user: currentUser, 
-            accessToken: newAccessToken
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
           }))
 
           processQueue(null, newAccessToken)

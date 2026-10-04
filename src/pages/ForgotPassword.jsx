@@ -150,10 +150,10 @@ function ForgotPassword() {
         otp: otp,
       })
 
-      const { user, access } = response.data
+      const { user, access, refresh } = response.data
 
       // Store user and access token in Redux state for instant auto-login
-      dispatch(setCredentials({ user, accessToken: access }))
+      dispatch(setCredentials({ user, accessToken: access, refreshToken: refresh }))
 
       // Redirection: Host -> Manager Studio, User -> Home
       if (user?.isOrganizer || user?.role === 'manager') {

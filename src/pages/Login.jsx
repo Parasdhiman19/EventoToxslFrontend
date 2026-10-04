@@ -37,10 +37,10 @@ function Login() {
           password: values.password,
         })
 
-        const { user, access } = response.data
+        const { user, access, refresh } = response.data
 
         // Store user and access token in in-memory Redux state
-        dispatch(setCredentials({ user, accessToken: access }))
+        dispatch(setCredentials({ user, accessToken: access, refreshToken: refresh }))
 
         // Seamless navigation: if admin go to admin dashboard, if manager go to overview, else intended path
         const isSuperAdminUser = user?.isSuperAdmin || user?.is_super_admin || user?.is_staff || user?.role === 'admin'
