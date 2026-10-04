@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import API from '../../services/api'
 import {
   Image as ImageIcon,
@@ -7,13 +7,14 @@ import {
   ArrowDown,
   Edit2,
   Trash2,
-  Calendar,
   CheckCircle2,
   X,
   ExternalLink,
   Eye,
   RefreshCw,
   Sparkles,
+  Upload,
+  Loader2,
 } from 'lucide-react'
 
 export default function AdminBanners() {
@@ -25,6 +26,9 @@ export default function AdminBanners() {
   const [editingBanner, setEditingBanner] = useState(null)
   const [feedback, setFeedback] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingArtwork, setIsUploadingArtwork] = useState(false)
+  const [artworkUploadError, setArtworkUploadError] = useState('')
+  const fileInputRef = useRef(null)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -35,8 +39,6 @@ export default function AdminBanners() {
     customUrl: '',
     displayOrder: 1,
     isActive: true,
-    activeFrom: '',
-    activeUntil: '',
   })
 
   const fetchBannersAndEvents = async () => {
@@ -61,6 +63,8 @@ export default function AdminBanners() {
 
   const openCreateModal = () => {
     setEditingBanner(null)
+    setArtworkUploadError('')
+    setIsUploadingArtwork(false)
     setFormData({
       title: '',
       subtitle: '',
@@ -70,14 +74,14 @@ export default function AdminBanners() {
       customUrl: '',
       displayOrder: banners.length + 1,
       isActive: true,
-      activeFrom: '',
-      activeUntil: '',
     })
     setIsDrawerOpen(true)
   }
 
   const openEditModal = (banner) => {
     setEditingBanner(banner)
+    setArtworkUploadError('')
+    setIsUploadingArtwork(false)
     setFormData({
       title: banner.title,
       subtitle: banner.subtitle || '',
@@ -87,14 +91,68 @@ export default function AdminBanners() {
       customUrl: banner.customUrl || '',
       displayOrder: banner.displayOrder || 1,
       isActive: banner.isActive,
-      activeFrom: banner.activeFrom ? banner.activeFrom.substring(0, 16) : '',
-      activeUntil: banner.activeUntil ? banner.activeUntil.substring(0, 16) : '',
     })
     setIsDrawerOpen(true)
   }
 
+  const handleArtworkFileUpload = async (file) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setArtworkUploadError('Please select a valid image file (PNG, JPG, WebP).')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setArtworkUploadError('Artwork file size must be less than 10MB.')
+      return
+    }
+
+    setArtworkUploadError('')
+    setIsUploadingArtwork(true)
+
+    // Set immediate local preview
+    const localPreview = URL.createObjectURL(file)
+    setFormData((prev) => ({ ...prev, imageUrl: localPreview }))
+
+    const uploadData = new FormData()
+    uploadData.append('file', file)
+    uploadData.append('folder', 'banners')
+
+    try {
+      const res = await API.post('events/upload/image/', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      const cdnUrl = res.data?.secure_url || res.data?.url
+      if (cdnUrl) {
+        setFormData((prev) => ({ ...prev, imageUrl: cdnUrl }))
+      }
+    } catch (err) {
+      console.error('Failed to upload artwork to Cloudinary:', err)
+      setArtworkUploadError(err.response?.data?.detail || 'Failed to upload artwork to Cloudinary. Please try again.')
+    } finally {
+      setIsUploadingArtwork(false)
+    }
+  }
+
+  const handleUseSelectedEventBanner = () => {
+    if (!formData.eventId) return
+    const selectedEv = events.find((e) => String(e.id) === String(formData.eventId))
+    const evBanner = selectedEv?.banner_url || selectedEv?.banner || selectedEv?.image || selectedEv?.banner_image
+    if (evBanner) {
+      setFormData((prev) => ({ ...prev, imageUrl: evBanner }))
+      setArtworkUploadError('')
+    }
+  }
+
   const handleFormSubmit = async (e) => {
     e.preventDefault()
+    if (isUploadingArtwork) {
+      alert('Please wait for artwork to finish uploading to Cloudinary.')
+      return
+    }
+    if (!formData.imageUrl) {
+      alert('Please upload an artwork image for this hero banner.')
+      return
+    }
     setIsSubmitting(true)
     try {
       const payload = {
@@ -106,8 +164,8 @@ export default function AdminBanners() {
         customUrl: formData.customUrl,
         displayOrder: Number(formData.displayOrder),
         isActive: Boolean(formData.isActive),
-        activeFrom: formData.activeFrom ? new Date(formData.activeFrom).toISOString() : null,
-        activeUntil: formData.activeUntil ? new Date(formData.activeUntil).toISOString() : null,
+        activeFrom: null,
+        activeUntil: null,
       }
 
       if (editingBanner) {
@@ -188,6 +246,19 @@ export default function AdminBanners() {
         </div>
       </div>
 
+      {/* Info & Recommendation Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-stone-50 border border-stone-200/80 rounded-xl text-xs font-mono text-stone-600">
+        <div className="flex items-center gap-2">
+          <Sparkles size={14} className="text-amber-500 shrink-0" />
+          <span>
+            {banners.filter((b) => b.isActive).length} active banner(s) — Recommended: 3 to 5 for optimal 3D carousel engagement.
+          </span>
+        </div>
+        <span className="text-[11px] text-stone-400">
+          Max top 7 displayed on public home page.
+        </span>
+      </div>
+
       {feedback && (
         <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-mono text-emerald-800 flex items-center justify-between">
           <span>{feedback}</span>
@@ -246,12 +317,12 @@ export default function AdminBanners() {
                     <h3 className="font-serif font-bold text-sm text-stone-900 truncate">{b.title}</h3>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-mono uppercase font-medium border ${
-                        b.isCurrentlyActive
+                        b.isActive
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : 'bg-stone-100 text-stone-600 border-stone-200'
                       }`}
                     >
-                      {b.isCurrentlyActive ? 'Active Now' : 'Inactive'}
+                      {b.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                   <p className="text-xs text-stone-500 truncate max-w-md">{b.subtitle || 'No subtitle provided'}</p>
@@ -336,19 +407,116 @@ export default function AdminBanners() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="font-mono text-stone-700 font-semibold uppercase text-[11px]">Artwork URL (16:9 recommended) *</label>
+                {/* Artwork File Upload to Cloudinary CDN */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-mono text-stone-700 font-semibold uppercase text-[11px]">
+                      Cover Artwork (16:9 recommended) <span className="text-red-500">*</span>
+                    </label>
+                    {formData.eventId && (
+                      <button
+                        type="button"
+                        onClick={handleUseSelectedEventBanner}
+                        className="text-[11px] font-mono text-blue-600 hover:text-blue-800 hover:underline cursor-pointer inline-flex items-center gap-1"
+                      >
+                        <Sparkles size={11} />
+                        <span>Use Event's Artwork</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Hidden file input */}
                   <input
-                    type="url"
-                    required
-                    placeholder="https://images.unsplash.com/..."
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-lg text-xs focus:bg-white focus:outline-none focus:border-stone-900 transition"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp, image/jpg"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleArtworkFileUpload(e.target.files[0])
+                      }
+                    }}
+                    className="sr-only"
                   />
-                  {formData.imageUrl && (
-                    <div className="rounded-xl overflow-hidden border border-stone-200 h-28 sm:h-32 mt-2 bg-stone-100">
-                      <img src={formData.imageUrl} alt="preview" className="h-full w-full object-cover" />
+
+                  {formData.imageUrl ? (
+                    <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-stone-900 group">
+                      <img 
+                        src={formData.imageUrl} 
+                        alt="Banner artwork preview" 
+                        className="w-full h-40 sm:h-44 object-cover object-center" 
+                      />
+
+                      {/* Overlay when uploading */}
+                      {isUploadingArtwork && (
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white">
+                          <Loader2 size={24} className="animate-spin text-amber-400" />
+                          <span className="text-xs font-mono">Uploading to Cloudinary CDN...</span>
+                        </div>
+                      )}
+
+                      {!isUploadingArtwork && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
+                          <span className="text-[11px] font-mono text-white/90 truncate max-w-[200px]">
+                            Cloudinary CDN Hosted
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white text-stone-900 text-xs font-mono font-medium shadow-sm cursor-pointer"
+                            >
+                              Change
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setFormData((prev) => ({ ...prev, imageUrl: '' }))}
+                              className="p-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm cursor-pointer"
+                              title="Remove artwork"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                          handleArtworkFileUpload(e.dataTransfer.files[0])
+                        }
+                      }}
+                      className="rounded-xl border-2 border-dashed border-stone-300 hover:border-stone-900 p-6 bg-stone-50 hover:bg-stone-100/70 transition-all flex flex-col items-center justify-center text-center cursor-pointer group"
+                    >
+                      {isUploadingArtwork ? (
+                        <div className="flex flex-col items-center gap-2 text-stone-600 py-3">
+                          <Loader2 size={24} className="animate-spin text-stone-900" />
+                          <span className="text-xs font-mono">Uploading artwork to Cloudinary...</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="w-10 h-10 mx-auto rounded-full bg-stone-200 group-hover:bg-stone-900 text-stone-600 group-hover:text-white transition flex items-center justify-center">
+                            <Upload size={18} />
+                          </div>
+                          <div>
+                            <span className="text-xs font-mono font-semibold text-stone-900 underline underline-offset-2">
+                              Click to browse or drag &amp; drop artwork
+                            </span>
+                          </div>
+                          <p className="text-[11px] font-mono text-stone-500">
+                            PNG, JPG, or WebP up to 10MB (16:9 ratio recommended)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {artworkUploadError && (
+                    <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs font-mono text-red-700">
+                      {artworkUploadError}
                     </div>
                   )}
                 </div>
@@ -394,26 +562,7 @@ export default function AdminBanners() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="font-mono text-stone-700 font-semibold uppercase text-[11px]">Active From</label>
-                    <input
-                      type="datetime-local"
-                      value={formData.activeFrom}
-                      onChange={(e) => setFormData({ ...formData, activeFrom: e.target.value })}
-                      className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="font-mono text-stone-700 font-semibold uppercase text-[11px]">Active Until</label>
-                    <input
-                      type="datetime-local"
-                      value={formData.activeUntil}
-                      onChange={(e) => setFormData({ ...formData, activeUntil: e.target.value })}
-                      className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-xs"
-                    />
-                  </div>
-                </div>
+
 
                 <div className="flex items-center gap-2 pt-2">
                   <input

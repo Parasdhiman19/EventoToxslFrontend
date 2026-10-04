@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   Sparkles,
@@ -24,7 +24,8 @@ import CommentDrawer from '../../components/feed/CommentDrawer'
 import { useAuthPrompt } from '../../context/AuthPromptContext'
 
 export default function Discover() {
-  const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
+  const { openBecomeOrganizer } = useOutletContext() || {}
   const { openAuthPrompt } = useAuthPrompt()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialQuery = searchParams.get('q') || ''
@@ -374,17 +375,38 @@ export default function Discover() {
             onClick={() => fetchEvents(1, true)}
             disabled={isLoadingInitial}
             className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-mono font-medium text-stone-700 hover:bg-stone-50 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-2xs disabled:opacity-50"
+            title="Refresh feed"
           >
             <RefreshCw size={12} className={isLoadingInitial ? 'animate-spin' : ''} />
-            <span>Refresh</span>
+            <span className="hidden sm:inline">Refresh</span>
           </button>
 
-          <Link
-            to="/manager/events/create"
-            className="rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-mono font-semibold text-stone-50 hover:bg-black transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
-          >
-            <span>+ Host Event</span>
-          </Link>
+          {isOrganizer ? (
+            <Link
+              to="/manager/events/create"
+              className="rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-mono font-semibold text-stone-50 hover:bg-black transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <span>+ Host Event</span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                if (isAuthenticated) {
+                  if (openBecomeOrganizer) openBecomeOrganizer()
+                } else {
+                  openAuthPrompt({
+                    actionType: 'host',
+                    redirectPath: '/manager/events/create',
+                  })
+                }
+              }}
+              className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-3.5 py-1.5 text-xs font-mono font-semibold text-white transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5 active:scale-95"
+            >
+              <Sparkles size={13} className="text-amber-100" />
+              <span>Become a Host</span>
+            </button>
+          )}
         </div>
       </div>
 

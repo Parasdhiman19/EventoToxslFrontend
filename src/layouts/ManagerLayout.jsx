@@ -417,7 +417,7 @@ export default function ManagerLayout() {
                     <ArrowUpRight size={14} className="text-stone-400" />
                   </Link>
                   <Link
-                    to="/manager/settings"
+                    to="/user/support"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-xs font-medium text-stone-400 hover:bg-stone-800/60 hover:text-stone-200"
                   >
@@ -493,7 +493,7 @@ export default function ManagerLayout() {
             <div className="h-4 w-px bg-stone-200" />
 
             <Link
-              to="/manager/settings"
+              to="/user/support"
               className="inline-flex items-center gap-1.5 text-stone-500 hover:text-stone-950 text-xs font-medium transition-colors px-2 py-1 rounded-md hover:bg-stone-50"
             >
               <HelpCircle size={14} className="text-stone-400" />

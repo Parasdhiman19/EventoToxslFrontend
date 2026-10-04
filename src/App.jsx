@@ -57,6 +57,7 @@ import Saved from './pages/UserPages/Saved'
 import Orders from './pages/UserPages/Orders'
 import Profile from './pages/UserPages/Profile'
 import UserNotifications from './pages/UserPages/Notifications'
+import SupportPage from './pages/UserPages/SupportPage'
 
 
 import ScrollToTop from './components/ScrollToTop'
@@ -181,6 +182,7 @@ function App() {
               <Route path="orders" element={<Orders />} />
               <Route path="profile" element={<Profile />} />
               <Route path="notifications" element={<UserNotifications />} />
+              <Route path="support" element={<SupportPage />} />
             </Route>
             <Route path="/User/*" element={<Navigate to="/" replace />} />
             {/* Direct convenience route aliases */}
@@ -190,6 +192,9 @@ function App() {
             <Route path="/saved" element={<Navigate to="/user/saved" replace />} />
             <Route path="/orders" element={<Navigate to="/user/orders" replace />} />
             <Route path="/notifications" element={<Navigate to="/user/notifications" replace />} />
+            <Route path="/support" element={<Navigate to="/user/support" replace />} />
+            <Route path="/help" element={<Navigate to="/user/support" replace />} />
+            <Route path="/report" element={<Navigate to="/user/support" replace />} />
           </Route>
 
 

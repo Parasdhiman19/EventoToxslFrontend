@@ -150,17 +150,18 @@ export default function AdminEvents() {
       {/* Filter Tabs & Search Bar */}
       <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-stone-200/80 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none flex-nowrap">
-          {['all', 'published', 'draft', 'suspended', 'cancelled', 'past'].map((tab) => (
+          {['all', 'active', 'published', 'draft', 'suspended', 'cancelled', 'past'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition shrink-0 whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
                 statusFilter === tab
                   ? 'bg-stone-900 text-white font-semibold shadow-2xs'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70 hover:text-stone-900'
               }`}
             >
-              {tab}
+              {tab === 'active' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+              <span>{tab === 'active' ? 'Active Events' : tab}</span>
             </button>
           ))}
         </div>

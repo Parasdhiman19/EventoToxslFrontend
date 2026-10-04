@@ -32,14 +32,14 @@ export default function ProtectedRoute({ requiresOrganizer, requiresAdmin, allow
   // 4. Organizer Capability check: if route requires organizer capability
   const isUserAnOrganizer = isOrganizer || role === 'manager' || isUserSuperAdmin
   if (requiresOrganizer && !isUserAnOrganizer) {
-    return <Navigate to="/discover" replace />
+    return <Navigate to="/discover?action=become-host" state={{ openBecomeOrganizer: true }} replace />
   }
 
   // Legacy allowedRoles support
   if (allowedRoles && Array.isArray(allowedRoles)) {
     const managerOnly = allowedRoles.includes('manager') && !allowedRoles.includes('user')
     if (managerOnly && !isUserAnOrganizer) {
-      return <Navigate to="/discover" replace />
+      return <Navigate to="/discover?action=become-host" state={{ openBecomeOrganizer: true }} replace />
     }
   }
 

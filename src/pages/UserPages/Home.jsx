@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   Flame,
@@ -24,6 +24,7 @@ import HomeEventSection from '../../components/home/HomeEventSection'
 export default function Home() {
   const navigate = useNavigate()
   const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
+  const { openBecomeOrganizer } = useOutletContext() || {}
 
   const [searchQuery, setSearchQuery] = useState('')
   const [allEvents, setAllEvents] = useState([])
@@ -124,11 +125,12 @@ export default function Home() {
     }
   }, [])
 
-  // Featured slides for Hero Carousel (uses admin banners if configured, otherwise fallback to featured events)
+  // Featured slides for Hero Carousel (uses admin banners if configured, otherwise falls back to featured/published events)
   const heroSlides = useMemo(() => {
     if (customBanners && customBanners.length > 0) {
-      return customBanners.map((b) => ({
+      return customBanners.slice(0, 3).map((b) => ({
         id: b.eventId || b.id,
+        eventId: b.eventId,
         title: b.title,
         category: b.subtitle || 'Featured Spotlight',
         banner: b.imageUrl,
@@ -151,15 +153,13 @@ export default function Home() {
         list.push(ev)
       }
     })
-    // If fewer than 3, pad with first available events
-    if (list.length < 3) {
-      allEvents.forEach((ev) => {
-        if (!list.some((item) => item.id === ev.id)) {
-          list.push(ev)
-        }
-      })
-    }
-    return list.slice(0, 5)
+    // Pad with first available live events
+    allEvents.forEach((ev) => {
+      if (list.length < 3 && !list.some((item) => item.id === ev.id)) {
+        list.push(ev)
+      }
+    })
+    return list.slice(0, 3)
   }, [customBanners, featuredHero, allEvents])
 
   // Recommended events curated by Super Admin
@@ -239,7 +239,10 @@ export default function Home() {
   return (
     <div className="max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 space-y-8 sm:space-y-10">
       {/* 1. Hero Spotlight Auto-scrolling Banner */}
-      <HomeHeroBanner featuredEvents={heroSlides} />
+      <HomeHeroBanner 
+        featuredEvents={heroSlides} 
+        onOpenBecomeOrganizer={openBecomeOrganizer}
+      />
 
       {/* 2. Standalone Search Bar */}
       <div className="max-w-3xl mx-auto w-full">
@@ -347,23 +350,25 @@ export default function Home() {
             {isOrganizer ? (
               <Link
                 to="/manager/events/create"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Create Stage</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             ) : isAuthenticated ? (
-              <Link
-                to="/manager/overview"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all"
+              <button
+                type="button"
+                onClick={openBecomeOrganizer}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
-                <span>Host Studio</span>
+                <Sparkles className="w-4 h-4 text-orange-200" />
+                <span>Become an Organizer</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             ) : (
               <Link
                 to="/account/signup"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Get Started Free</span>
                 <ArrowRight className="w-4 h-4" />

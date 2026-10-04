@@ -2,9 +2,16 @@
   import { store } from '../redux/store/store'
   import { setCredentials, logout } from '../redux/slice/authSlice'
 
-  // Dynamically resolve API URL to match the browser's current host (localhost vs 127.0.0.1)
-  // This ensures requests remain Same-Site, allowing SameSite=Lax HttpOnly cookies to pass seamlessly.
+  // Dynamically resolve API URL: uses VITE_API_URL in production or local hostname in dev
   const getApiBaseUrl = () => {
+    let url = import.meta.env.VITE_API_URL
+    if (url && typeof url === 'string') {
+      url = url.trim().replace(/\/+$/, '')
+      if (!url.endsWith('/api')) {
+        url += '/api'
+      }
+      return `${url}/`
+    }
     const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '127.0.0.1'
     return `http://${host}:8000/api/`
   }

@@ -44,12 +44,12 @@ const ORGANIZER_LINKS = [
 ]
 
 const TRUST_LINKS = [
-  { label: 'Help Center & FAQs', path: '/help' },
-  { label: '100% Verified Passes', path: '/guarantee' },
-  { label: 'Buyer Protection Policy', path: '/protection' },
-  { label: 'Refund Guidelines', path: '/refunds' },
-  { label: 'Organizer Verification', path: '/verification' },
-  { label: 'Security & Anti-Fraud', path: '/security' },
+  { label: 'Help & Problem Support', path: '/support' },
+  { label: 'Report an Issue / Glitch', path: '/support' },
+  { label: 'Buyer Protection Policy', path: '/support' },
+  { label: 'Refund Guidelines', path: '/support' },
+  { label: 'Organizer Verification', path: '/support' },
+  { label: 'Security & Anti-Fraud', path: '/about' },
 ]
 
 const TOP_CITIES = [
@@ -66,8 +66,9 @@ export default function Footer({
   variant = 'default',
   hideNewsletter = false,
   className = '',
+  onOpenBecomeOrganizer,
 }) {
-  const { isAuthenticated } = useSelector((state) => state.auth || {})
+  const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
   const [email, setEmail] = useState('')
   const [isSubscribed, setIsSubscribed] = useState(false)
 
@@ -271,16 +272,27 @@ export default function Footer({
               Organizers
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              {ORGANIZER_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.path}
-                    className="text-stone-400 hover:text-white transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>{link.label}</span>
-                  </Link>
-                </li>
-              ))}
+              {ORGANIZER_LINKS.map((link) => {
+                const handleOrgClick = (e) => {
+                  if (isAuthenticated && !isOrganizer) {
+                    e.preventDefault()
+                    if (onOpenBecomeOrganizer) {
+                      onOpenBecomeOrganizer()
+                    }
+                  }
+                }
+                return (
+                  <li key={link.label}>
+                    <Link
+                      to={link.path}
+                      onClick={handleOrgClick}
+                      className="text-stone-400 hover:text-white transition-colors inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>{link.label}</span>
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 

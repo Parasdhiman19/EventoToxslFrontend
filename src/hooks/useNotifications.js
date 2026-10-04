@@ -15,11 +15,27 @@ import {
   clearNotifications,
 } from '../redux/slice/notificationSlice'
 
-// Helper to determine WS URL based on current browser window location
+// Helper to determine WS URL: uses VITE_WS_URL or infers from VITE_API_URL in production, or local host in dev
 const getWebSocketUrl = () => {
-  const isSecure = window.location.protocol === 'https:'
+  let wsUrl = import.meta.env.VITE_WS_URL
+  if (wsUrl && typeof wsUrl === 'string') {
+    wsUrl = wsUrl.trim().replace(/\/+$/, '')
+    return `${wsUrl}/`
+  }
+  // Auto-infer from VITE_API_URL if VITE_WS_URL was not explicitly set
+  let apiUrl = import.meta.env.VITE_API_URL
+  if (apiUrl && typeof apiUrl === 'string') {
+    let wsBase = apiUrl
+      .trim()
+      .replace(/^http:/i, 'ws:')
+      .replace(/^https:/i, 'wss:')
+      .replace(/\/api\/?$/i, '')
+      .replace(/\/+$/, '')
+    return `${wsBase}/ws/notifications/`
+  }
+  const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
   const protocol = isSecure ? 'wss:' : 'ws:'
-  const host = window.location.hostname || '127.0.0.1'
+  const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '127.0.0.1'
   return `${protocol}//${host}:8000/ws/notifications/`
 }
 
