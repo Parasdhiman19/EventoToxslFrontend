@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { CheckCheck, ExternalLink, Sparkles, X } from 'lucide-react'
+import { CheckCheck, ExternalLink, X } from 'lucide-react'
 import NotificationItem from './NotificationItem'
 import NotificationEmptyState from './NotificationEmptyState'
 
@@ -25,30 +25,25 @@ export default function NotificationDropdown({
     <>
       {/* Mobile Dimmed Backdrop Overlay */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 sm:hidden animate-in fade-in duration-200"
+        className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs z-50 sm:hidden animate-in fade-in duration-200"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Notification Container: Native-feeling Mobile Bottom Sheet / Desktop Anchored Popover */}
+      {/* Notification Card: Top Slide-down for Mobile, Anchored Popover for Desktop */}
       <div
-        className="fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] flex flex-col rounded-t-3xl bg-white shadow-2xl border-t border-stone-200/90 overflow-hidden animate-in slide-in-from-bottom duration-300 ease-out sm:fixed-none sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-full sm:mt-2.5 sm:w-[390px] sm:max-w-[390px] sm:rounded-2xl sm:border sm:border-stone-200/90 sm:shadow-2xl sm:max-h-[540px] sm:animate-in sm:fade-in sm:zoom-in-95 sm:duration-150"
+        className="fixed inset-x-3.5 top-[60px] z-50 w-auto max-w-[calc(100vw-28px)] rounded-2xl bg-white/98 backdrop-blur-xl border border-stone-200/90 shadow-2xl overflow-hidden flex flex-col max-h-[min(460px,calc(100dvh-80px))] animate-in fade-in slide-in-from-top-2 duration-200 sm:fixed-none sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2.5 sm:w-[380px] sm:max-w-[380px] sm:max-h-[520px] sm:rounded-2xl sm:border sm:border-stone-200/90 sm:shadow-2xl sm:animate-in sm:fade-in sm:zoom-in-95 sm:duration-150"
         role="dialog"
         aria-label="Notification Center"
       >
-        {/* Mobile Drag Handle Indicator */}
-        <div className="pt-2.5 pb-1 flex justify-center sm:hidden bg-stone-50/90 shrink-0">
-          <div className="w-10 h-1.5 rounded-full bg-stone-300" />
-        </div>
-
         {/* Header */}
-        <div className="px-4 py-3 sm:p-3.5 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
+        <div className="p-3.5 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-serif text-base sm:text-sm font-semibold text-stone-900 tracking-tight">
+            <h3 className="font-serif text-sm font-semibold text-stone-900 tracking-tight">
               Notifications
             </h3>
             {unreadCount > 0 && (
-              <span className="px-2 py-0.5 sm:px-1.5 sm:py-0.2 rounded-full bg-amber-500 text-white font-mono text-[10px] font-bold shadow-2xs">
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono text-[10px] font-bold shadow-2xs">
                 {unreadCount} new
               </span>
             )}
@@ -76,7 +71,7 @@ export default function NotificationDropdown({
               <button
                 type="button"
                 onClick={onMarkAllRead}
-                className="inline-flex items-center gap-1 text-[11px] font-mono text-stone-600 hover:text-stone-950 font-medium px-2 py-1 sm:py-0.5 rounded-md hover:bg-stone-200/70 transition cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-stone-600 hover:text-stone-950 font-medium px-2 py-0.5 rounded-md hover:bg-stone-200/70 transition cursor-pointer active:scale-95"
               >
                 <CheckCheck size={13} className="text-stone-500" />
                 <span className="hidden xs:inline">Mark all read</span>
@@ -88,10 +83,10 @@ export default function NotificationDropdown({
             <button
               type="button"
               onClick={onClose}
-              className="sm:hidden p-1.5 -mr-1 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-200/70 transition cursor-pointer active:scale-90"
+              className="sm:hidden p-1 -mr-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200/70 transition cursor-pointer active:scale-90"
               aria-label="Close Notifications"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -115,14 +110,14 @@ export default function NotificationDropdown({
         </div>
 
         {/* Footer */}
-        <div className="p-3 sm:p-2.5 bg-stone-50/90 border-t border-stone-100 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-2.5 shrink-0">
+        <div className="p-2.5 bg-stone-50/80 border-t border-stone-100 flex items-center justify-between text-xs shrink-0">
           <Link
             to={allNotificationsUrl}
             onClick={onClose}
-            className="w-full py-2.5 sm:py-2 px-4 sm:px-3 rounded-xl font-mono text-xs font-semibold text-stone-900 bg-white border border-stone-200/90 hover:bg-stone-100 transition shadow-2xs inline-flex items-center justify-center gap-2 text-center group active:scale-[0.99]"
+            className="w-full py-2 px-3 rounded-xl font-mono text-xs font-semibold text-stone-900 bg-white border border-stone-200/80 hover:bg-stone-100 transition shadow-2xs inline-flex items-center justify-center gap-1.5 text-center group active:scale-[0.99]"
           >
             <span>View All Notifications</span>
-            <ExternalLink size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            <ExternalLink size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Link>
         </div>
       </div>
