@@ -16,18 +16,6 @@ export default function NotificationBell({ variant = 'light' }) {
     deleteNotification,
   } = useNotifications()
 
-  // Lock body scroll on mobile when sheet is open
-  useEffect(() => {
-    if (isOpen && window.innerWidth < 640) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
-
   // Close dropdown on outside click or touch
   useEffect(() => {
     function handleClickOutside(event) {
@@ -50,11 +38,10 @@ export default function NotificationBell({ variant = 'light' }) {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`relative p-2 rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 active:scale-95 ${
-          isDark
+        className={`relative p-2 rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 active:scale-95 ${isDark
             ? 'text-stone-300 hover:text-stone-50 hover:bg-stone-800 focus:ring-stone-700'
             : 'text-stone-700 hover:text-stone-950 hover:bg-stone-100/90 border border-stone-200/80 bg-white/80 backdrop-blur-xs shadow-2xs focus:ring-stone-900/10'
-        }`}
+          }`}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         aria-expanded={isOpen}
       >
