@@ -23,16 +23,16 @@ export default function NotificationDropdown({
 
   return (
     <>
-      {/* Mobile Dimmed Backdrop Overlay */}
+      {/* Mobile Dimmed Backdrop Overlay (Clean tint without blurring the navbar) */}
       <div
-        className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs z-50 sm:hidden animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/30 z-40 sm:hidden animate-in fade-in duration-150"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Notification Card: Top Slide-down for Mobile, Anchored Popover for Desktop */}
       <div
-        className="fixed inset-x-3.5 top-[60px] z-50 w-auto max-w-[calc(100vw-28px)] rounded-2xl bg-white/98 backdrop-blur-xl border border-stone-200/90 shadow-2xl overflow-hidden flex flex-col max-h-[min(460px,calc(100dvh-80px))] animate-in fade-in slide-in-from-top-2 duration-200 sm:fixed-none sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2.5 sm:w-[380px] sm:max-w-[380px] sm:max-h-[520px] sm:rounded-2xl sm:border sm:border-stone-200/90 sm:shadow-2xl sm:animate-in sm:fade-in sm:zoom-in-95 sm:duration-150"
+        className="fixed inset-x-3.5 top-[62px] z-50 w-auto max-w-[calc(100vw-28px)] rounded-2xl bg-white border border-stone-200 shadow-2xl overflow-hidden flex flex-col max-h-[min(460px,calc(100dvh-80px))] animate-in fade-in slide-in-from-top-2 duration-200 sm:fixed-none sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2.5 sm:w-[380px] sm:max-w-[380px] sm:max-h-[520px] sm:rounded-2xl sm:border sm:border-stone-200 sm:shadow-2xl sm:animate-in sm:fade-in sm:zoom-in-95 sm:duration-150"
         role="dialog"
         aria-label="Notification Center"
       >
