@@ -16,6 +16,18 @@ export default function NotificationBell({ variant = 'light' }) {
     deleteNotification,
   } = useNotifications()
 
+  // Lock body scroll on mobile when sheet is open
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 640) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   // Close dropdown on outside click or touch
   useEffect(() => {
     function handleClickOutside(event) {
