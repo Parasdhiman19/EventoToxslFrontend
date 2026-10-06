@@ -47,9 +47,9 @@ export default function ManagerNotifications() {
       : notifications
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-5 sm:pb-6 border-b border-stone-200">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="p-1.5 rounded-lg bg-stone-900 text-stone-50">
@@ -67,10 +67,10 @@ export default function ManagerNotifications() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center flex-wrap gap-2.5 sm:gap-3">
           {/* Real-time Status */}
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/90 text-xs font-mono text-stone-600 shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/90 text-xs font-mono text-stone-600 shadow-2xs shrink-0"
             title={`WebSocket status: ${wsStatus}`}
           >
             <span
@@ -89,7 +89,7 @@ export default function ManagerNotifications() {
             <button
               type="button"
               onClick={markAllAsRead}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-900 text-stone-50 hover:bg-stone-800 text-xs font-mono font-medium transition shadow-xs cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-900 text-stone-50 hover:bg-stone-800 text-xs font-mono font-medium transition shadow-xs cursor-pointer active:scale-95 shrink-0"
             >
               <CheckCheck size={14} />
               <span>Mark all read</span>
@@ -100,11 +100,11 @@ export default function ManagerNotifications() {
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-between gap-4">
-        <div className="inline-flex p-1 bg-stone-200/70 rounded-full border border-stone-300/60">
+        <div className="inline-flex p-1 bg-stone-200/70 rounded-full border border-stone-300/60 max-w-full overflow-x-auto">
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
               filter === 'all'
                 ? 'bg-white text-stone-900 shadow-xs font-semibold'
                 : 'text-stone-600 hover:text-stone-900'
@@ -115,7 +115,7 @@ export default function ManagerNotifications() {
           <button
             type="button"
             onClick={() => setFilter('unread')}
-            className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               filter === 'unread'
                 ? 'bg-white text-stone-900 shadow-xs font-semibold'
                 : 'text-stone-600 hover:text-stone-900'

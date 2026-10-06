@@ -16,7 +16,7 @@ export default function NotificationBell({ variant = 'light' }) {
     deleteNotification,
   } = useNotifications()
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click or touch
   useEffect(() => {
     function handleClickOutside(event) {
       if (bellRef.current && !bellRef.current.contains(event.target)) {
@@ -24,7 +24,11 @@ export default function NotificationBell({ variant = 'light' }) {
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside, { passive: true })
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [])
 
   const isDark = variant === 'dark'

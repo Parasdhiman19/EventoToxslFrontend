@@ -59,7 +59,7 @@ export default function NotificationItem({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 pr-6">
+      <div className="flex-1 min-w-0 pr-1 sm:pr-2">
         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
           <span
             className={`text-[10px] font-mono uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded border ${config.badgeClass}`}
@@ -72,7 +72,7 @@ export default function NotificationItem({
         </div>
 
         <h4
-          className={`text-xs leading-snug font-medium text-stone-900 ${
+          className={`text-xs leading-snug font-medium text-stone-900 line-clamp-2 ${
             !notification.isRead ? 'font-semibold text-stone-950' : 'text-stone-700'
           }`}
         >
@@ -92,16 +92,16 @@ export default function NotificationItem({
       </div>
 
       {/* Unread Status Dot & Action Buttons */}
-      <div className="absolute top-3 right-3 flex items-center gap-1">
+      <div className="shrink-0 flex items-center gap-1 self-start mt-0.5">
         {!notification.isRead && (
           <span
-            className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-200/80 animate-pulse group-hover:hidden"
+            className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-200/80 animate-pulse sm:group-hover:hidden"
             title="Unread"
           />
         )}
 
-        {/* Quick action buttons on hover */}
-        <div className="hidden group-hover:flex items-center gap-0.5">
+        {/* Action buttons (Visible on hover on desktop, always accessible with subtle styling or compact button on mobile) */}
+        <div className="flex sm:hidden sm:group-hover:flex items-center gap-0.5">
           {!notification.isRead && onMarkRead && (
             <button
               data-action="mark-read"
