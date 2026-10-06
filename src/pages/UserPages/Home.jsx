@@ -76,54 +76,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    let isMounted = true
-    const fetchData = async () => {
-      try {
-        const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
-        const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
-        const eventsPromise = API.get('events/', {
-          params: { page_size: 50, sort: 'upcoming' },
-        })
-
-        const [heroRes, contentRes, eventsRes] = await Promise.all([heroPromise, contentPromise, eventsPromise])
-
-        if (!isMounted) return
-
-        if (heroRes?.data) {
-          setFeaturedHero(heroRes.data)
-        }
-
-        if (contentRes?.data?.banners) {
-          setCustomBanners(contentRes.data.banners)
-        }
-        if (contentRes?.data?.recommendations) {
-          setCustomRecommendations(contentRes.data.recommendations)
-        }
-
-        let eventsList = []
-        if (eventsRes?.data?.results && Array.isArray(eventsRes.data.results)) {
-          eventsList = eventsRes.data.results
-        } else if (Array.isArray(eventsRes?.data)) {
-          eventsList = eventsRes.data
-        }
-        setAllEvents(eventsList)
-      } catch (err) {
-        if (isMounted) {
-          setError(err.response?.data?.detail || 'Failed to load live experiences. Please try again.')
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchData()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+    loadHomeData()
+  }, [loadHomeData])
 
   // Featured slides for Hero Carousel (uses admin banners if configured, otherwise falls back to featured/published events)
   const heroSlides = useMemo(() => {
@@ -377,8 +331,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Subtle background decoration */}
-        <div className="absolute -right-12 -bottom-12 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle background decoration (GPU-friendly radial gradient) */}
+        <div 
+          className="absolute -right-12 -bottom-12 w-72 h-72 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)' }}
+        />
       </section>
 
       {/* 5. Tech & Conferences Section */}

@@ -174,7 +174,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
       className="relative w-full select-none py-1 sm:py-2 overflow-hidden"
     >
       {/* Main Carousel Track */}
-      <div className="relative w-full h-[330px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center [perspective:1400px]">
+      <div className="relative w-full h-[330px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center sm:[perspective:1400px]">
 
         {/* Carousel Cards Deck */}
         <div className="relative w-full h-full flex items-center justify-center">
@@ -211,6 +211,8 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                     src={slideImg}
                     alt={slideTitle}
                     onError={() => handleImageError(slide.id || idx)}
+                    decoding="async"
+                    loading={isCenter ? 'eager' : 'lazy'}
                     className="absolute inset-0 w-full h-full object-cover object-center rounded-lg sm:rounded-xl"
                   />
                 ) : (
@@ -235,12 +237,12 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
 
                   {/* Top Badges */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-stone-100 font-semibold shadow-md">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/60 border border-white/20 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-stone-100 font-semibold shadow-md">
                       <BadgeIcon size={11} className="text-amber-400 sm:w-3 sm:h-3" />
                       <span>{slideCategory}</span>
                     </span>
 
-                    <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono font-bold text-amber-300 shadow-md">
+                    <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/60 border border-white/20 text-[10px] sm:text-xs font-mono font-bold text-amber-300 shadow-md">
                       {slidePrice}
                     </span>
                   </div>
@@ -262,15 +264,15 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
 
                     {/* Meta details chips */}
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-mono text-stone-100">
-                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/50 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium">
+                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium">
                         <Calendar size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
                         <span>{slideDate}</span>
                       </div>
-                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/50 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium truncate max-w-[170px] sm:max-w-[260px]">
+                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium truncate max-w-[170px] sm:max-w-[260px]">
                         <MapPin size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
                         <span className="truncate">{slideLocation}</span>
                       </div>
-                      <div className="hidden md:flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm font-medium">
+                      <div className="hidden md:flex items-center gap-1.5 bg-black/60 px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm font-medium">
                         <Users size={13} className="text-amber-400 shrink-0" />
                         <span>{attendees}</span>
                       </div>

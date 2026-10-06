@@ -306,35 +306,27 @@ export default function UserLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-stone-50 text-stone-900 selection:bg-stone-900 selection:text-stone-50 font-sans">
-      {/* Top Global Navigation Bar with Expanding/Contracting Animation on Mobile */}
-      <header className={`sticky top-0 z-40 border-b transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      {/* Top Global Navigation Bar */}
+      <header className={`sticky top-0 z-40 border-b transition-all duration-200 ${
         isScrolled 
-          ? 'border-stone-300/80 bg-white/95 backdrop-blur-2xl shadow-sm' 
-          : 'border-stone-200/80 bg-white/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)]'
+          ? 'border-stone-300/80 bg-white/95 backdrop-blur-xl shadow-xs' 
+          : 'border-stone-200/80 bg-white/90 backdrop-blur-lg shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)]'
       }`}>
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex items-center justify-between transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] gap-3 lg:gap-6 ${
-            isDiscoverPage ? 'h-16' : (isScrolled ? 'h-13 sm:h-14 lg:h-16' : 'h-16')
-          }`}>
+          <div className="flex items-center justify-between h-16 gap-3 lg:gap-6">
             
             {/* Left: Brand Logo & Desktop Nav */}
             <div className="flex items-center gap-2 lg:gap-6 shrink-0">
               <Link to="/" className="inline-flex items-center gap-2.5 group">
-                <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-stone-50 font-serif font-bold shadow-xs ring-1 ring-stone-900/10 group-hover:scale-105 group-hover:shadow-md transition-all duration-300 ${
-                  isScrolled ? 'w-7 h-7 text-sm sm:w-8 sm:h-8 sm:text-base' : 'w-8 h-8 text-base'
-                }`}>
+                <div className="relative flex items-center justify-center rounded-xl bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-stone-50 font-serif font-bold shadow-xs ring-1 ring-stone-900/10 group-hover:scale-105 group-hover:shadow-md transition-all duration-200 w-8 h-8 text-base">
                   <span>E</span>
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className={`font-serif font-bold tracking-tight text-stone-900 leading-none group-hover:text-stone-700 transition-all duration-300 ${
-                    isScrolled ? 'text-lg sm:text-xl' : 'text-xl'
-                  }`}>
+                  <span className="font-serif font-bold tracking-tight text-stone-900 leading-none group-hover:text-stone-700 transition-colors text-xl">
                     Evento
                   </span>
-                  <span className={`text-[9px] font-mono uppercase tracking-widest text-stone-400 leading-tight transition-all duration-300 overflow-hidden ${
-                    isScrolled ? 'max-h-0 opacity-0 -mt-0.5 sm:max-h-4 sm:opacity-100 sm:mt-0.5' : 'max-h-4 opacity-100 mt-0.5'
-                  }`}>
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-stone-400 leading-tight mt-0.5">
                     Live Stages
                   </span>
                 </div>
