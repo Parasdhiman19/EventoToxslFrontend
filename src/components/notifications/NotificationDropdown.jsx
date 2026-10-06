@@ -23,9 +23,9 @@ export default function NotificationDropdown({
 
   return (
     <>
-      {/* Mobile Dimmed Backdrop Overlay (Clean tint without blurring the navbar) */}
+      {/* Mobile Transparent Dismiss Overlay (Dismisses on outside tap with zero tint/darkening on navbar) */}
       <div
-        className="fixed inset-0 bg-black/30 z-40 sm:hidden animate-in fade-in duration-150"
+        className="fixed inset-0 bg-transparent z-40 sm:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
