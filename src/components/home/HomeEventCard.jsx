@@ -68,17 +68,19 @@ export default function HomeEventCard({
   return (
     <Link
       to={`/events/${event.id}`}
-      className={`group flex flex-col bg-stone-50 hover:bg-white rounded-xl border border-stone-200/60 hover:border-stone-300/80 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.08),0_4px_12px_-2px_rgba(0,0,0,0.03)] hover:-translate-y-1.5 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out ${className}`}
+      draggable={false}
+      className={`group flex flex-col bg-stone-50 hover:bg-white rounded-xl border border-stone-200/60 hover:border-stone-300/80 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.08),0_4px_12px_-2px_rgba(0,0,0,0.03)] hover:-translate-y-1.5 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out select-none ${className}`}
     >
       {/* Card Image Banner */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-100 rounded-t-xl">
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-100 rounded-t-xl select-none">
         <img
           src={imageUrl}
           alt={event.title || 'Event'}
           onError={() => setImageError(true)}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+          draggable={false}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none"
         />
 
         {/* Gradient Overlay for Top Badges */}
