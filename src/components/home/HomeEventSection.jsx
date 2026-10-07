@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import HomeEventCard from './HomeEventCard'
@@ -14,6 +14,11 @@ export default function HomeEventSection({
   onBookmarkChange,
 }) {
   const scrollContainerRef = useRef(null)
+  const isDraggingRef = useRef(false)
+  const startXRef = useRef(0)
+  const scrollLeftRef = useRef(0)
+  const hasDraggedRef = useRef(false)
+  const [isGrabbing, setIsGrabbing] = useState(false)
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -27,7 +32,34 @@ export default function HomeEventSection({
     }
   }
 
-  // If not loading and no events, don't show an empty empty block or show graceful notice
+  // Desktop Mouse Drag-to-Scroll handlers (Only applies to mouse/trackpad pointer, not native touch)
+  const handleMouseDown = (e) => {
+    // Only handle primary mouse click (button 0)
+    if (e.button !== 0) return
+    isDraggingRef.current = true
+    hasDraggedRef.current = false
+    startXRef.current = e.pageX - scrollContainerRef.current.offsetLeft
+    scrollLeftRef.current = scrollContainerRef.current.scrollLeft
+    setIsGrabbing(true)
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current) return
+    e.preventDefault()
+    const x = e.pageX - scrollContainerRef.current.offsetLeft
+    const walk = (x - startXRef.current) * 1.5 // Multiplier for smooth velocity
+    if (Math.abs(walk) > 5) {
+      hasDraggedRef.current = true
+    }
+    scrollContainerRef.current.scrollLeft = scrollLeftRef.current - walk
+  }
+
+  const handleMouseUpOrLeave = () => {
+    isDraggingRef.current = false
+    setIsGrabbing(false)
+  }
+
+  // If not loading and no events, don't show an empty block
   if (!isLoading && (!events || events.length === 0)) {
     return null
   }
@@ -91,11 +123,22 @@ export default function HomeEventSection({
         </div>
       </div>
 
-      {/* Horizontal Scrollable Event Row */}
+      {/* Horizontal Scrollable Event Row (Dual-Axis Native Touch + Desktop Drag) */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 touch-pan-y no-scrollbar"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUpOrLeave}
+        onMouseLeave={handleMouseUpOrLeave}
+        className={`flex gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden pb-4 pt-1 no-scrollbar select-none ${
+          isGrabbing ? 'cursor-grabbing' : 'cursor-grab sm:cursor-default'
+        }`}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x pan-y',
+        }}
       >
         {isLoading ? (
           // Skeleton placeholders
@@ -114,7 +157,14 @@ export default function HomeEventSection({
           events.map((event) => (
             <div
               key={event.id}
-              className="min-w-[270px] sm:min-w-[310px] max-w-[310px] shrink-0 snap-start"
+              className="min-w-[270px] sm:min-w-[310px] max-w-[310px] shrink-0"
+              onClickCapture={(e) => {
+                // If user dragged more than 5px, suppress link navigation click
+                if (hasDraggedRef.current) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }
+              }}
             >
               <HomeEventCard
                 event={event}
