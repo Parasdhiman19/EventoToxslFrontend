@@ -623,6 +623,21 @@ export default function ManagerLayout() {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
+
+        {/* Minimalist Manager Console Footer */}
+        <footer className="border-t border-stone-200/80 bg-white/70 px-6 sm:px-8 py-3.5 text-xs text-stone-500 flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="font-serif font-bold text-stone-800">Evento Studio</span>
+            <span className="text-stone-300">•</span>
+            <span className="text-[11px] font-mono text-stone-400">Host Console</span>
+          </div>
+          <div className="flex items-center gap-4 text-[11px]">
+            <Link to="/user/support" className="hover:text-stone-900 transition-colors">Support</Link>
+            <Link to="/terms" className="hover:text-stone-900 transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-stone-900 transition-colors">Privacy</Link>
+            <span className="text-stone-400 font-mono">&copy; {new Date().getFullYear()}</span>
+          </div>
+        </footer>
       </div>
     </div>
   )
