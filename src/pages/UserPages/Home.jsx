@@ -191,7 +191,7 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 space-y-8 sm:space-y-10">
+    <div className="w-full max-w-[1600px] mx-auto px-0 sm:px-0 py-1 sm:py-2 space-y-5 sm:space-y-10">
       {/* 1. Hero Spotlight Auto-scrolling Banner */}
       <HomeHeroBanner 
         featuredEvents={heroSlides} 
@@ -199,24 +199,24 @@ export default function Home() {
       />
 
       {/* 2. Standalone Search Bar */}
-      <div className="max-w-3xl mx-auto w-full">
+      <div className="max-w-2xl mx-auto w-full px-0.5">
         <form
           onSubmit={handleSearch}
-          className="flex items-center bg-white border border-stone-200/90 rounded-2xl p-1.5 sm:p-2 shadow-xs hover:shadow-md hover:border-stone-300 transition-all duration-200"
+          className="flex items-center bg-white border border-stone-200/90 rounded-2xl p-1 sm:p-1.5 shadow-2xs hover:border-stone-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-150"
         >
-          <div className="pl-3 pr-2 text-stone-400">
-            <Search className="w-5 h-5" />
+          <div className="pl-3 pr-2 text-stone-400 shrink-0">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search events, festivals, workshops, cities..."
-            className="w-full bg-transparent text-stone-900 placeholder:text-stone-400 text-sm sm:text-base outline-none pr-2"
+            placeholder="Search events, festivals, concerts, cities..."
+            className="w-full bg-transparent text-stone-900 placeholder:text-stone-400 text-xs sm:text-sm outline-none pr-2 py-1.5"
           />
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all duration-150 shrink-0 shadow-xs cursor-pointer"
+            className="px-4 sm:px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all duration-150 shrink-0 shadow-xs cursor-pointer"
           >
             Search
           </button>
@@ -236,7 +236,7 @@ export default function Home() {
           <button
             type="button"
             onClick={loadHomeData}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Retry</span>
@@ -270,7 +270,7 @@ export default function Home() {
         onBookmarkChange={handleBookmarkChange}
       />
 
-      {/* 3. Music & Live Concerts Section */}
+      {/* 5. Music & Live Concerts Section */}
       {(isLoading || musicEvents.length > 0) && (
         <HomeEventSection
           title="Music & Live Concerts"
@@ -284,48 +284,48 @@ export default function Home() {
         />
       )}
 
-      {/* 4. Host Organizer Promo Banner */}
-      <section className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-stone-950 via-stone-900 to-orange-950/90 text-white p-8 sm:p-12 shadow-xl border border-stone-800/80">
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-semibold uppercase font-mono">
-              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+      {/* 6. Host Organizer Promo Banner */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-stone-950 via-stone-900 to-orange-950/90 text-white p-5 sm:p-8 md:p-10 shadow-lg border border-stone-800/80">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[10px] sm:text-xs font-semibold uppercase font-mono">
+              <Sparkles className="w-3 h-3 text-orange-400" />
               <span>Host on Evento</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
               Create and sell tickets for your own event
             </h3>
-            <p className="text-sm text-stone-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
               Launch your stage in minutes. Set custom ticket tiers, design interactive seating maps, and track real-time revenue payouts.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0">
             {isOrganizer ? (
               <Link
                 to="/manager/events/create"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Create Stage</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
             ) : isAuthenticated ? (
               <button
                 type="button"
                 onClick={openBecomeOrganizer}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-orange-200" />
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-200" />
                 <span>Become an Organizer</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             ) : (
               <Link
                 to="/account/signup"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Get Started Free</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
             )}
           </div>
@@ -333,12 +333,12 @@ export default function Home() {
 
         {/* Subtle background decoration (GPU-friendly radial gradient) */}
         <div 
-          className="absolute -right-12 -bottom-12 w-72 h-72 rounded-full pointer-events-none"
+          className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)' }}
         />
       </section>
 
-      {/* 5. Tech & Conferences Section */}
+      {/* 7. Tech & Conferences Section */}
       {(isLoading || techEvents.length > 0) && (
         <HomeEventSection
           title="Tech Conferences & Summits"
@@ -352,7 +352,7 @@ export default function Home() {
         />
       )}
 
-      {/* 6. Nightlife & Parties Section */}
+      {/* 8. Nightlife & Parties Section */}
       {(isLoading || nightlifeEvents.length > 0) && (
         <HomeEventSection
           title="Nightlife & Clubbing"
@@ -366,7 +366,7 @@ export default function Home() {
         />
       )}
 
-      {/* 7. Workshops & Creative Labs Section */}
+      {/* 9. Workshops & Creative Labs Section */}
       {(isLoading || workshopEvents.length > 0) && (
         <HomeEventSection
           title="Workshops, Arts & Tastings"
@@ -380,35 +380,35 @@ export default function Home() {
         />
       )}
 
-      {/* 8. Bottom Platform Guarantee Banner */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-stone-200/80">
-        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-2xs">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5" />
+      {/* 10. Bottom Platform Guarantee Banner */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 sm:pt-4 border-t border-stone-200/80">
+        <div className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl bg-white border border-stone-200/80 shadow-2xs">
+          <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-stone-900">100% Verified Tickets</h4>
-            <p className="text-xs text-stone-500 mt-0.5">Authentic QR code ticketing and direct organizer passes.</p>
+            <h4 className="text-xs sm:text-sm font-bold text-stone-900">100% Verified Tickets</h4>
+            <p className="text-[11px] sm:text-xs text-stone-500 mt-0.5">Authentic QR code ticketing and direct organizer passes.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-2xs">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-            <Ticket className="w-5 h-5" />
+        <div className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl bg-white border border-stone-200/80 shadow-2xs">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <Ticket className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-stone-900">Instant Digital Delivery</h4>
-            <p className="text-xs text-stone-500 mt-0.5">Access tickets instantly in your wallet and email.</p>
+            <h4 className="text-xs sm:text-sm font-bold text-stone-900">Instant Digital Delivery</h4>
+            <p className="text-[11px] sm:text-xs text-stone-500 mt-0.5">Access tickets instantly in your wallet and email.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-2xs">
-          <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
-            <Building2 className="w-5 h-5" />
+        <div className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl bg-white border border-stone-200/80 shadow-2xs">
+          <div className="w-9 h-9 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+            <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-stone-900">Interactive Seating Maps</h4>
-            <p className="text-xs text-stone-500 mt-0.5">Pick exact seats, rows, and VIP booths in real-time.</p>
+            <h4 className="text-xs sm:text-sm font-bold text-stone-900">Interactive Seating Maps</h4>
+            <p className="text-[11px] sm:text-xs text-stone-500 mt-0.5">Pick exact seats, rows, and VIP booths in real-time.</p>
           </div>
         </div>
       </section>

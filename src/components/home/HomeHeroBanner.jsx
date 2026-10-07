@@ -163,13 +163,13 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
 
     if (offset === 0) {
       // Main Center Card: Dominant, Elevated, Full Opacity
-      return 'left-1/2 -translate-x-1/2 scale-100 [transform:translateZ(0)_rotateY(0deg)] z-30 opacity-100 pointer-events-auto border-white/20 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.18),0_4px_14px_-4px_rgba(0,0,0,0.08)] ring-1 ring-black/5'
+      return 'left-1/2 -translate-x-1/2 scale-100 [transform:translateZ(0)_rotateY(0deg)] z-30 opacity-100 pointer-events-auto border-y sm:border border-white/20 sm:shadow-[0_14px_34px_-10px_rgba(0,0,0,0.18),0_4px_14px_-4px_rgba(0,0,0,0.08)] sm:ring-1 sm:ring-black/5'
     } else if (offset === -1) {
       // Left Preview Card
-      return 'left-1/2 max-sm:-translate-x-[150%] max-sm:scale-90 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[57%] md:-translate-x-[60%] lg:-translate-x-[62%] xl:-translate-x-[63%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
+      return 'left-1/2 max-sm:-translate-x-[150%] max-sm:scale-95 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[57%] md:-translate-x-[60%] lg:-translate-x-[62%] xl:-translate-x-[63%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
     } else {
       // Right Preview Card
-      return 'left-1/2 max-sm:translate-x-[50%] max-sm:scale-90 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[43%] md:-translate-x-[40%] lg:-translate-x-[38%] xl:-translate-x-[37%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(-14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
+      return 'left-1/2 max-sm:translate-x-[50%] max-sm:scale-95 max-sm:opacity-0 max-sm:pointer-events-none sm:-translate-x-[43%] md:-translate-x-[40%] lg:-translate-x-[38%] xl:-translate-x-[37%] sm:scale-[0.82] md:scale-[0.85] lg:scale-[0.88] sm:[transform:perspective(1200px)_rotateY(-14deg)_translateZ(0)] z-10 opacity-0 sm:opacity-75 sm:hover:opacity-95 filter sm:brightness-75 sm:hover:brightness-90 cursor-pointer sm:pointer-events-auto border-white/10 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] ring-1 ring-black/5'
     }
   }
 
@@ -179,10 +179,10 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full select-none py-1 sm:py-2 overflow-hidden"
+      className="relative w-full select-none py-0 sm:py-2 overflow-hidden"
     >
       {/* Main Carousel Track */}
-      <div className="relative w-full h-[330px] sm:h-[430px] md:h-[490px] lg:h-[550px] flex items-center justify-center sm:[perspective:1400px]">
+      <div className="relative w-full h-[220px] sm:h-[350px] md:h-[430px] lg:h-[490px] flex items-center justify-center sm:[perspective:1400px]">
 
         {/* Carousel Cards Deck */}
         <div className="relative w-full h-full flex items-center justify-center">
@@ -211,7 +211,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
               <div
                 key={slide.isBranded ? slide.id : `slide-${slide.id || idx}-${idx}`}
                 onClick={() => !isCenter && setCurrentIndex(idx)}
-                className={`absolute w-[95%] sm:w-[86%] lg:w-[80%] h-[310px] sm:h-[410px] md:h-[470px] lg:h-[530px] rounded-lg sm:rounded-xl overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border bg-stone-950 ${placementClass}`}
+                className={`absolute w-full sm:w-[86%] lg:w-[80%] h-full sm:h-[340px] md:h-[420px] lg:h-[480px] rounded-md sm:rounded-lg overflow-hidden transition-all duration-700 sm:duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform border border-white/20 bg-stone-950 ${placementClass}`}
               >
                 {/* Visual Backdrop: Artwork or Rich Atmospheric Mesh Gradient */}
                 {hasImage ? (
@@ -221,7 +221,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                     onError={() => handleImageError(slide.id || idx)}
                     decoding="async"
                     loading={isCenter ? 'eager' : 'lazy'}
-                    className="absolute inset-0 w-full h-full object-cover object-center rounded-lg sm:rounded-xl"
+                    className="absolute inset-0 w-full h-full object-cover object-center rounded-md sm:rounded-lg"
                   />
                 ) : (
                   <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradientBg || 'from-indigo-950 via-slate-950 to-black'}`}>
@@ -238,27 +238,27 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                 )}
 
                 {/* Localized Gradient for Crisp Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-50% to-transparent rounded-lg sm:rounded-xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-55% to-black/20 rounded-md sm:rounded-lg" />
 
                 {/* Card Content Overlay */}
-                <div className="relative z-10 p-4 sm:p-7 lg:p-10 h-full flex flex-col justify-between text-left">
+                <div className="relative z-10 p-3.5 sm:p-7 lg:p-10 h-full flex flex-col justify-between text-left">
 
                   {/* Top Badges */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/60 border border-white/20 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-stone-100 font-semibold shadow-md">
-                      <BadgeIcon size={11} className="text-amber-400 sm:w-3 sm:h-3" />
-                      <span>{slideCategory}</span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-stone-100 font-semibold shadow-xs">
+                      <BadgeIcon size={11} className="text-amber-400 sm:w-3.5 sm:h-3.5" />
+                      <span className="truncate max-w-[140px] sm:max-w-none">{slideCategory}</span>
                     </span>
 
-                    <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-black/60 border border-white/20 text-[10px] sm:text-xs font-mono font-bold text-amber-300 shadow-md">
+                    <span className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-mono font-bold text-amber-300 shadow-xs shrink-0">
                       {slidePrice}
                     </span>
                   </div>
 
                   {/* Bottom Information Details */}
-                  <div className="space-y-1.5 sm:space-y-3.5">
-                    {/* Live Kicker */}
-                    <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="space-y-1 sm:space-y-2.5">
+                    {/* Live Kicker (desktop only to prevent mobile clutter) */}
+                    <div className="hidden sm:flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
                       <span className="text-[9px] sm:text-[11px] font-mono uppercase tracking-widest text-amber-300 font-bold drop-shadow-sm">
                         {kickerText}
@@ -266,54 +266,56 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                     </div>
 
                     {/* Bold Modern Poster Title */}
-                    <h2 className="text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[1.05] line-clamp-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] [text-shadow:_0_2px_12px_rgba(0,0,0,0.9)]">
+                    <h2 className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white leading-snug line-clamp-1 sm:line-clamp-2 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                       {slideTitle}
                     </h2>
 
-                    {/* Meta details chips */}
-                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-mono text-stone-100">
-                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium">
+                    {/* Consolidated Single-line Meta Row */}
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs text-stone-200 font-medium font-mono truncate">
+                      <span className="flex items-center gap-1 shrink-0">
                         <Calendar size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
                         <span>{slideDate}</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/20 shadow-sm font-medium truncate max-w-[170px] sm:max-w-[260px]">
+                      </span>
+                      <span className="text-white/40">•</span>
+                      <span className="flex items-center gap-1 truncate">
                         <MapPin size={11} className="text-amber-400 shrink-0 sm:w-3.5 sm:h-3.5" />
                         <span className="truncate">{slideLocation}</span>
-                      </div>
-                      <div className="hidden md:flex items-center gap-1.5 bg-black/60 px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm font-medium">
-                        <Users size={13} className="text-amber-400 shrink-0" />
+                      </span>
+                      <span className="hidden md:flex items-center gap-1 shrink-0 text-white/40">•</span>
+                      <span className="hidden md:flex items-center gap-1 shrink-0">
+                        <Users size={12} className="text-amber-400 shrink-0" />
                         <span>{attendees}</span>
-                      </div>
+                      </span>
                     </div>
 
                     {/* Active Center CTA Action Buttons */}
                     {isCenter && (
-                      <div className="pt-1 sm:pt-2 flex items-center gap-2 sm:gap-3">
+                      <div className="pt-0.5 sm:pt-1.5 flex items-center gap-2 sm:gap-3">
                         {slide.isCreatorSlide ? (
                           isOrganizer ? (
                             <Link
                               to="/manager/events/create"
-                              className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-orange-500/30 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                              className="px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono shadow-md shadow-orange-500/25 transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                             >
                               <span>Create Stage</span>
-                              <ArrowRight size={13} className="sm:w-4 sm:h-4" />
+                              <ArrowRight size={13} className="sm:w-3.5 sm:h-3.5" />
                             </Link>
                           ) : isAuthenticated ? (
                             <button
                               type="button"
                               onClick={onOpenBecomeOrganizer}
-                              className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-orange-500/30 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                              className="px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono shadow-md shadow-orange-500/25 transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                             >
                               <span>Become a Host</span>
-                              <Sparkles size={13} className="sm:w-4 sm:h-4 text-amber-200" />
+                              <Sparkles size={13} className="sm:w-3.5 sm:h-3.5 text-amber-200" />
                             </button>
                           ) : (
                             <Link
                               to="/account/signup"
-                              className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-orange-500/30 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                              className="px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono shadow-md shadow-orange-500/25 transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                             >
                               <span>Host an Event</span>
-                              <ArrowRight size={13} className="sm:w-4 sm:h-4" />
+                              <ArrowRight size={13} className="sm:w-3.5 sm:h-3.5" />
                             </Link>
                           )
                         ) : isExternal ? (
@@ -321,24 +323,24 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
                             href={targetUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-blue-600/40 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                            className="px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono shadow-md shadow-blue-600/30 transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                           >
                             <span>{buttonText}</span>
-                            <ArrowRight size={13} className="sm:w-4 sm:h-4" />
+                            <ArrowRight size={13} className="sm:w-3.5 sm:h-3.5" />
                           </a>
                         ) : (
                           <Link
                             to={targetUrl}
-                            className="px-4 sm:px-6 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-sm font-bold uppercase tracking-wider font-mono shadow-lg shadow-blue-600/40 transition-all active:scale-95 inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer"
+                            className="px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono shadow-md shadow-blue-600/30 transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                           >
                             <span>{buttonText}</span>
-                            <ArrowRight size={13} className="sm:w-4 sm:h-4" />
+                            <ArrowRight size={13} className="sm:w-3.5 sm:h-3.5" />
                           </Link>
                         )}
 
                         <Link
                           to="/discover"
-                          className="px-3.5 sm:px-5 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-black/50 hover:bg-black/70 border border-white/30 text-white text-[11px] sm:text-sm font-semibold uppercase tracking-wider font-mono backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm"
+                          className="hidden sm:inline-flex px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-black/50 hover:bg-black/70 border border-white/25 text-white text-[11px] sm:text-xs font-semibold uppercase tracking-wider font-mono backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-2xs"
                         >
                           <span>Discover</span>
                         </Link>
@@ -352,19 +354,20 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
         </div>
       </div>
 
-      {/* Synchronized Pagination Indicators */}
+      {/* Synchronized Minimal Pill Pagination Indicators */}
       {totalSlides > 1 && (
-        <div className="relative z-10 flex items-center justify-center gap-2 pt-4">
+        <div className="relative z-10 flex items-center justify-center gap-1.5 pt-2.5 sm:pt-3.5">
           {slides.map((slide, idx) => (
             <button
               key={slide.isBranded ? slide.id : `dot-${slide.id || idx}-${idx}`}
               type="button"
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${currentIndex === idx
-                ? 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-600 shadow-xs'
-                : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-blue-200/80 hover:bg-blue-300'
-                }`}
+              className={`transition-all duration-300 cursor-pointer ${
+                currentIndex === idx
+                  ? 'w-5 sm:w-6 h-1 sm:h-1.5 rounded-full bg-blue-600 shadow-xs'
+                  : 'w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-stone-300 hover:bg-stone-400'
+              }`}
             />
           ))}
         </div>

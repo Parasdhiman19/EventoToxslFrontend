@@ -764,7 +764,7 @@ export default function UserLayout() {
             <main className={`flex-1 w-full max-w-[1600px] mx-auto ${
               isDiscoverPage 
                 ? 'px-0 py-0 lg:px-8 lg:py-8' 
-                : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8 pb-28 md:pb-8'
+                : 'px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-6 pb-24 md:pb-8'
             }`}>
               <Outlet context={{ openBecomeOrganizer: handleOpenBecomeOrganizer }} />
             </main>
@@ -812,9 +812,6 @@ export default function UserLayout() {
                           size={20} 
                           className={`transition-transform duration-200 ${isActive ? 'scale-110 stroke-[2.4]' : 'stroke-[1.8]'}`} 
                         />
-                        {isActive && (
-                          <span className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-stone-900" />
-                        )}
                       </div>
                       <span className={`text-[10px] tracking-tight leading-none ${isActive ? 'font-bold text-stone-950' : 'font-medium text-stone-400'}`}>
                         {link.name}

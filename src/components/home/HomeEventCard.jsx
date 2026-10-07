@@ -69,10 +69,10 @@ export default function HomeEventCard({
     <Link
       to={`/events/${event.id}`}
       draggable={false}
-      className={`group flex flex-col bg-stone-50 hover:bg-white rounded-xl border border-stone-200/60 hover:border-stone-300/80 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.08),0_4px_12px_-2px_rgba(0,0,0,0.03)] hover:-translate-y-1.5 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out select-none ${className}`}
+      className={`group flex flex-col w-full select-none cursor-pointer active:scale-[0.98] transition-transform duration-150 ${className}`}
     >
-      {/* Card Image Banner */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-100 rounded-t-xl select-none">
+      {/* 1. Rectangular Artwork Tile with Sharp/Squarish Border Radius */}
+      <div className="relative aspect-[16/10] w-full rounded-md sm:rounded-lg overflow-hidden bg-stone-100 border border-stone-200/90 shadow-2xs group-hover:shadow-md group-hover:border-stone-300 transition-all duration-300">
         <img
           src={imageUrl}
           alt={event.title || 'Event'}
@@ -80,16 +80,16 @@ export default function HomeEventCard({
           loading="lazy"
           decoding="async"
           draggable={false}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out pointer-events-none"
         />
 
-        {/* Gradient Overlay for Top Badges */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+        {/* Subtle Top Gradient for Badge Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/25 pointer-events-none" />
 
-        {/* Top Floating Badges: Category & Bookmark */}
-        <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-auto">
+        {/* Floating Top Elements: Category & Bookmark with Squarish Corners */}
+        <div className="absolute top-2 inset-x-2 flex items-center justify-between pointer-events-auto">
           {event.category ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold tracking-wide bg-stone-900/90 border border-white/15 text-white shadow-xs uppercase font-mono">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[9px] sm:text-[10px] font-mono font-semibold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-xs truncate max-w-[130px]">
               {event.category}
             </span>
           ) : (
@@ -101,76 +101,53 @@ export default function HomeEventCard({
             onClick={handleToggleBookmark}
             disabled={isSaving}
             aria-label="Save event"
-            className={`w-7 h-7 rounded-md flex items-center justify-center border border-white/15 transition-transform active:scale-90 ${isBookmarked
-              ? 'bg-amber-500 text-white shadow-xs'
-              : 'bg-black/60 text-white hover:bg-black/80'
-              }`}
+            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border border-white/20 backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-xs ${
+              isBookmarked
+                ? 'bg-amber-500 text-white'
+                : 'bg-black/50 text-white hover:bg-black/70'
+            }`}
           >
-            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-current' : ''}`} />
+            <Bookmark className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
         </div>
 
-        {/* Bottom Floating Pill on Image: Urgency or Date */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-          {/* Calendar Badge */}
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/75 border border-white/15 font-medium text-[11px]">
-            <Calendar className="w-3.5 h-3.5 text-stone-300" />
-            <span>{event.dateFormatted || event.date || 'Upcoming'}</span>
+        {/* Low Inventory Alert on Image (if active) */}
+        {isUrgent && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-rose-600/90 backdrop-blur-md border border-rose-400/30 text-white text-[9px] font-mono font-bold tracking-wider uppercase shadow-xs">
+            <Flame className="w-2.5 h-2.5 animate-pulse" />
+            <span>{event.spotsLeft} left</span>
           </div>
-
-          {/* Low inventory alert */}
-          {isUrgent && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-600/95 border border-rose-400/30 text-white text-[10px] font-semibold tracking-wider uppercase font-mono">
-              <Flame className="w-3 h-3 animate-pulse" />
-              <span>{event.spotsLeft} left</span>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Card Content */}
-      <div className="flex flex-col flex-1 p-3.5 justify-between gap-3 transition-colors duration-300">
-        <div className="space-y-1.5">
-          {/* Host studio mini pill */}
-          {organizerName && (
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-stone-500 line-clamp-1">
-              {organizerLogo ? (
-                <img
-                  src={organizerLogo}
-                  alt={organizerName}
-                  onError={() => setLogoError(true)}
-                  className="w-3.5 h-3.5 rounded-full object-cover ring-1 ring-stone-200 shrink-0"
-                />
-              ) : (
-                <span className="w-3.5 h-3.5 rounded-full bg-stone-900 text-amber-400 font-serif text-[8px] font-bold flex items-center justify-center shrink-0">
-                  {organizerName.charAt(0).toUpperCase()}
-                </span>
-              )}
-              <span className="truncate">{organizerName}</span>
-            </div>
-          )}
-
-          {/* Event Title */}
-          <h3 className="font-bold text-stone-900 text-[15px] leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors tracking-tight">
-            {event.title}
-          </h3>
-
-          {/* Venue & Location */}
-          <div className="flex items-center gap-1.5 text-xs text-stone-500 line-clamp-1">
-            <MapPin className="w-3.5 h-3.5 shrink-0 text-stone-400" />
-            <span className="truncate">{venueDisplay}</span>
-          </div>
+      {/* 2. Clean Typography & Metadata Flow Below Image */}
+      <div className="pt-2 px-0.5 space-y-0.5">
+        {/* Date & Time Kicker (Clean neutral/blue) */}
+        <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-blue-600">
+          <Calendar className="w-3 h-3 text-blue-500 shrink-0" />
+          <span className="truncate">{event.dateFormatted || event.date || 'Upcoming'}</span>
         </div>
 
-        {/* Card Footer: Starting Price & Details link */}
-        <div className="pt-2.5 border-t border-stone-200/70 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-mono">Starting From</span>
-            <span className="text-sm font-bold text-stone-900">{priceDisplay}</span>
+        {/* Bold Event Title */}
+        <h3 className="font-bold text-stone-900 text-xs sm:text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors tracking-tight">
+          {event.title}
+        </h3>
+
+        {/* Venue & Location */}
+        <div className="flex items-center gap-1 text-[11px] sm:text-xs text-stone-500 line-clamp-1 pt-0.5">
+          <MapPin className="w-3 h-3 shrink-0 text-stone-400" />
+          <span className="truncate">{venueDisplay}</span>
+        </div>
+
+        {/* Price & Action Row */}
+        <div className="pt-1 flex items-center justify-between gap-1">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[10px] text-stone-400 uppercase font-mono">From</span>
+            <span className="text-xs sm:text-sm font-bold text-stone-900">{priceDisplay}</span>
           </div>
 
-          <span className="text-xs font-semibold text-blue-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-            Get Tickets &rarr;
+          <span className="text-[11px] font-semibold text-blue-600 group-hover:text-blue-700 group-hover:translate-x-0.5 transition-all shrink-0">
+            Passes &rarr;
           </span>
         </div>
       </div>

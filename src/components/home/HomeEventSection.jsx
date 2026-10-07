@@ -94,7 +94,7 @@ export default function HomeEventSection({
       {/* Horizontal Scrollable Event Row */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 w-full min-w-0 touch-auto no-scrollbar"
+        className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 pt-1 w-full min-w-0 touch-auto no-scrollbar -mx-1 px-1"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -107,19 +107,19 @@ export default function HomeEventSection({
           Array.from({ length: 4 }).map((_, idx) => (
             <div
               key={idx}
-              className="min-w-[270px] sm:min-w-[310px] max-w-[310px] bg-stone-50 rounded-xl border border-stone-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-3 space-y-3 shrink-0 animate-pulse"
+              className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] space-y-2 shrink-0 animate-pulse"
             >
-              <div className="aspect-[16/10] bg-stone-200 rounded-lg" />
+              <div className="aspect-[16/10] bg-stone-200 rounded-md sm:rounded-lg" />
+              <div className="h-3 bg-stone-200 rounded w-1/3" />
               <div className="h-4 bg-stone-200 rounded w-3/4" />
               <div className="h-3 bg-stone-200 rounded w-1/2" />
-              <div className="h-6 bg-stone-200 rounded mt-4" />
             </div>
           ))
         ) : (
           events.map((event) => (
             <div
               key={event.id}
-              className="min-w-[270px] sm:min-w-[310px] max-w-[310px] shrink-0"
+              className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] shrink-0"
             >
               <HomeEventCard
                 event={event}
