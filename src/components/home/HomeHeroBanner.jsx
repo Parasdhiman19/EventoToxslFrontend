@@ -73,6 +73,7 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [touchStartX, setTouchStartX] = useState(null)
+  const [touchStartY, setTouchStartY] = useState(null)
   const [imageErrors, setImageErrors] = useState({})
 
   // Normalize input into at most 3 items
@@ -128,20 +129,27 @@ export default function HomeHeroBanner({ featuredEvents = [], featuredEvent = nu
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handlePrev, handleNext])
 
-  // Touch Swipe handlers for mobile
+  // Touch Swipe handlers for mobile (only triggers if horizontal swipe exceeds vertical movement)
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX)
+    setTouchStartY(e.touches[0].clientY)
   }
 
   const handleTouchEnd = (e) => {
-    if (touchStartX === null) return
-    const diff = touchStartX - e.changedTouches[0].clientX
-    if (diff > 45) {
-      handleNext()
-    } else if (diff < -45) {
-      handlePrev()
+    if (touchStartX === null || touchStartY === null) return
+    const diffX = touchStartX - e.changedTouches[0].clientX
+    const diffY = touchStartY - e.changedTouches[0].clientY
+
+    // Only swipe if horizontal movement is dominant and exceeds threshold
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 45) {
+      if (diffX > 0) {
+        handleNext()
+      } else {
+        handlePrev()
+      }
     }
     setTouchStartX(null)
+    setTouchStartY(null)
   }
 
   const handleImageError = (id) => {

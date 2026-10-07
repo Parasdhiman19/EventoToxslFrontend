@@ -94,7 +94,7 @@ export default function HomeEventSection({
       {/* Horizontal Scrollable Event Row */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 overscroll-x-contain no-scrollbar touch-pan-x"
+        className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 overscroll-x-contain no-scrollbar"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         {isLoading ? (
