@@ -23,7 +23,7 @@ export default function OrganizerTicketGroup({
         type="button"
         onClick={onToggle}
         aria-expanded={isExpanded}
-        className="w-full flex items-center justify-between p-4 sm:p-5 bg-stone-50/70 hover:bg-stone-100/70 transition-colors text-left cursor-pointer select-none"
+        className="w-full flex items-center justify-between p-3.5 sm:p-5 bg-stone-50/70 hover:bg-stone-100/70 transition-colors text-left cursor-pointer select-none active:bg-stone-100"
       >
         {/* Left Side: Avatar + Name + Expand Chevron */}
         <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
@@ -37,7 +37,7 @@ export default function OrganizerTicketGroup({
           </div>
 
           {/* Organizer Logo / Initial Badge */}
-          <div className="w-9 h-9 rounded-xl bg-stone-900 text-amber-400 font-serif font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs overflow-hidden ring-1 ring-stone-200">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-stone-900 text-amber-400 font-serif font-bold text-xs flex items-center justify-center shrink-0 shadow-sm overflow-hidden ring-1 ring-stone-200">
             {showLogo ? (
               <img
                 src={organizerLogo}
@@ -52,7 +52,7 @@ export default function OrganizerTicketGroup({
 
           {/* Organizer Title & Events Subtitle */}
           <div className="truncate">
-            <h2 className="font-semibold text-stone-900 text-base sm:text-lg tracking-tight truncate flex items-center gap-1.5">
+            <h2 className="font-semibold text-stone-900 text-sm sm:text-base tracking-tight truncate flex items-center gap-1.5">
               <span>{organizerName}</span>
               <ShieldCheck size={14} className="text-blue-500 fill-blue-500/15 shrink-0" />
             </h2>
@@ -67,7 +67,7 @@ export default function OrganizerTicketGroup({
 
         {/* Right Side: Total Tickets Badge */}
         <div className="shrink-0 flex items-center gap-2 pl-2">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold font-mono tracking-wide bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+          <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold font-mono tracking-wide bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs whitespace-nowrap">
             {totalTicketsCount} {totalTicketsCount === 1 ? 'ticket' : 'tickets'}
           </span>
         </div>
@@ -75,7 +75,7 @@ export default function OrganizerTicketGroup({
 
       {/* Organizer Content (Events list injected via children) */}
       {isExpanded && (
-        <div className="p-4 sm:p-5 border-t border-stone-200/70 space-y-4 bg-white animate-in fade-in duration-150">
+        <div className="p-3 sm:p-5 border-t border-stone-200/70 space-y-3 bg-white animate-in fade-in duration-150">
           {children}
         </div>
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Ticket as TicketIcon, Search, X, ChevronsUpDown } from 'lucide-react'
+import { Ticket as TicketIcon, Search, X, ChevronsUpDown, Sparkles } from 'lucide-react'
 import API from '../../services/api'
 import { groupTicketsByOrganizerAndEvent } from '../../utils/ticketGrouping'
 import OrganizerTicketGroup from '../../components/tickets/OrganizerTicketGroup'
@@ -141,115 +141,172 @@ export default function MyTickets() {
   const isSearching = searchQuery.trim().length > 0
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-16">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-stone-200">
-        <div>
-          <h1 className="font-serif text-3xl font-medium tracking-tight text-stone-900">
-            My Tickets &amp; Passes
-          </h1>
-          <p className="text-xs text-stone-500 mt-1">
-            Access door QR barcodes, view seating tiers, and retrieve invoice receipts.
-          </p>
+    <div className="max-w-5xl mx-auto pb-20 md:pb-10">
+
+      {/* ── Mobile Hero Header ─────────────────────────────────────── */}
+      <div
+        className="relative overflow-hidden
+                   rounded-none md:rounded-2xl
+                   bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950
+                   px-4 pt-6 pb-6 sm:px-6 sm:pt-8 sm:pb-8
+                   shadow-xl
+                   -mx-2.5 sm:mx-0 -mt-2.5 sm:mt-0 mb-6 md:mb-8"
+      >
+        {/* Decorative blurs */}
+        <div className="pointer-events-none absolute -top-16 -right-16 w-64 h-64 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-blue-500/8 blur-2xl" />
+
+        {/* Header content */}
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+                            text-[10px] font-mono font-semibold uppercase tracking-widest
+                            text-amber-400 bg-amber-400/10 border border-amber-400/20 mb-3">
+              <Sparkles className="w-3 h-3" />
+              Digital Passes
+            </div>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+              My Tickets &amp; Passes
+            </h1>
+            <p className="text-xs text-stone-400 mt-1.5 max-w-xs leading-relaxed">
+              Access QR codes, view seating tiers &amp; retrieve invoice receipts.
+            </p>
+          </div>
+
+          {/* Tab Switcher */}
+          <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-sm rounded-xl
+                          border border-white/10 w-fit shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => { setActiveTab('upcoming'); setSearchQuery('') }}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer
+                ${activeTab === 'upcoming'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200'
+                }`}
+            >
+              Upcoming
+              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-mono
+                ${activeTab === 'upcoming' ? 'bg-stone-900 text-white' : 'bg-white/10 text-stone-400'}`}>
+                {upcomingTickets.length}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setActiveTab('past'); setSearchQuery('') }}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer
+                ${activeTab === 'past'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200'
+                }`}
+            >
+              Past
+              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-mono
+                ${activeTab === 'past' ? 'bg-stone-900 text-white' : 'bg-white/10 text-stone-400'}`}>
+                {pastTickets.length}
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-lg border border-stone-200/80 w-fit">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('upcoming')
-              setSearchQuery('')
-            }}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'upcoming'
-                ? 'bg-stone-900 text-stone-50 shadow-sm font-semibold'
-                : 'text-stone-600 hover:text-stone-950'
-            }`}
-          >
-            Upcoming ({upcomingTickets.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('past')
-              setSearchQuery('')
-            }}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'past'
-                ? 'bg-stone-900 text-stone-50 shadow-sm font-semibold'
-                : 'text-stone-600 hover:text-stone-950'
-            }`}
-          >
-            Past Stages ({pastTickets.length})
-          </button>
+        {/* Stats strip */}
+        <div className="relative mt-5 pt-4 border-t border-white/10 grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p className="text-xl font-bold font-mono text-white">{tickets.length}</p>
+            <p className="text-[10px] text-stone-500 uppercase tracking-wide font-mono mt-0.5">Total</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold font-mono text-amber-400">{upcomingTickets.length}</p>
+            <p className="text-[10px] text-stone-500 uppercase tracking-wide font-mono mt-0.5">Upcoming</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold font-mono text-stone-400">{pastTickets.length}</p>
+            <p className="text-[10px] text-stone-500 uppercase tracking-wide font-mono mt-0.5">Past</p>
+          </div>
         </div>
       </div>
 
-      {/* Search Input Bar & Quick Action Strip */}
+      {/* ── Search & Expand Strip ──────────────────────────────────── */}
       {currentTabTickets.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="flex items-center gap-2 mb-5">
           <div className="relative flex-1 flex items-center">
             <Search className="absolute left-3.5 w-4 h-4 text-stone-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by event, organizer, venue, tier, or ticket code..."
-              className="w-full pl-10 pr-10 py-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-400 shadow-2xs transition-all font-sans"
+              placeholder="Search event, organizer, or code..."
+              className="w-full pl-10 pr-10 py-3 bg-white border border-stone-200 rounded-2xl
+                         text-sm text-stone-900 placeholder:text-stone-400
+                         focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-400
+                         shadow-sm transition-all font-sans"
             />
             {isSearching && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-stone-400 hover:text-stone-700 p-1 cursor-pointer"
+                className="absolute right-3 text-stone-400 hover:text-stone-700 p-1 cursor-pointer
+                           rounded-full hover:bg-stone-100 transition"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Expand All / Collapse All Toggle Button */}
           {!isSearching && groupedOrganizers.length > 0 && (
             <button
               type="button"
               onClick={handleToggleExpandAll}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-mono text-stone-700 shadow-2xs transition-colors cursor-pointer shrink-0 select-none"
+              title={allCollapsed ? 'Expand All' : 'Collapse All'}
+              className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-2xl border border-stone-200
+                         bg-white hover:bg-stone-50 text-stone-600 shadow-sm transition-colors cursor-pointer shrink-0"
             >
-              <ChevronsUpDown className="w-3.5 h-3.5 text-stone-400" />
-              <span>{allCollapsed ? 'Expand All' : 'Collapse All'}</span>
+              <ChevronsUpDown className="w-4 h-4" />
+              <span className="text-xs font-mono hidden sm:inline">{allCollapsed ? 'Expand' : 'Collapse'}</span>
             </button>
           )}
         </div>
       )}
 
-      {/* Loading Skeleton */}
+      {/* ── Loading Skeleton ──────────────────────────────────────── */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2].map((n) => (
-            <div key={n} className="rounded-2xl border border-stone-200 bg-white p-6 shadow-2xs animate-pulse space-y-4">
-              <div className="h-5 w-32 bg-stone-200 rounded" />
-              <div className="h-14 bg-stone-100 rounded-xl" />
-              <div className="h-14 bg-stone-100 rounded-xl" />
+            <div key={n} className="rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-sm animate-pulse">
+              <div className="p-4 bg-stone-50 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-stone-200 shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-36 bg-stone-200 rounded" />
+                  <div className="h-3 w-20 bg-stone-100 rounded" />
+                </div>
+                <div className="h-6 w-16 bg-stone-200 rounded-full shrink-0" />
+              </div>
+              <div className="p-4 space-y-3 border-t border-stone-100">
+                <div className="h-16 bg-stone-100 rounded-xl" />
+                <div className="h-16 bg-stone-100 rounded-xl" />
+              </div>
             </div>
           ))}
         </div>
       ) : fetchError ? (
-        <div className="rounded-xl border border-red-200 bg-red-50/50 p-8 text-center text-xs text-red-700 space-y-2">
-          <p className="font-semibold">{fetchError}</p>
+        /* Error State */
+        <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+            <X className="w-6 h-6 text-red-500" />
+          </div>
+          <p className="font-semibold text-red-700 text-sm">{fetchError}</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="text-stone-900 underline font-mono cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-stone-900 text-white text-xs font-mono cursor-pointer"
           >
-            Click to retry
+            Retry
           </button>
         </div>
       ) : groupedOrganizers.length > 0 ? (
         /* Hierarchical Grouped Organizers & Events */
-        <div className="space-y-5">
+        <div className="space-y-4">
           {groupedOrganizers.map((org) => {
-            // Auto-expand during search so matches are immediately visible
             const isOrgExpanded = isSearching ? true : !collapsedOrganizers.has(org.organizerName)
             return (
               <OrganizerTicketGroup
@@ -289,35 +346,48 @@ export default function MyTickets() {
         </div>
       ) : isSearching ? (
         /* Search Empty State */
-        <div className="rounded-2xl border border-dashed border-stone-300 p-12 text-center space-y-3 bg-white">
-          <p className="font-semibold text-stone-900 text-sm">
-            No passes found matching &ldquo;{searchQuery}&rdquo;
-          </p>
-          <p className="text-xs text-stone-500">
-            Try searching for a different organizer, event title, or tier name.
-          </p>
+        <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center space-y-4">
+          <div className="w-12 h-12 mx-auto rounded-full bg-stone-100 flex items-center justify-center">
+            <Search className="w-5 h-5 text-stone-400" />
+          </div>
+          <div>
+            <p className="font-semibold text-stone-900 text-sm">
+              No passes for &ldquo;{searchQuery}&rdquo;
+            </p>
+            <p className="text-xs text-stone-500 mt-1">
+              Try a different event title, organizer, or tier name.
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="px-4 py-2 rounded-lg bg-stone-900 text-white text-xs font-mono uppercase tracking-wider font-semibold cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-stone-900 text-white text-xs font-mono uppercase tracking-wider font-semibold cursor-pointer"
           >
             Clear Search
           </button>
         </div>
       ) : (
         /* Default Empty State */
-        <div className="rounded-xl border border-dashed border-stone-300 p-16 text-center space-y-4 bg-white">
-          <div className="h-12 w-12 mx-auto rounded-full bg-stone-100 text-stone-600 flex items-center justify-center">
-            <TicketIcon size={24} />
+        <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 sm:p-16 text-center space-y-5">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-stone-900 to-stone-700
+                          text-amber-400 flex items-center justify-center shadow-lg">
+            <TicketIcon size={28} />
           </div>
-          <div className="space-y-1">
-            <p className="font-serif text-lg font-medium text-stone-900">No {activeTab} tickets found</p>
-            <p className="text-xs text-stone-500">Discover upcoming stages and curate your weekend agenda.</p>
+          <div className="space-y-1.5">
+            <p className="font-serif text-lg font-semibold text-stone-900">
+              No {activeTab} tickets yet
+            </p>
+            <p className="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
+              Discover upcoming live stages and curate your weekend agenda.
+            </p>
           </div>
           <Link
             to="/discover"
-            className="inline-block rounded-md bg-stone-900 px-5 py-2.5 text-xs font-mono font-medium uppercase tracking-wider text-stone-50 hover:bg-stone-800 transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-5 py-2.5
+                       text-xs font-mono font-semibold uppercase tracking-wider text-white
+                       hover:bg-stone-800 transition-colors shadow-sm active:scale-95"
           >
+            <Sparkles size={13} className="text-amber-400" />
             Explore Events &rarr;
           </Link>
         </div>

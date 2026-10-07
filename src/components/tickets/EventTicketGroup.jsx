@@ -24,7 +24,7 @@ export default function EventTicketGroup({
         type="button"
         onClick={onToggle}
         aria-expanded={isExpanded}
-        className="w-full flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 bg-stone-50/40 hover:bg-stone-100/50 transition-colors text-left cursor-pointer gap-3 select-none"
+        className="w-full flex flex-col gap-3 p-3 sm:p-4 bg-stone-50/40 hover:bg-stone-100/50 transition-colors text-left cursor-pointer select-none active:bg-stone-100"
       >
         {/* Left Side: Title, Date, Venue */}
         <div className="flex items-start gap-3 min-w-0">
@@ -67,8 +67,8 @@ export default function EventTicketGroup({
         </div>
 
         {/* Right Side: Tier Badges Summary & Count */}
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto pl-8 sm:pl-0">
-          {/* Tier breakdown chips (e.g. VIP x 3) */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pl-8 sm:pl-0">
+          {/* Tier breakdown chips */}
           <div className="flex flex-wrap items-center gap-1.5">
             {tierSummary.map((t) => (
               <span
@@ -81,7 +81,7 @@ export default function EventTicketGroup({
           </div>
 
           {/* Event Total Tickets Count */}
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono bg-stone-900 text-white shadow-2xs">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold font-mono bg-stone-900 text-white shadow-2xs">
             {totalTicketsCount} {totalTicketsCount === 1 ? 'pass' : 'passes'}
           </span>
         </div>
@@ -89,7 +89,7 @@ export default function EventTicketGroup({
 
       {/* Expanded Tickets List */}
       {isExpanded && (
-        <div className="p-3 sm:p-4 border-t border-stone-100 bg-stone-50/20 space-y-2.5 animate-in fade-in duration-150">
+        <div className="p-3 sm:p-4 border-t border-stone-100 bg-stone-50/20 space-y-2 animate-in fade-in duration-150">
           {children}
         </div>
       )}

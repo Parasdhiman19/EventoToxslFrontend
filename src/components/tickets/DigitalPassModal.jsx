@@ -49,13 +49,22 @@ export default function DigitalPassModal({ ticket, onClose }) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-950/80 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4
+                 bg-stone-950/80 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl bg-stone-900 text-stone-100 shadow-2xl border border-stone-800 space-y-5 p-5 sm:p-6 relative my-auto scrollbar-thin scrollbar-thumb-stone-700"
+        className="w-full sm:max-w-md sm:max-h-[92vh] overflow-y-auto
+                   rounded-t-3xl sm:rounded-2xl
+                   bg-stone-900 text-stone-100 shadow-2xl border border-stone-800
+                   space-y-4 p-5 sm:p-6 relative
+                   max-h-[92dvh] overflow-y-auto
+                   scrollbar-thin scrollbar-thumb-stone-700
+                   animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Bottom-sheet drag handle (mobile only) */}
+        <div className="sm:hidden w-10 h-1 bg-stone-700 rounded-full mx-auto -mt-1 mb-2" />
         {/* Close Button with generous touch target */}
         <button
           type="button"
@@ -92,9 +101,9 @@ export default function DigitalPassModal({ ticket, onClose }) {
         </div>
 
         {/* High-Contrast Barcode / QR Ticket Box */}
-        <div className="bg-white text-stone-950 p-4 sm:p-6 rounded-xl text-center space-y-3.5 shadow-md">
+        <div className="bg-white text-stone-950 p-4 sm:p-6 rounded-2xl text-center space-y-3.5 shadow-md">
           {/* Real Scannable QR Code */}
-          <div className="w-36 h-36 sm:w-48 sm:h-48 mx-auto bg-white rounded-xl p-2 sm:p-3 flex items-center justify-center border border-stone-200 shadow-inner">
+          <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto bg-white rounded-xl p-2 sm:p-3 flex items-center justify-center border border-stone-200 shadow-inner">
             <QRCodeSVG
               value={ticketCode}
               size={144}
