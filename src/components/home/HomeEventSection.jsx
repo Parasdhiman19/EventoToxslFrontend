@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import HomeEventCard from './HomeEventCard'
@@ -12,8 +12,21 @@ export default function HomeEventSection({
   events = [],
   isLoading = false,
   onBookmarkChange,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
 }) {
   const scrollContainerRef = useRef(null)
+
+  // Automatically trigger onLoadMore when user scrolls near the end
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current
+    if (!el || !hasMore || isLoadingMore || !onLoadMore) return
+    const remaining = el.scrollWidth - (el.scrollLeft + el.clientWidth)
+    if (remaining <= 320) {
+      onLoadMore()
+    }
+  }, [hasMore, isLoadingMore, onLoadMore])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -22,8 +35,15 @@ export default function HomeEventSection({
   }
 
   const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' })
+    const el = scrollContainerRef.current
+    if (el) {
+      el.scrollBy({ left: 340, behavior: 'smooth' })
+      if (hasMore && !isLoadingMore && onLoadMore) {
+        const remaining = el.scrollWidth - (el.scrollLeft + el.clientWidth + 340)
+        if (remaining <= 350) {
+          onLoadMore()
+        }
+      }
     }
   }
 
@@ -91,9 +111,10 @@ export default function HomeEventSection({
         </div>
       </div>
 
-      {/* Horizontal Scrollable Event Row */}
+      {/* Horizontal Scrollable Event Row with Automatic Infinite Scroll */}
       <div
         ref={scrollContainerRef}
+        onScroll={handleScroll}
         className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 pt-1 w-full min-w-0 touch-auto no-scrollbar -mx-1 px-1"
         style={{
           scrollbarWidth: 'none',
@@ -116,17 +137,37 @@ export default function HomeEventSection({
             </div>
           ))
         ) : (
-          events.map((event) => (
-            <div
-              key={event.id}
-              className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] shrink-0"
-            >
-              <HomeEventCard
-                event={event}
-                onBookmarkChange={onBookmarkChange}
-              />
-            </div>
-          ))
+          <>
+            {events.map((event) => (
+              <div
+                key={event.id}
+                className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] shrink-0"
+              >
+                <HomeEventCard
+                  event={event}
+                  onBookmarkChange={onBookmarkChange}
+                />
+              </div>
+            ))}
+
+            {/* Auto-loading skeleton cards while fetching next page */}
+            {isLoadingMore && (
+              <>
+                <div className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] space-y-2 shrink-0 animate-pulse">
+                  <div className="aspect-[16/10] bg-stone-200 rounded-md sm:rounded-lg" />
+                  <div className="h-3 bg-stone-200 rounded w-1/3" />
+                  <div className="h-4 bg-stone-200 rounded w-3/4" />
+                  <div className="h-3 bg-stone-200 rounded w-1/2" />
+                </div>
+                <div className="w-[205px] xs:w-[225px] sm:w-[255px] md:w-[275px] space-y-2 shrink-0 animate-pulse hidden sm:block">
+                  <div className="aspect-[16/10] bg-stone-200 rounded-md sm:rounded-lg" />
+                  <div className="h-3 bg-stone-200 rounded w-1/3" />
+                  <div className="h-4 bg-stone-200 rounded w-3/4" />
+                  <div className="h-3 bg-stone-200 rounded w-1/2" />
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
     </section>

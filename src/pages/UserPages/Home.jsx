@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
@@ -21,65 +21,187 @@ import HomeHeroBanner from '../../components/home/HomeHeroBanner'
 import HomeCategorySection from '../../components/home/HomeCategorySection'
 import HomeEventSection from '../../components/home/HomeEventSection'
 
+const SECTION_CONFIGS = {
+  trending: {
+    sort: 'featured',
+    category: null,
+  },
+  music: {
+    sort: 'upcoming',
+    category: 'Music & Concerts',
+  },
+  tech: {
+    sort: 'upcoming',
+    category: 'Tech & Conferences,Conference',
+  },
+  nightlife: {
+    sort: 'upcoming',
+    category: 'Nightlife,Club Night',
+  },
+  workshops: {
+    sort: 'upcoming',
+    category: 'Workshops,Art & Exhibitions,Food & Tasting',
+  },
+}
+
+const INITIAL_SECTION_STATE = {
+  events: [],
+  page: 1,
+  hasMore: false,
+  isLoading: true,
+  isLoadingMore: false,
+}
+
 export default function Home() {
   const navigate = useNavigate()
   const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
   const { openBecomeOrganizer } = useOutletContext() || {}
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [allEvents, setAllEvents] = useState([])
   const [featuredHero, setFeaturedHero] = useState(null)
   const [customBanners, setCustomBanners] = useState([])
   const [customRecommendations, setCustomRecommendations] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch all live events, hero spotlight, and dynamic admin content
-  const loadHomeData = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      // 1. Fetch featured hero event & dynamic admin homepage content
-      const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
-      const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
+  const [sectionsData, setSectionsData] = useState({
+    trending: { ...INITIAL_SECTION_STATE },
+    music: { ...INITIAL_SECTION_STATE },
+    tech: { ...INITIAL_SECTION_STATE },
+    nightlife: { ...INITIAL_SECTION_STATE },
+    workshops: { ...INITIAL_SECTION_STATE },
+  })
 
-      // 2. Fetch list of published events
-      const eventsPromise = API.get('events/', {
-        params: { page_size: 50, sort: 'upcoming' },
-      })
-
-      const [heroRes, contentRes, eventsRes] = await Promise.all([heroPromise, contentPromise, eventsPromise])
-
-      if (heroRes?.data) {
-        setFeaturedHero(heroRes.data)
-      }
-
-      if (contentRes?.data?.banners) {
-        setCustomBanners(contentRes.data.banners)
-      }
-      if (contentRes?.data?.recommendations) {
-        setCustomRecommendations(contentRes.data.recommendations)
-      }
-
-      let eventsList = []
-      if (eventsRes?.data?.results && Array.isArray(eventsRes.data.results)) {
-        eventsList = eventsRes.data.results
-      } else if (Array.isArray(eventsRes?.data)) {
-        eventsList = eventsRes.data
-      }
-      setAllEvents(eventsList)
-    } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to load live experiences. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+  const [reloadTrigger, setReloadTrigger] = useState(0)
+  const triggerReload = () => setReloadTrigger((prev) => prev + 1)
 
   useEffect(() => {
-    loadHomeData()
-  }, [loadHomeData])
+    let isMounted = true
 
-  // Featured slides for Hero Carousel (uses admin banners if configured, otherwise falls back to featured/published events)
+    const loadData = async () => {
+      try {
+        const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
+        const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
+
+        const sectionPromises = Object.entries(SECTION_CONFIGS).map(async ([key, cfg]) => {
+          const params = { page: 1, page_size: 10, sort: cfg.sort }
+          if (cfg.category) params.category = cfg.category
+          try {
+            const res = await API.get('events/', { params })
+            const list = Array.isArray(res.data?.results) ? res.data.results : (Array.isArray(res.data) ? res.data : [])
+            return {
+              key,
+              events: list,
+              hasMore: !!res.data?.hasMore,
+              page: 1,
+            }
+          } catch {
+            return { key, events: [], hasMore: false, page: 1 }
+          }
+        })
+
+        const [heroRes, contentRes, ...sectionResults] = await Promise.all([
+          heroPromise,
+          contentPromise,
+          ...sectionPromises,
+        ])
+
+        if (!isMounted) return
+
+        if (heroRes?.data) {
+          setFeaturedHero(heroRes.data)
+        }
+        if (contentRes?.data?.banners) {
+          setCustomBanners(contentRes.data.banners)
+        }
+        if (contentRes?.data?.recommendations) {
+          setCustomRecommendations(contentRes.data.recommendations)
+        }
+
+        setSectionsData((prev) => {
+          const next = { ...prev }
+          sectionResults.forEach((res) => {
+            if (res?.key) {
+              next[res.key] = {
+                events: res.events,
+                page: res.page,
+                hasMore: res.hasMore,
+                isLoading: false,
+                isLoadingMore: false,
+              }
+            }
+          })
+          return next
+        })
+      } catch (err) {
+        if (isMounted) {
+          setError(err.response?.data?.detail || 'Failed to load live experiences. Please try again.')
+        }
+      }
+    }
+
+    loadData()
+    return () => { isMounted = false }
+  }, [reloadTrigger])
+
+  // Load next page of 10 items for a specific section
+  const handleLoadMore = async (key) => {
+    const current = sectionsData[key]
+    if (!current || !current.hasMore || current.isLoadingMore) return
+
+    setSectionsData((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], isLoadingMore: true },
+    }))
+
+    try {
+      const cfg = SECTION_CONFIGS[key]
+      const nextPage = current.page + 1
+      const params = { page: nextPage, page_size: 10, sort: cfg.sort }
+      if (cfg.category) params.category = cfg.category
+
+      const res = await API.get('events/', { params })
+      const newItems = Array.isArray(res.data?.results) ? res.data.results : []
+      const hasMore = !!res.data?.hasMore
+
+      setSectionsData((prev) => {
+        const existingIds = new Set(prev[key].events.map((e) => e.id))
+        const uniqueNew = newItems.filter((e) => !existingIds.has(e.id))
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
+            events: [...prev[key].events, ...uniqueNew],
+            page: nextPage,
+            hasMore,
+            isLoadingMore: false,
+          },
+        }
+      })
+    } catch {
+      setSectionsData((prev) => ({
+        ...prev,
+        [key]: { ...prev[key], isLoadingMore: false },
+      }))
+    }
+  }
+
+  // Handle bookmark toggle locally to keep state synced across all sections
+  const handleBookmarkChange = (eventId, nextBookmarked) => {
+    setSectionsData((prev) => {
+      const next = { ...prev }
+      Object.keys(next).forEach((k) => {
+        next[k] = {
+          ...next[k],
+          events: next[k].events.map((ev) =>
+            ev.id === eventId ? { ...ev, isBookmarked: nextBookmarked } : ev
+          ),
+        }
+      })
+      return next
+    })
+  }
+
+  // Featured slides for Hero Carousel (uses admin banners if configured, otherwise falls back to featured/trending events)
   const heroSlides = useMemo(() => {
     if (customBanners && customBanners.length > 0) {
       return customBanners.slice(0, 3).map((b) => ({
@@ -102,83 +224,14 @@ export default function Home() {
     if (featuredHero) {
       list.push(featuredHero)
     }
-    allEvents.forEach((ev) => {
-      if (ev.is_featured && (!featuredHero || ev.id !== featuredHero.id)) {
-        list.push(ev)
-      }
-    })
-    // Pad with first available live events
-    allEvents.forEach((ev) => {
-      if (list.length < 3 && !list.some((item) => item.id === ev.id)) {
+    const trending = sectionsData.trending.events || []
+    trending.forEach((ev) => {
+      if (list.length < 3 && (!featuredHero || ev.id !== featuredHero.id)) {
         list.push(ev)
       }
     })
     return list.slice(0, 3)
-  }, [customBanners, featuredHero, allEvents])
-
-  // Recommended events curated by Super Admin
-  const curatedRecommendedEvents = useMemo(() => {
-    if (customRecommendations && customRecommendations.length > 0) {
-      const list = []
-      customRecommendations.forEach((rec) => {
-        const found = allEvents.find((e) => e.id === rec.eventId)
-        if (found && !list.some((item) => item.id === found.id)) {
-          list.push(found)
-        }
-      })
-      if (list.length > 0) return list
-    }
-    return []
-  }, [customRecommendations, allEvents])
-
-  // Category segmentations
-  const trendingEvents = useMemo(() => {
-    return [...allEvents]
-      .sort((a, b) => {
-        const scoreA = (a.is_featured || a.isFeatured ? 50 : 0) + (a.likesCount || 0) * 3 + (a.commentsCount || 0) * 2
-        const scoreB = (b.is_featured || b.isFeatured ? 50 : 0) + (b.likesCount || 0) * 3 + (b.commentsCount || 0) * 2
-        return scoreB - scoreA
-      })
-      .slice(0, 8)
-  }, [allEvents])
-
-  const musicEvents = useMemo(() => {
-    return allEvents.filter(
-      (e) => (e.category || '').toLowerCase().includes('music')
-    )
-  }, [allEvents])
-
-  const techEvents = useMemo(() => {
-    return allEvents.filter(
-      (e) =>
-        (e.category || '').toLowerCase().includes('tech') ||
-        (e.category || '').toLowerCase().includes('conference')
-    )
-  }, [allEvents])
-
-  const nightlifeEvents = useMemo(() => {
-    return allEvents.filter(
-      (e) =>
-        (e.category || '').toLowerCase().includes('nightlife') ||
-        (e.category || '').toLowerCase().includes('club')
-    )
-  }, [allEvents])
-
-  const workshopEvents = useMemo(() => {
-    return allEvents.filter(
-      (e) =>
-        (e.category || '').toLowerCase().includes('workshop') ||
-        (e.category || '').toLowerCase().includes('art') ||
-        (e.category || '').toLowerCase().includes('food')
-    )
-  }, [allEvents])
-
-  // Handle bookmark toggle locally to keep state synced across all sections
-  const handleBookmarkChange = (eventId, nextBookmarked) => {
-    setAllEvents((prev) =>
-      prev.map((ev) => (ev.id === eventId ? { ...ev, isBookmarked: nextBookmarked } : ev))
-    )
-  }
+  }, [customBanners, featuredHero, sectionsData.trending.events])
 
   // Handle standalone search submit
   const handleSearch = (e) => {
@@ -193,8 +246,8 @@ export default function Home() {
   return (
     <div className="w-full max-w-[1600px] mx-auto px-0 sm:px-0 py-1 sm:py-2 space-y-5 sm:space-y-10">
       {/* 1. Hero Spotlight Auto-scrolling Banner */}
-      <HomeHeroBanner 
-        featuredEvents={heroSlides} 
+      <HomeHeroBanner
+        featuredEvents={heroSlides}
         onOpenBecomeOrganizer={openBecomeOrganizer}
       />
 
@@ -235,7 +288,7 @@ export default function Home() {
           </div>
           <button
             type="button"
-            onClick={loadHomeData}
+            onClick={triggerReload}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -245,41 +298,47 @@ export default function Home() {
       )}
 
       {/* 3.5. Curated Recommendations (if set by Super Admin) */}
-      {curatedRecommendedEvents.length > 0 && (
+      {customRecommendations.length > 0 && (
         <HomeEventSection
           title="Curated Recommendations"
           subtitle="Hand-picked events and editor's top choices this week"
           icon={Sparkles}
           badge="Featured Choice"
           viewAllLink="/discover"
-          events={curatedRecommendedEvents}
-          isLoading={isLoading}
+          events={customRecommendations}
+          isLoading={false}
           onBookmarkChange={handleBookmarkChange}
         />
       )}
 
-      {/* 4. Trending / Selling Fast Section */}
+      {/* 4. Trending / Selling Fast Section (Top 10 with Pagination) */}
       <HomeEventSection
         title="Trending Events"
         subtitle="The most popular experiences and hot-ticket stages right now"
         icon={Flame}
         badge="Popular"
         viewAllLink="/discover?sort=featured"
-        events={trendingEvents}
-        isLoading={isLoading}
+        events={sectionsData.trending.events}
+        isLoading={sectionsData.trending.isLoading}
+        hasMore={sectionsData.trending.hasMore}
+        isLoadingMore={sectionsData.trending.isLoadingMore}
+        onLoadMore={() => handleLoadMore('trending')}
         onBookmarkChange={handleBookmarkChange}
       />
 
-      {/* 5. Music & Live Concerts Section */}
-      {(isLoading || musicEvents.length > 0) && (
+      {/* 5. Music & Live Concerts Section (Top 10 with Pagination) */}
+      {(sectionsData.music.isLoading || sectionsData.music.events.length > 0) && (
         <HomeEventSection
           title="Music & Live Concerts"
           subtitle="Acoustic sets, electronic festivals, and world-class tours"
           icon={Music}
           badge="Live"
           viewAllLink="/discover?category=Music%20%26%20Concerts"
-          events={musicEvents}
-          isLoading={isLoading}
+          events={sectionsData.music.events}
+          isLoading={sectionsData.music.isLoading}
+          hasMore={sectionsData.music.hasMore}
+          isLoadingMore={sectionsData.music.isLoadingMore}
+          onLoadMore={() => handleLoadMore('music')}
           onBookmarkChange={handleBookmarkChange}
         />
       )}
@@ -332,50 +391,59 @@ export default function Home() {
         </div>
 
         {/* Subtle background decoration (GPU-friendly radial gradient) */}
-        <div 
+        <div
           className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)' }}
         />
       </section>
 
-      {/* 7. Tech & Conferences Section */}
-      {(isLoading || techEvents.length > 0) && (
+      {/* 7. Tech & Conferences Section (Top 10 with Pagination) */}
+      {(sectionsData.tech.isLoading || sectionsData.tech.events.length > 0) && (
         <HomeEventSection
           title="Tech Conferences & Summits"
           subtitle="Developer symposiums, AI summits, and startup networkings"
           icon={Laptop}
           badge="Tech"
           viewAllLink="/discover?category=Tech%20%26%20Conferences"
-          events={techEvents}
-          isLoading={isLoading}
+          events={sectionsData.tech.events}
+          isLoading={sectionsData.tech.isLoading}
+          hasMore={sectionsData.tech.hasMore}
+          isLoadingMore={sectionsData.tech.isLoadingMore}
+          onLoadMore={() => handleLoadMore('tech')}
           onBookmarkChange={handleBookmarkChange}
         />
       )}
 
-      {/* 8. Nightlife & Parties Section */}
-      {(isLoading || nightlifeEvents.length > 0) && (
+      {/* 8. Nightlife & Parties Section (Top 10 with Pagination) */}
+      {(sectionsData.nightlife.isLoading || sectionsData.nightlife.events.length > 0) && (
         <HomeEventSection
           title="Nightlife & Clubbing"
           subtitle="Top DJs, rooftop lounges, and weekend after-parties"
           icon={Moon}
           badge="Nightlife"
           viewAllLink="/discover?category=Nightlife"
-          events={nightlifeEvents}
-          isLoading={isLoading}
+          events={sectionsData.nightlife.events}
+          isLoading={sectionsData.nightlife.isLoading}
+          hasMore={sectionsData.nightlife.hasMore}
+          isLoadingMore={sectionsData.nightlife.isLoadingMore}
+          onLoadMore={() => handleLoadMore('nightlife')}
           onBookmarkChange={handleBookmarkChange}
         />
       )}
 
-      {/* 9. Workshops & Creative Labs Section */}
-      {(isLoading || workshopEvents.length > 0) && (
+      {/* 9. Workshops & Creative Labs Section (Top 10 with Pagination) */}
+      {(sectionsData.workshops.isLoading || sectionsData.workshops.events.length > 0) && (
         <HomeEventSection
           title="Workshops, Arts & Tastings"
           subtitle="Masterclasses, culinary tastings, and hands-on skill labs"
           icon={Wrench}
           badge="Explore"
           viewAllLink="/discover?category=Workshops"
-          events={workshopEvents}
-          isLoading={isLoading}
+          events={sectionsData.workshops.events}
+          isLoading={sectionsData.workshops.isLoading}
+          hasMore={sectionsData.workshops.hasMore}
+          isLoadingMore={sectionsData.workshops.isLoadingMore}
+          onLoadMore={() => handleLoadMore('workshops')}
           onBookmarkChange={handleBookmarkChange}
         />
       )}
