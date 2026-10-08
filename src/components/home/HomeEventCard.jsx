@@ -101,11 +101,10 @@ export default function HomeEventCard({
             onClick={handleToggleBookmark}
             disabled={isSaving}
             aria-label="Save event"
-            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border border-white/20 backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-xs ${
-              isBookmarked
+            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border border-white/20 backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-xs ${isBookmarked
                 ? 'bg-amber-500 text-white'
                 : 'bg-black/50 text-white hover:bg-black/70'
-            }`}
+              }`}
           >
             <Bookmark className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>

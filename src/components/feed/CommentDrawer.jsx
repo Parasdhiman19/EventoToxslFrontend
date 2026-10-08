@@ -271,12 +271,12 @@ export default function CommentDrawer({
               replies: c.replies.map((r) =>
                 r.id === commentId
                   ? {
-                      ...r,
-                      isDeleted: true,
-                      content: '[This comment was deleted by user]',
-                      canEdit: false,
-                      canDelete: false,
-                    }
+                    ...r,
+                    isDeleted: true,
+                    content: '[This comment was deleted by user]',
+                    canEdit: false,
+                    canDelete: false,
+                  }
                   : r
               ),
             }
@@ -367,11 +367,10 @@ export default function CommentDrawer({
               {comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
-                    comment.isDeleted
+                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${comment.isDeleted
                       ? 'bg-stone-50/50 border-stone-200/50 opacity-60'
                       : 'bg-stone-50/80 border-stone-200/80 hover:border-stone-300'
-                  }`}
+                    }`}
                 >
                   {/* Top Comment Author & Time */}
                   <div className="flex items-start justify-between gap-2">
@@ -475,9 +474,8 @@ export default function CommentDrawer({
                         <button
                           type="button"
                           onClick={() => handleToggleLike(comment.id, false)}
-                          className={`inline-flex items-center gap-1 transition cursor-pointer ${
-                            comment.isLiked ? 'text-rose-600 font-semibold' : 'hover:text-stone-900'
-                          }`}
+                          className={`inline-flex items-center gap-1 transition cursor-pointer ${comment.isLiked ? 'text-rose-600 font-semibold' : 'hover:text-stone-900'
+                            }`}
                         >
                           <Heart
                             size={13}
@@ -515,11 +513,10 @@ export default function CommentDrawer({
                       {comment.replies.map((reply) => (
                         <div
                           key={reply.id}
-                          className={`p-2.5 rounded-xl border text-xs ${
-                            reply.isDeleted
+                          className={`p-2.5 rounded-xl border text-xs ${reply.isDeleted
                               ? 'bg-stone-50/40 border-stone-200/40 opacity-60'
                               : 'bg-white border-stone-200/90 shadow-2xs'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
@@ -614,9 +611,8 @@ export default function CommentDrawer({
                               <button
                                 type="button"
                                 onClick={() => handleToggleLike(reply.id, true, comment.id)}
-                                className={`inline-flex items-center gap-1 transition cursor-pointer ${
-                                  reply.isLiked ? 'text-rose-600 font-semibold' : 'hover:text-stone-900'
-                                }`}
+                                className={`inline-flex items-center gap-1 transition cursor-pointer ${reply.isLiked ? 'text-rose-600 font-semibold' : 'hover:text-stone-900'
+                                  }`}
                               >
                                 <Heart
                                   size={11}

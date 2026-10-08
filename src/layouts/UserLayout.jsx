@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Outlet, NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-  LogOut, 
-  User as UserIcon, 
-  ChevronDown, 
-  Menu, 
-  X, 
+import {
+  LogOut,
+  User as UserIcon,
+  ChevronDown,
+  Menu,
+  X,
   Home as HomeIcon,
-  Compass, 
-  Ticket, 
-  Bookmark, 
+  Compass,
+  Ticket,
+  Bookmark,
   Receipt,
   Search,
   Sparkles,
@@ -310,11 +310,10 @@ export default function UserLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-stone-50 text-stone-900 selection:bg-stone-900 selection:text-stone-50 font-sans">
       {/* Top Global Navigation Bar */}
-      <header className={`sticky top-0 z-40 border-b transition-all duration-200 ${
-        isScrolled 
-          ? 'border-stone-300/80 bg-white/95 backdrop-blur-xl shadow-xs' 
+      <header className={`sticky top-0 z-40 border-b transition-all duration-200 ${isScrolled
+          ? 'border-stone-300/80 bg-white/95 backdrop-blur-xl shadow-xs'
           : 'border-stone-200/80 bg-white/90 backdrop-blur-lg shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)]'
-      }`}>
+        }`}>
         <div className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
           {/* MOBILE FULL-WIDTH SEARCH VIEW (WHEN SEARCH TOGGLED ON MOBILE) */}
           {isMobileSearchOpen ? (
@@ -419,7 +418,7 @@ export default function UserLayout() {
           ) : (
             /* STANDARD RESPONSIVE NAVIGATION BAR */
             <div className="flex items-center justify-between h-16 gap-2 sm:gap-3 lg:gap-5">
-              
+
               {/* Left: Brand Logo & Desktop Nav Links */}
               <div className="flex items-center gap-2 lg:gap-4 shrink-0 min-w-0">
                 <Link to="/" className="inline-flex items-center gap-2 group shrink-0">
@@ -447,10 +446,9 @@ export default function UserLayout() {
                         key={link.path}
                         to={link.path}
                         className={({ isActive }) =>
-                          `${isSecondary ? 'hidden xl:flex' : 'flex'} items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none ${
-                            isActive
-                              ? 'bg-stone-900 text-stone-50 shadow-xs font-semibold'
-                              : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/60'
+                          `${isSecondary ? 'hidden xl:flex' : 'flex'} items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none ${isActive
+                            ? 'bg-stone-900 text-stone-50 shadow-xs font-semibold'
+                            : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/60'
                           }`
                         }
                       >
@@ -482,7 +480,7 @@ export default function UserLayout() {
                     className="w-full pl-8 lg:pl-9 pr-10 py-1.5 lg:py-2 text-xs rounded-full border border-stone-200/90 bg-stone-100/60 placeholder:text-stone-400 text-stone-900 focus:outline-none focus:bg-white focus:border-stone-900 focus:ring-2 focus:ring-stone-900/5 hover:bg-stone-100/90 transition-all duration-200 shadow-2xs"
                   />
                   <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
-                  
+
                   {headerSearch ? (
                     <button
                       type="button"
@@ -801,9 +799,8 @@ export default function UserLayout() {
                     loadSearchEvents()
                     setTimeout(() => mobileSearchInputRef.current?.focus(), 60)
                   }}
-                  className={`rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-950 hover:bg-stone-50 active:scale-90 transition-all shadow-2xs cursor-pointer ${
-                    isScrolled ? 'p-1.5' : 'p-2'
-                  }`}
+                  className={`rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-950 hover:bg-stone-50 active:scale-90 transition-all shadow-2xs cursor-pointer ${isScrolled ? 'p-1.5' : 'p-2'
+                    }`}
                   aria-label="Open Search"
                 >
                   <Search size={isScrolled ? 15 : 17} />
@@ -818,24 +815,21 @@ export default function UserLayout() {
                 <button
                   type="button"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className={`rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-950 hover:bg-stone-50 active:scale-90 hover:scale-105 transition-all duration-300 shadow-2xs focus:outline-none focus:ring-2 focus:ring-stone-900/10 cursor-pointer ${
-                    isScrolled ? 'p-1.5' : 'p-2'
-                  }`}
+                  className={`rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-950 hover:bg-stone-50 active:scale-90 hover:scale-105 transition-all duration-300 shadow-2xs focus:outline-none focus:ring-2 focus:ring-stone-900/10 cursor-pointer ${isScrolled ? 'p-1.5' : 'p-2'
+                    }`}
                   aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
                   aria-expanded={isMobileMenuOpen}
                 >
                   <div className="relative w-[18px] h-[18px] flex items-center justify-center">
                     <Menu
                       size={isScrolled ? 16 : 18}
-                      className={`absolute inset-0 m-auto transition-all duration-300 ${
-                        isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
-                      }`}
+                      className={`absolute inset-0 m-auto transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                        }`}
                     />
                     <X
                       size={isScrolled ? 16 : 18}
-                      className={`absolute inset-0 m-auto transition-all duration-300 ${
-                        isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
-                      }`}
+                      className={`absolute inset-0 m-auto transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                        }`}
                     />
                   </div>
                 </button>
@@ -891,67 +885,65 @@ export default function UserLayout() {
         const isEventDetailPage = location.pathname.startsWith('/events/')
         return (
           <>
-            <main className={`flex-1 w-full max-w-[1600px] mx-auto ${
-              isDiscoverPage 
-                ? 'px-0 py-0 lg:px-8 lg:py-8' 
+            <main className={`flex-1 w-full max-w-[1600px] mx-auto ${isDiscoverPage
+                ? 'px-0 py-0 lg:px-8 lg:py-8'
                 : 'px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-6 pb-24 md:pb-8'
-            }`}>
+              }`}>
               <Outlet context={{ openBecomeOrganizer: handleOpenBecomeOrganizer }} />
             </main>
 
             {/* Reusable Detailed Footer (hidden on mobile discover to allow 100dvh full-screen feed, visible on desktop and other pages) */}
-            <Footer 
+            <Footer
               onOpenBecomeOrganizer={handleOpenBecomeOrganizer}
-              className={`mt-auto pb-28 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`} 
+              className={`mt-auto pb-28 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`}
             />
 
             {/* Instagram-Style Mobile Bottom Navigation Bar (hidden on event detail pages) */}
             {!isEventDetailPage && (
-              <nav 
+              <nav
                 aria-label="Mobile Bottom Navigation"
                 className="fixed bottom-0 inset-x-0 z-40 md:hidden h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
               >
-              <div className="grid grid-cols-5 items-center justify-around w-full max-w-md mx-auto">
-                {mobileBottomLinks.map((link) => {
-                  const Icon = link.icon
-                  const isActive = (link.path === '/' && location.pathname === '/') || 
-                                   (link.path !== '/' && location.pathname.startsWith(link.path))
-                  
-                  const handleClick = (e) => {
-                    if (link.isAuthGated && !isAuthenticated) {
-                      e.preventDefault()
-                      openAuthPrompt({
-                        actionType: link.authAction || 'general',
-                        redirectPath: link.path,
-                      })
-                    }
-                  }
+                <div className="grid grid-cols-5 items-center justify-around w-full max-w-md mx-auto">
+                  {mobileBottomLinks.map((link) => {
+                    const Icon = link.icon
+                    const isActive = (link.path === '/' && location.pathname === '/') ||
+                      (link.path !== '/' && location.pathname.startsWith(link.path))
 
-                  return (
-                    <Link
-                      key={link.name}
-                      to={link.path}
-                      onClick={handleClick}
-                      className={`flex flex-col items-center justify-center gap-1 py-1 px-1 rounded-xl transition-all duration-200 select-none active:scale-90 ${
-                        isActive
-                          ? 'text-stone-950 font-semibold'
-                          : 'text-stone-400 hover:text-stone-700'
-                      }`}
-                    >
-                      <div className="relative flex items-center justify-center">
-                        <Icon 
-                          size={20} 
-                          className={`transition-transform duration-200 ${isActive ? 'scale-110 stroke-[2.4]' : 'stroke-[1.8]'}`} 
-                        />
-                      </div>
-                      <span className={`text-[10px] tracking-tight leading-none ${isActive ? 'font-bold text-stone-950' : 'font-medium text-stone-400'}`}>
-                        {link.name}
-                      </span>
-                    </Link>
-                  )
-                })}
-              </div>
-            </nav>
+                    const handleClick = (e) => {
+                      if (link.isAuthGated && !isAuthenticated) {
+                        e.preventDefault()
+                        openAuthPrompt({
+                          actionType: link.authAction || 'general',
+                          redirectPath: link.path,
+                        })
+                      }
+                    }
+
+                    return (
+                      <Link
+                        key={link.name}
+                        to={link.path}
+                        onClick={handleClick}
+                        className={`flex flex-col items-center justify-center gap-1 py-1 px-1 rounded-xl transition-all duration-200 select-none active:scale-90 ${isActive
+                            ? 'text-stone-950 font-semibold'
+                            : 'text-stone-400 hover:text-stone-700'
+                          }`}
+                      >
+                        <div className="relative flex items-center justify-center">
+                          <Icon
+                            size={20}
+                            className={`transition-transform duration-200 ${isActive ? 'scale-110 stroke-[2.4]' : 'stroke-[1.8]'}`}
+                          />
+                        </div>
+                        <span className={`text-[10px] tracking-tight leading-none ${isActive ? 'font-bold text-stone-950' : 'font-medium text-stone-400'}`}>
+                          {link.name}
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </nav>
             )}
           </>
         )

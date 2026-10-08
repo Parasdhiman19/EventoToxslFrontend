@@ -1,14 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  X, 
-  Search, 
-  ShieldCheck, 
-  Building2, 
-  Sparkles, 
-  Bell, 
-  User as UserIcon, 
-  LogOut 
+import {
+  X,
+  Search,
+  ShieldCheck,
+  Building2,
+  Sparkles,
+  Bell,
+  User as UserIcon,
+  LogOut
 } from 'lucide-react'
 
 export default function MobileDrawer({
@@ -25,34 +25,31 @@ export default function MobileDrawer({
   onLogout,
 }) {
   return (
-    <div 
-      className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${
-        isOpen ? 'pointer-events-auto' : 'pointer-events-none'
-      }`}
+    <div
+      className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
       role="dialog"
       aria-modal="true"
       aria-label="Mobile Navigation"
     >
       {/* Soft Backdrop with smooth fade transition */}
-      <div 
+      <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${
-          isOpen ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'opacity-0'
+          }`}
       />
 
       {/* Sliding & Expanding Panel from top */}
-      <div 
-        className={`fixed inset-x-0 top-0 max-h-[92dvh] w-full bg-white text-stone-900 rounded-b-3xl shadow-2xl border-b border-stone-200 overflow-y-auto overscroll-contain transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-full opacity-0 scale-98'
-        }`}
+      <div
+        className={`fixed inset-x-0 top-0 max-h-[92dvh] w-full bg-white text-stone-900 rounded-b-3xl shadow-2xl border-b border-stone-200 overflow-y-auto overscroll-contain transform transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-full opacity-0 scale-98'
+          }`}
       >
         <div className="p-4 sm:p-5 flex flex-col justify-between space-y-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
           <div>
             {/* Header with Brand Logo & Close Button */}
             <div className="flex items-center justify-between pb-3.5 border-b border-stone-200">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 onClick={onClose}
                 className="inline-flex items-center gap-2 font-serif text-xl tracking-tight font-semibold active:scale-95 transition-transform"
               >
@@ -73,8 +70,8 @@ export default function MobileDrawer({
             </div>
 
             {/* Mobile Search Form */}
-            <form 
-              onSubmit={onSearchSubmit} 
+            <form
+              onSubmit={onSearchSubmit}
               className="mt-4 relative group"
             >
               <input

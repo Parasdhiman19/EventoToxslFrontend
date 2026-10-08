@@ -18,14 +18,14 @@ import API from '../../services/api'
 
 /* ─── Category colour map ─── */
 const CAT_COLORS = {
-  music:      'bg-violet-500/20 text-violet-200 border-violet-400/30',
-  concert:    'bg-violet-500/20 text-violet-200 border-violet-400/30',
-  tech:       'bg-blue-500/20   text-blue-200   border-blue-400/30',
+  music: 'bg-violet-500/20 text-violet-200 border-violet-400/30',
+  concert: 'bg-violet-500/20 text-violet-200 border-violet-400/30',
+  tech: 'bg-blue-500/20   text-blue-200   border-blue-400/30',
   conference: 'bg-blue-500/20   text-blue-200   border-blue-400/30',
-  food:       'bg-orange-500/20 text-orange-200 border-orange-400/30',
-  art:        'bg-pink-500/20   text-pink-200   border-pink-400/30',
-  sports:     'bg-emerald-500/20 text-emerald-200 border-emerald-400/30',
-  default:    'bg-white/15      text-white      border-white/20',
+  food: 'bg-orange-500/20 text-orange-200 border-orange-400/30',
+  art: 'bg-pink-500/20   text-pink-200   border-pink-400/30',
+  sports: 'bg-emerald-500/20 text-emerald-200 border-emerald-400/30',
+  default: 'bg-white/15      text-white      border-white/20',
 }
 
 function catColor(cat = '') {
@@ -40,9 +40,8 @@ function SavedCard({ ev, onRemove, isRemoving }) {
 
   return (
     <div
-      className={`group transition-all duration-300 ${
-        isRemoving ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
-      }`}
+      className={`group transition-all duration-300 ${isRemoving ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
+        }`}
     >
       <Link
         to={`/events/${ev.id}`}
@@ -158,10 +157,10 @@ function SkeletonCard() {
 
 /* ─── Sort/Filter chip row ─── */
 const SORT_OPTIONS = [
-  { label: 'Recent',  value: 'newest',    icon: Clock },
-  { label: 'Soonest', value: 'date_asc',  icon: Flame },
+  { label: 'Recent', value: 'newest', icon: Clock },
+  { label: 'Soonest', value: 'date_asc', icon: Flame },
   { label: 'Price ↑', value: 'price_asc', icon: TrendingUp },
-  { label: 'A → Z',   value: 'alpha',     icon: AlignLeft },
+  { label: 'A → Z', value: 'alpha', icon: AlignLeft },
 ]
 
 /* ═══════════════════════════════════════════════════════════
@@ -169,10 +168,10 @@ const SORT_OPTIONS = [
 ══════════════════════════════════════════════════════════ */
 export default function Saved() {
   const [bookmarkedEvents, setBookmarkedEvents] = useState([])
-  const [isLoading, setIsLoading]   = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [fetchError, setFetchError] = useState(null)
-  const [sortBy, setSortBy]         = useState('newest')
-  const [search, setSearch]         = useState('')
+  const [sortBy, setSortBy] = useState('newest')
+  const [search, setSearch] = useState('')
   const [removingIds, setRemovingIds] = useState(new Set())
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [isClearing, setIsClearing] = useState(false)
@@ -403,11 +402,10 @@ export default function Saved() {
                     onClick={() => setSortBy(opt.value)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
                                 text-[11px] sm:text-xs font-mono font-semibold transition-all cursor-pointer
-                                ${
-                                  active
-                                    ? 'bg-stone-900 text-white shadow-sm'
-                                    : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300 hover:bg-stone-50 shadow-xs'
-                                }`}
+                                ${active
+                        ? 'bg-stone-900 text-white shadow-sm'
+                        : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300 hover:bg-stone-50 shadow-xs'
+                      }`}
                   >
                     <Icon size={12} />
                     <span>{opt.label}</span>

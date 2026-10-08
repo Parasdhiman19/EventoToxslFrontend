@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { 
-  Ticket, 
-  AlertCircle, 
-  Armchair, 
-  Minus, 
-  Plus, 
-  Timer, 
-  CreditCard, 
-  Sparkles, 
+import {
+  Ticket,
+  AlertCircle,
+  Armchair,
+  Minus,
+  Plus,
+  Timer,
+  CreditCard,
+  Sparkles,
   Lock,
   X,
   ChevronDown,
@@ -52,8 +52,8 @@ export default function EventDetailCheckout({
   const [showBreakdown, setShowBreakdown] = useState(false)
 
   return (
-    <div 
-      id="checkout-terminal" 
+    <div
+      id="checkout-terminal"
       className="rounded-2xl border border-stone-200/90 bg-white shadow-md overflow-hidden scroll-mt-24 transition-all"
     >
       {/* Terminal Header */}
@@ -161,13 +161,12 @@ export default function EventDetailCheckout({
                           onSelectTier(tier.id)
                         }
                       }}
-                      className={`p-3 rounded-xl border transition-all ${
-                        tierSoldOut || isEventEnded
+                      className={`p-3 rounded-xl border transition-all ${tierSoldOut || isEventEnded
                           ? 'opacity-60 bg-stone-50 border-stone-200 cursor-not-allowed'
                           : isSelected
-                          ? 'border-stone-900 bg-stone-50/90 ring-1 ring-stone-900 shadow-xs cursor-pointer'
-                          : 'border-stone-200 bg-white hover:border-stone-400 cursor-pointer'
-                      }`}
+                            ? 'border-stone-900 bg-stone-50/90 ring-1 ring-stone-900 shadow-xs cursor-pointer'
+                            : 'border-stone-200 bg-white hover:border-stone-400 cursor-pointer'
+                        }`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="space-y-0.5 min-w-0 flex-1">
@@ -190,9 +189,8 @@ export default function EventDetailCheckout({
                           <span className="font-mono font-bold text-stone-900 text-sm block">
                             {parseFloat(tier.price) > 0 ? `$${parseFloat(tier.price).toFixed(2)}` : 'Free'}
                           </span>
-                          <span className={`text-[10px] font-mono uppercase tracking-wider block mt-0.5 ${
-                            tierSoldOut ? 'text-red-600 font-bold' : spots <= 5 ? 'text-amber-600 font-medium' : 'text-stone-400'
-                          }`}>
+                          <span className={`text-[10px] font-mono uppercase tracking-wider block mt-0.5 ${tierSoldOut ? 'text-red-600 font-bold' : spots <= 5 ? 'text-amber-600 font-medium' : 'text-stone-400'
+                            }`}>
                             {tierSoldOut ? 'Sold Out' : `${spots} Left`}
                           </span>
                         </div>
@@ -200,8 +198,8 @@ export default function EventDetailCheckout({
 
                       {/* Integrated Quantity Stepper inside Active Tier Card */}
                       {isSelected && !isEventEnded && !isSoldOut && (
-                        <div 
-                          onClick={(e) => e.stopPropagation()} 
+                        <div
+                          onClick={(e) => e.stopPropagation()}
                           className="mt-3 pt-2.5 border-t border-stone-200 flex items-center justify-between animate-in fade-in"
                         >
                           <span className="text-[11px] font-mono text-stone-600">
@@ -304,11 +302,10 @@ export default function EventDetailCheckout({
               <button
                 type="button"
                 onClick={() => onSelectPaymentMethod('instant')}
-                className={`p-2 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                  paymentMethod === 'instant'
+                className={`p-2 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 transition cursor-pointer ${paymentMethod === 'instant'
                     ? 'border-stone-900 bg-stone-900 text-white shadow-xs font-semibold'
                     : 'border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100'
-                }`}
+                  }`}
               >
                 <Sparkles size={12} />
                 <span>Instant Pass</span>
@@ -316,11 +313,10 @@ export default function EventDetailCheckout({
               <button
                 type="button"
                 onClick={() => onSelectPaymentMethod('paypal')}
-                className={`p-2 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                  paymentMethod === 'paypal'
+                className={`p-2 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 transition cursor-pointer ${paymentMethod === 'paypal'
                     ? 'border-stone-900 bg-stone-900 text-white shadow-xs font-semibold'
                     : 'border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100'
-                }`}
+                  }`}
               >
                 <CreditCard size={12} />
                 <span>PayPal</span>
@@ -345,9 +341,9 @@ export default function EventDetailCheckout({
                         label: 'pay'
                       }}
                       disabled={
-                        isSubmitting || 
-                        (hasAssignedSeating ? selectedSeats.length === 0 : isSoldOut) || 
-                        isEventEnded || 
+                        isSubmitting ||
+                        (hasAssignedSeating ? selectedSeats.length === 0 : isSoldOut) ||
+                        isEventEnded ||
                         !isAuthenticated
                       }
                       createOrder={onPayPalCreateOrder}
@@ -403,8 +399,8 @@ export default function EventDetailCheckout({
               <>
                 <Lock size={13} />
                 <span>
-                  {isAuthenticated 
-                    ? `Confirm ${activeQuantity} ${activeQuantity === 1 ? 'Pass' : 'Passes'} • $${grandTotal.toFixed(2)}` 
+                  {isAuthenticated
+                    ? `Confirm ${activeQuantity} ${activeQuantity === 1 ? 'Pass' : 'Passes'} • $${grandTotal.toFixed(2)}`
                     : 'Sign In to Buy Tickets'}
                 </span>
               </>

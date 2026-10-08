@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { 
-  Heart, 
-  MessageCircle, 
-  Bookmark, 
-  Ticket, 
-  Sparkles, 
-  ShieldCheck, 
-  ArrowRight, 
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Ticket,
+  Sparkles,
+  ShieldCheck,
+  ArrowRight,
   X,
   CheckCircle2
 } from 'lucide-react'
@@ -123,7 +123,7 @@ export default function AuthPromptModal({
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-stone-950/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
@@ -134,7 +134,7 @@ export default function AuthPromptModal({
 
       {/* Modal Card */}
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-stone-200/90 overflow-hidden z-10 animate-in zoom-in-95 duration-200 text-stone-900">
-        
+
         {/* Subtle decorative top gradient */}
         <div className={`h-24 w-full bg-gradient-to-b ${config.accentColor} absolute top-0 inset-x-0 pointer-events-none`} />
 
@@ -149,7 +149,7 @@ export default function AuthPromptModal({
         </button>
 
         <div className="p-6 sm:p-7 space-y-5 relative">
-          
+
           {/* Top Badge & Icon */}
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-2xl ${config.iconBg} border flex items-center justify-center shrink-0 shadow-xs`}>

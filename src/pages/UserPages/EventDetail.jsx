@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { 
-  AlertCircle, 
+import {
+  AlertCircle,
   ArrowLeft,
   Armchair
 } from 'lucide-react'
@@ -143,9 +143,9 @@ export default function EventDetail() {
   }, [user, attendeeName, attendeeEmail])
 
   const hasAssignedSeating = Boolean(
-    (event?.has_assigned_seating || event?.hasAssignedSeating) && 
-    seatingData && 
-    seatingData.seats && 
+    (event?.has_assigned_seating || event?.hasAssignedSeating) &&
+    seatingData &&
+    seatingData.seats &&
     seatingData.seats.length > 0
   )
 
@@ -210,8 +210,8 @@ export default function EventDetail() {
         activeQuantity: qty,
       }
     } else {
-      const raw = typeof selectedTier?.price === 'string' 
-        ? parseFloat(selectedTier.price.replace('$', '')) 
+      const raw = typeof selectedTier?.price === 'string'
+        ? parseFloat(selectedTier.price.replace('$', ''))
         : (selectedTier?.price || 0)
       const unit = isNaN(raw) ? 0 : raw
       const sum = unit * quantity
@@ -253,7 +253,7 @@ export default function EventDetail() {
     if (data.tier_id) return Array.isArray(data.tier_id) ? data.tier_id[0] : data.tier_id
     if (data.quantity) return Array.isArray(data.quantity) ? data.quantity[0] : data.quantity
     if (data.eventId) return Array.isArray(data.eventId) ? data.eventId[0] : data.eventId
-    
+
     // First value in error object
     const values = Object.values(data)
     if (values.length > 0) {
@@ -391,7 +391,7 @@ export default function EventDetail() {
       if (hasAssignedSeating && seatingData) {
         setSeatingData((prev) => ({
           ...prev,
-          seats: prev.seats.map((s) => 
+          seats: prev.seats.map((s) =>
             selectedSeatIds.includes(s.id) ? { ...s, status: 'booked' } : s
           )
         }))
@@ -484,7 +484,7 @@ export default function EventDetail() {
       if (hasAssignedSeating && seatingData) {
         setSeatingData((prev) => ({
           ...prev,
-          seats: prev.seats.map((s) => 
+          seats: prev.seats.map((s) =>
             selectedSeatIds.includes(s.id) ? { ...s, status: 'booked' } : s
           )
         }))
@@ -640,8 +640,8 @@ export default function EventDetail() {
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-stone-200/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3">
         <div>
           <div className="text-[10px] font-mono text-stone-500 uppercase tracking-wider">
-            {hasAssignedSeating 
-              ? (selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Assigned Seating') 
+            {hasAssignedSeating
+              ? (selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Assigned Seating')
               : selectedTier?.name || 'Ticket Passes'}
           </div>
           <div className="font-mono font-bold text-stone-900 text-base">
@@ -670,13 +670,13 @@ export default function EventDetail() {
           className="px-5 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-mono text-xs font-bold uppercase tracking-wider hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95 shadow-md flex items-center gap-2 cursor-pointer"
         >
           <span>
-            {isEventEnded 
-              ? 'Stage Ended' 
-              : isSoldOut 
-              ? 'Sold Out' 
-              : hasAssignedSeating && selectedSeats.length === 0 
-              ? 'Select Seats' 
-              : 'Buy Tickets'}
+            {isEventEnded
+              ? 'Stage Ended'
+              : isSoldOut
+                ? 'Sold Out'
+                : hasAssignedSeating && selectedSeats.length === 0
+                  ? 'Select Seats'
+                  : 'Buy Tickets'}
           </span>
         </button>
       </div>
