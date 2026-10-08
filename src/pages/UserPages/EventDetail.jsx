@@ -43,7 +43,7 @@ export default function EventDetail() {
 
   // PayPal Sandbox & Hold State
   const [paypalConfig, setPaypalConfig] = useState(null)
-  const [paymentMethod, setPaymentMethod] = useState('paypal') // 'paypal' | 'instant'
+  const [paymentMethod, setPaymentMethod] = useState('instant') // 'instant' | 'paypal'
   const [reservationHold, setReservationHold] = useState(null) // { orderId, paypalOrderId, expiresAt }
   const [holdSecondsLeft, setHoldSecondsLeft] = useState(null)
 
@@ -178,6 +178,19 @@ export default function EventDetail() {
 
   const isSoldOut = remainingSpots === 0
   const isEventEnded = event?.isEnded || event?.is_ended || event?.status === 'past'
+
+  // Lowest available price for mobile bar preview
+  const lowestPrice = useMemo(() => {
+    if (event?.tiers && event.tiers.length > 0) {
+      const prices = event.tiers.map((t) => {
+        const raw = typeof t.price === 'string' ? parseFloat(t.price.replace('$', '')) : Number(t.price)
+        return isNaN(raw) ? 0 : raw
+      })
+      return Math.min(...prices)
+    }
+    const base = parseFloat(event?.price)
+    return isNaN(base) ? 0 : base
+  }, [event])
 
   // Pricing calculations
   const { subtotal, platformFee, grandTotal, activeQuantity } = useMemo(() => {
@@ -543,7 +556,7 @@ export default function EventDetail() {
 
       {/* Main Layout: If Assigned Seating -> Seating Picker spans Top */}
       {hasAssignedSeating && (
-        <div className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 shadow-2xs space-y-4">
+        <div id="seating-picker-section" className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 shadow-2xs space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-stone-100 pb-3">
             <div>
               <h2 className="font-serif text-xl font-medium text-stone-900 flex items-center gap-2">
@@ -571,15 +584,15 @@ export default function EventDetail() {
         </div>
       )}
 
-      {/* Two Column Layout: Details on Left, Booking Ticket Terminal on Right */}
+      {/* Two Column Layout: Details on Left on Desktop, Ticket Terminal First on Mobile */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Event Context, Venue, Organizer */}
-        <div className="lg:col-span-7">
+        {/* Event Context, Venue, Organizer */}
+        <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
           <EventDetailAbout event={event} />
         </div>
 
-        {/* Right Column: Ticket Buying Terminal */}
-        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
+        {/* Ticket Buying Terminal (Visible on BOTH mobile and desktop) */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-20 order-1 lg:order-2">
           <EventDetailCheckout
             event={event}
             hasAssignedSeating={hasAssignedSeating}
@@ -618,29 +631,53 @@ export default function EventDetail() {
               title: 'Sign In to Book Passes',
               subtitle: `Sign in or create an account to reserve tickets for "${event?.title || 'this event'}".`,
             })}
+            onRemoveSeat={handleSeatToggle}
           />
         </div>
       </div>
 
-      {/* Sticky Mobile Booking Bar (visible only on mobile/tablet < lg) */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 lg:hidden bg-white/95 backdrop-blur-md border-t border-stone-200/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
+      {/* Sticky Mobile Quick-Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-stone-200/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3">
         <div>
           <div className="text-[10px] font-mono text-stone-500 uppercase tracking-wider">
-            {hasAssignedSeating ? (selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Assigned Seating') : 'Total Cost'}
+            {hasAssignedSeating 
+              ? (selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Assigned Seating') 
+              : selectedTier?.name || 'Ticket Passes'}
           </div>
           <div className="font-mono font-bold text-stone-900 text-base">
-            ${grandTotal.toFixed(2)}
+            {hasAssignedSeating
+              ? (selectedSeats.length > 0 ? `$${grandTotal.toFixed(2)}` : (lowestPrice > 0 ? `From $${lowestPrice.toFixed(2)}` : 'Select Seats'))
+              : (grandTotal > 0 ? `$${grandTotal.toFixed(2)}` : (lowestPrice > 0 ? `From $${lowestPrice.toFixed(2)}` : 'Free Entry'))
+            }
           </div>
         </div>
         <button
           type="button"
           onClick={() => {
+            if (hasAssignedSeating && selectedSeats.length === 0) {
+              const el = document.getElementById('seating-picker-section')
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                return
+              }
+            }
             const el = document.getElementById('checkout-terminal')
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
           }}
-          className="px-5 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-mono text-xs font-bold uppercase tracking-wider hover:bg-stone-800 transition active:scale-95 shadow-md flex items-center gap-2 cursor-pointer"
+          disabled={isEventEnded || isSoldOut}
+          className="px-5 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-mono text-xs font-bold uppercase tracking-wider hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95 shadow-md flex items-center gap-2 cursor-pointer"
         >
-          <span>{isEventEnded ? 'Stage Ended' : isSoldOut ? 'Sold Out' : hasAssignedSeating && selectedSeats.length === 0 ? 'Select Seats' : 'Book Passes'}</span>
+          <span>
+            {isEventEnded 
+              ? 'Stage Ended' 
+              : isSoldOut 
+              ? 'Sold Out' 
+              : hasAssignedSeating && selectedSeats.length === 0 
+              ? 'Select Seats' 
+              : 'Buy Tickets'}
+          </span>
         </button>
       </div>
 

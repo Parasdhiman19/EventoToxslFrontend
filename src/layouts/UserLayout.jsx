@@ -759,6 +759,7 @@ export default function UserLayout() {
       {/* Main Content Area */}
       {(() => {
         const isDiscoverPage = location.pathname.includes('/discover')
+        const isEventDetailPage = location.pathname.startsWith('/events/')
         return (
           <>
             <main className={`flex-1 w-full max-w-[1600px] mx-auto ${
@@ -775,11 +776,12 @@ export default function UserLayout() {
               className={`mt-auto pb-28 md:pb-0 ${isDiscoverPage ? 'hidden lg:block' : ''}`} 
             />
 
-            {/* Instagram-Style Mobile Bottom Navigation Bar */}
-            <nav 
-              aria-label="Mobile Bottom Navigation"
-              className="fixed bottom-0 inset-x-0 z-40 md:hidden h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
-            >
+            {/* Instagram-Style Mobile Bottom Navigation Bar (hidden on event detail pages) */}
+            {!isEventDetailPage && (
+              <nav 
+                aria-label="Mobile Bottom Navigation"
+                className="fixed bottom-0 inset-x-0 z-40 md:hidden h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-white/95 backdrop-blur-xl border-t border-stone-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-2 flex items-center justify-center"
+              >
               <div className="grid grid-cols-5 items-center justify-around w-full max-w-md mx-auto">
                 {mobileBottomLinks.map((link) => {
                   const Icon = link.icon
@@ -821,6 +823,7 @@ export default function UserLayout() {
                 })}
               </div>
             </nav>
+            )}
           </>
         )
       })()}
