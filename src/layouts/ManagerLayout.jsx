@@ -185,7 +185,7 @@ export default function ManagerLayout() {
           <span className="h-6 w-6 rounded-lg bg-stone-100 text-stone-950 flex items-center justify-center font-sans text-xs font-bold shadow-xs shrink-0">
             E
           </span>
-          <span className="truncate">Evento <span className="text-stone-400 font-sans text-[10px] uppercase tracking-wider ml-0.5 hidden xs:inline">Manager</span></span>
+          <span className="truncate">Evento <span className="text-stone-400 font-sans text-[10px] uppercase tracking-wider ml-0.5 hidden sm:inline">Manager</span></span>
         </Link>
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Mobile Notification Bell */}
