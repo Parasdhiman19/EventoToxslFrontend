@@ -52,32 +52,63 @@ const INITIAL_SECTION_STATE = {
   isLoadingMore: false,
 }
 
+// In-memory module cache that persists across client-side page transitions
+let homeDataCache = null
+let homeCacheTimestamp = 0
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes freshness window
+
 export default function Home() {
   const navigate = useNavigate()
   const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
   const { openBecomeOrganizer } = useOutletContext() || {}
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [featuredHero, setFeaturedHero] = useState(null)
-  const [customBanners, setCustomBanners] = useState([])
-  const [customRecommendations, setCustomRecommendations] = useState([])
+  const [featuredHero, setFeaturedHero] = useState(() => homeDataCache?.featuredHero || null)
+  const [customBanners, setCustomBanners] = useState(() => homeDataCache?.customBanners || [])
+  const [customRecommendations, setCustomRecommendations] = useState(() => homeDataCache?.customRecommendations || [])
   const [error, setError] = useState(null)
 
-  const [sectionsData, setSectionsData] = useState({
-    trending: { ...INITIAL_SECTION_STATE },
-    music: { ...INITIAL_SECTION_STATE },
-    tech: { ...INITIAL_SECTION_STATE },
-    nightlife: { ...INITIAL_SECTION_STATE },
-    workshops: { ...INITIAL_SECTION_STATE },
+  const [sectionsData, setSectionsData] = useState(() => {
+    if (homeDataCache?.sectionsData) {
+      return homeDataCache.sectionsData
+    }
+    return {
+      trending: { ...INITIAL_SECTION_STATE },
+      music: { ...INITIAL_SECTION_STATE },
+      tech: { ...INITIAL_SECTION_STATE },
+      nightlife: { ...INITIAL_SECTION_STATE },
+      workshops: { ...INITIAL_SECTION_STATE },
+    }
   })
 
   const [reloadTrigger, setReloadTrigger] = useState(0)
-  const triggerReload = () => setReloadTrigger((prev) => prev + 1)
+  const triggerReload = () => {
+    homeDataCache = null
+    homeCacheTimestamp = 0
+    setReloadTrigger((prev) => prev + 1)
+  }
 
   useEffect(() => {
     let isMounted = true
 
+    // If cache is still fresh and user didn't hit manual reload, do not make any network requests!
+    const isCacheFresh = homeDataCache && (Date.now() - homeCacheTimestamp < CACHE_TTL_MS)
+    if (isCacheFresh && reloadTrigger === 0) {
+      return
+    }
+
     const loadData = async () => {
+      // If no cache exists, show loading state
+      if (!homeDataCache) {
+        setSectionsData((prev) => {
+          const next = { ...prev }
+          Object.keys(next).forEach((k) => {
+            next[k] = { ...next[k], isLoading: true }
+          })
+          return next
+        })
+      }
+
       try {
         const heroPromise = API.get('events/featured/').catch(() => ({ data: null }))
         const contentPromise = API.get('admin/content/homepage/').catch(() => ({ data: { banners: [], recommendations: [] } }))
@@ -107,15 +138,13 @@ export default function Home() {
 
         if (!isMounted) return
 
-        if (heroRes?.data) {
-          setFeaturedHero(heroRes.data)
-        }
-        if (contentRes?.data?.banners) {
-          setCustomBanners(contentRes.data.banners)
-        }
-        if (contentRes?.data?.recommendations) {
-          setCustomRecommendations(contentRes.data.recommendations)
-        }
+        const newHero = heroRes?.data || null
+        const newBanners = contentRes?.data?.banners || []
+        const newRecs = contentRes?.data?.recommendations || []
+
+        if (newHero) setFeaturedHero(newHero)
+        if (newBanners.length > 0) setCustomBanners(newBanners)
+        if (newRecs.length > 0) setCustomRecommendations(newRecs)
 
         setSectionsData((prev) => {
           const next = { ...prev }
@@ -130,6 +159,16 @@ export default function Home() {
               }
             }
           })
+
+          // Save fresh snapshot to in-memory cache
+          homeDataCache = {
+            featuredHero: newHero || homeDataCache?.featuredHero || null,
+            customBanners: newBanners.length > 0 ? newBanners : (homeDataCache?.customBanners || []),
+            customRecommendations: newRecs.length > 0 ? newRecs : (homeDataCache?.customRecommendations || []),
+            sectionsData: next,
+          }
+          homeCacheTimestamp = Date.now()
+
           return next
         })
       } catch (err) {
@@ -166,7 +205,7 @@ export default function Home() {
       setSectionsData((prev) => {
         const existingIds = new Set(prev[key].events.map((e) => e.id))
         const uniqueNew = newItems.filter((e) => !existingIds.has(e.id))
-        return {
+        const next = {
           ...prev,
           [key]: {
             ...prev[key],
@@ -176,6 +215,10 @@ export default function Home() {
             isLoadingMore: false,
           },
         }
+        if (homeDataCache) {
+          homeDataCache.sectionsData = next
+        }
+        return next
       })
     } catch {
       setSectionsData((prev) => ({
@@ -197,6 +240,9 @@ export default function Home() {
           ),
         }
       })
+      if (homeDataCache) {
+        homeDataCache.sectionsData = next
+      }
       return next
     })
   }
