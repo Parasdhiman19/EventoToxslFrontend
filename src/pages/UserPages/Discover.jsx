@@ -23,6 +23,14 @@ import FeedSkeleton from '../../components/feed/FeedSkeleton'
 import CommentDrawer from '../../components/feed/CommentDrawer'
 import { useAuthPrompt } from '../../context/AuthPromptContext'
 
+// Module-level query-keyed cache that persists across client-side route transitions
+const discoverCache = new Map()
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes freshness window
+
+const getFilterKey = (category, city, search, sort) => {
+  return `${category || 'All'}_${city || 'All Cities'}_${(search || '').trim().toLowerCase()}_${sort || 'upcoming'}`
+}
+
 export default function Discover() {
   const { isAuthenticated, isOrganizer } = useSelector((state) => state.auth || {})
   const { openBecomeOrganizer } = useOutletContext() || {}
@@ -38,18 +46,25 @@ export default function Discover() {
   const [selectedCity, setSelectedCity] = useState(initialCity)
   const [sortBy, setSortBy] = useState(initialSort)
   const [bookmarkedIds, setBookmarkedIds] = useState([])
-  const [activeEvent, setActiveEvent] = useState(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
   const [mobileCommentEvent, setMobileCommentEvent] = useState(null)
 
-  // Paginated Feed State
-  const [events, setEvents] = useState([])
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true)
+  // Track if initial mount has occurred to avoid re-fetching cached initial view
+  const isFirstMountRef = useRef(true)
+
+  // Initial State Hydration from Cache
+  const initialKey = getFilterKey(initialCategory, initialCity, initialQuery, initialSort)
+  const cachedInitial = discoverCache.get(initialKey)
+  const isInitialCachedFresh = cachedInitial && (Date.now() - cachedInitial.timestamp < CACHE_TTL_MS)
+
+  const [events, setEvents] = useState(() => isInitialCachedFresh ? cachedInitial.events : [])
+  const [page, setPage] = useState(() => isInitialCachedFresh ? (cachedInitial.page || 1) : 1)
+  const [hasMore, setHasMore] = useState(() => isInitialCachedFresh ? cachedInitial.hasMore : true)
+  const [isLoadingInitial, setIsLoadingInitial] = useState(() => !isInitialCachedFresh)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [fetchError, setFetchError] = useState(null)
-  const [totalCount, setTotalCount] = useState(0)
+  const [totalCount, setTotalCount] = useState(() => isInitialCachedFresh ? cachedInitial.totalCount : 0)
+  const [activeEvent, setActiveEvent] = useState(() => isInitialCachedFresh ? cachedInitial.activeEvent : null)
 
   const sentinelRef = useRef(null)
   const isFetchingRef = useRef(false)
@@ -90,7 +105,23 @@ export default function Discover() {
 
   // Fetch paginated events from backend
   const fetchEvents = useCallback(
-    async (pageNum, isReset = false) => {
+    async (pageNum, isReset = false, bypassCache = false) => {
+      const filterKey = getFilterKey(selectedCategory, selectedCity, searchQuery, sortBy)
+
+      // If resetting and cache already exists and fresh (e.g. returning to this view), use cache
+      if (isReset && !bypassCache) {
+        const cached = discoverCache.get(filterKey)
+        if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+          setEvents(cached.events)
+          setPage(cached.page || 1)
+          setHasMore(cached.hasMore)
+          setTotalCount(cached.totalCount)
+          if (cached.activeEvent) setActiveEvent(cached.activeEvent)
+          setIsLoadingInitial(false)
+          return
+        }
+      }
+
       if (isFetchingRef.current) return
       isFetchingRef.current = true
 
@@ -137,14 +168,38 @@ export default function Discover() {
         if (isReset) {
           setEvents(fetchedList)
           setPage(1)
-          if (fetchedList.length > 0) {
-            setActiveEvent(fetchedList[0])
+          const firstEvent = fetchedList.length > 0 ? fetchedList[0] : null
+          if (firstEvent) {
+            setActiveEvent(firstEvent)
           }
+
+          // Cache fresh result for this specific filter/sort key
+          discoverCache.set(filterKey, {
+            events: fetchedList,
+            page: 1,
+            hasMore: moreAvailable,
+            totalCount: total,
+            activeEvent: firstEvent,
+            timestamp: Date.now(),
+          })
         } else {
           setEvents((prev) => {
             const existingIds = new Set(prev.map((e) => e.id))
             const newUnique = fetchedList.filter((e) => !existingIds.has(e.id))
-            return [...prev, ...newUnique]
+            const updated = [...prev, ...newUnique]
+
+            const existingEntry = discoverCache.get(filterKey)
+            if (existingEntry) {
+              discoverCache.set(filterKey, {
+                ...existingEntry,
+                events: updated,
+                page: pageNum,
+                hasMore: moreAvailable,
+                timestamp: Date.now(),
+              })
+            }
+
+            return updated
           })
           setPage(pageNum)
         }
@@ -170,10 +225,21 @@ export default function Discover() {
     [selectedCategory, selectedCity, searchQuery, sortBy]
   )
 
-  // Reset and fetch whenever filters change
+  // Reset and fetch whenever filters or sort change
   useEffect(() => {
-    fetchEvents(1, true)
-  }, [fetchEvents])
+    // If first mount and we already hydrated with fresh cached data from navbar, don't re-fetch
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false
+      const filterKey = getFilterKey(selectedCategory, selectedCity, searchQuery, sortBy)
+      const cached = discoverCache.get(filterKey)
+      if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+        return // Rendered instantly from cache!
+      }
+    }
+
+    // Filter, search or sort was changed by the user: fetch fresh from server
+    fetchEvents(1, true, true)
+  }, [selectedCategory, selectedCity, searchQuery, sortBy, fetchEvents])
 
   // Setup IntersectionObserver for Infinite Scrolling (Bottom Sentinel)
   useEffect(() => {
